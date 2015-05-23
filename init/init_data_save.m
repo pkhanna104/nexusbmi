@@ -8,6 +8,8 @@ function handles = init_data_save(handles)
     %Save task info: 
     x.state = cell(x.tot_task_iters,1);
     x.cursor = zeros(x.tot_task_iters,1);
+    x.target = zeros(x.tot_task_iters,1);
+    
     x.reward_times = {[]};
     x.cursor_size = handles.window.cursor_radius;
     x.target_size = handles.window.target_radius;

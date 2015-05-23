@@ -26,7 +26,7 @@ classdef target_task < handle
             obj.state_name_array = {'wait','target','hold','reward'};
             obj.FSM = {
                        {'wait','target', @obj.start_target}; 
-                       {'target','reward', @obj.enter_target};
+                       {'target','hold', @obj.enter_target};
                        {'hold','target', @obj.leave_early};
                        {'hold','reward', @obj.end_hold};
                        {'reward','wait', @obj.ITI_end};
@@ -36,7 +36,7 @@ classdef target_task < handle
             obj.hold_time_std =time(2);
             obj.state = 'wait';
             obj.state_ind = 1;
-            obj.loop_time = .1;%loop time
+            obj.loop_time = .4; %loop time
             obj.ts = 0;
             obj.ITI  = .1;
             obj.rew_flag = 0;
