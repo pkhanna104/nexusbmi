@@ -1,9 +1,5 @@
 function [handles] = init_task(handles,load_dec)
 
-%Generically good things: 
-% addpath('/Users/preeyakhanna/kinbmi/minibmi')
-% addpath('/Users/preeyakhanna/kinbmi/classes')
-
 %Hack to see if javapath has been added already. If it has, then don't add
 %it again. We do this becuase 'javaaddpath' seems to clear local variables,
 %and so if to keep track of whether the nexus has already been connected
@@ -11,7 +7,7 @@ function [handles] = init_task(handles,load_dec)
 
 global add_java
 if isempty(add_java)
-    addpath(genpath('C:\Nexus\Preeya\UCSF_minibmi'));
+    addpath(genpath(handles.root_path));
     javaaddpath('C:\Nexus\jssc.jar')
     javaaddpath('C:\Nexus\nexus.jar')
     global add_java;
@@ -44,11 +40,11 @@ handles.reward_sounds = struct;
 handles.reward_sounds.file = {};
 handles.reward_sounds.params = {};
 
-snds = dir([handles.root_path 'sounds/']);
+snds = dir(handles.med_path);
 for d = 1:length(snds)
     if length(snds(d).name) > 3
         if strcmp(snds(d).name(end-2:end), 'wav')
-            [y, Fs, nbits] = wavread([handles.root_path 'sounds/' snds(d).name]);
+            [y, Fs, nbits] = wavread([handles.med_path snds(d).name]);
             handles.reward_sounds.file{end+1} = y;
             handles.reward_sounds.params{end+1} = [Fs, nbits];
         end
@@ -56,7 +52,7 @@ for d = 1:length(snds)
 end
 
 %Load Mario:
-handles.mario.up = imread('sounds/mario-bros-computer-game.jpg'); 
+handles.mario.up = imread([handles.med_path 'mario-bros-computer-game.jpg']); 
 
 %Create Task Display
 handles = init_task_display(handles);

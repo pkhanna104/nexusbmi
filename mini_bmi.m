@@ -59,15 +59,40 @@ handles.output = hObject;
 handles = load_default(handles);
 
 %Set system:
-%2 for pk-mbp, 1 for UCSF
-handles.ucsf = 1;
+%Assume config file is in current directory (same as one mini_bmi is run
+%from). 
+
+if exist('config.txt','file')==2
+    [label paths] = textread('config.txt', '%s %s',5);
+    
+    %Confirm labels are correct
+    corr_labels = {'config','root','dec','dat','med'};
+    for l = 1:length(label)
+        if ~strcmp(corr_labels{l}, label{l})
+            errordlg('Re Run Config File Maker -- error in labels')
+        end
+    end
+    
+    handles.root_path = paths{2};
+    handles.dec_path = paths{3};
+    handles.dat_path = paths{4};
+    handles.med_path = paths{5};
+        
+else
+    h = errordlg('Run Config File maker in /nexusbmi/config/make_config_file.m!');
+end
+%2 for pk-mbp, 1 for UCSF, 3 for Toshiba
+handles.ucsf = 3;
 
 if handles.ucsf == 1
     handles.root_path = 'C:\Nexus\Preeya\UCSF_minibmi4\';
     handles.dec_path = 'C:\Nexus\Preeya\UCSF_minibmi4\decoder\';
-elseif handles.ucsf ==2;
+elseif handles.ucsf ==2
     handles.root_path = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi4/';
     handles.dec_path = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi4/decoder/';
+elseif handles.ucsf == 3
+    handles.root_path = 'C:\Users\George\Preeya\nexusbmi\';
+    handles.dec_path = 'C:\Users\George\Preeya\nexusbmi\decoder\';
 end
 
 addpath(genpath(handles.root_path));
@@ -101,6 +126,10 @@ global nex_init nex_inst;
 load_dec = 1;
 handles = init_task(handles, load_dec);
 keep_running = 1; 
+
+%Set stop button to 'off'
+setappdata(handles.figure1, 'stop',0);
+
 
 intro_display(handles);
 
@@ -174,8 +203,10 @@ function nexusSource_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of nexusSource
-handles.neural_source_name.nexus = get(hObject,'Value');
-set(handles.simNexusSource,'Value',~get(hObject,'Value'))
+nx = get(hObject,'Value');
+handles.neural_source_name.nexus = nx;
+set(handles.simNexusSource,'Value',~nx);
+handles.neural_source_name.sim_nexus = ~nx;
 guidata(hObject, handles);
 
 
@@ -186,8 +217,13 @@ function simNexusSource_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of simNexusSource
-handles.neural_source_name.sim_nexus = get(hObject,'Value'); 
-set(handles.nexusSource,'Value',~get(hObject,'Value'))
+sim_nx = get(hObject,'Value');
+handles.neural_source_name.sim_nexus = sim_nx; 
+set(handles.nexusSource,'Value',~sim_nx);
+handles.neural_source_name.nexus = ~sim_nx;
+if sim_nx
+    set(handles.serial_port_box,'String','')
+end
 guidata(hObject, handles);
 
 
