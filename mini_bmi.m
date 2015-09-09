@@ -55,9 +55,6 @@ function mini_bmi_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for mini_bmi
 handles.output = hObject;
 
-%Load Default Values
-handles = load_default(handles);
-
 %Set system:
 %Assume config file is in current directory (same as one mini_bmi is run
 %from). 
@@ -81,21 +78,12 @@ if exist('config.txt','file')==2
 else
     h = errordlg('Run Config File maker in /nexusbmi/config/make_config_file.m!');
 end
-%2 for pk-mbp, 1 for UCSF, 3 for Toshiba
-handles.ucsf = 3;
-
-if handles.ucsf == 1
-    handles.root_path = 'C:\Nexus\Preeya\UCSF_minibmi4\';
-    handles.dec_path = 'C:\Nexus\Preeya\UCSF_minibmi4\decoder\';
-elseif handles.ucsf ==2
-    handles.root_path = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi4/';
-    handles.dec_path = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi4/decoder/';
-elseif handles.ucsf == 3
-    handles.root_path = 'C:\Users\George\Preeya\nexusbmi\';
-    handles.dec_path = 'C:\Users\George\Preeya\nexusbmi\decoder\';
-end
 
 addpath(genpath(handles.root_path));
+
+
+%Load Default Values
+handles = load_default(handles);
 
 handles.tic = tic;
 
