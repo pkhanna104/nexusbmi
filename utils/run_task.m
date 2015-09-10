@@ -7,7 +7,7 @@ function handles = run_task(handles)
     disp('Data shape: ')
     size(data)
     feat = handles.feature_extractor.extract_features(data);
-
+    
     %Calculate Stuff
     handles = calc_cursor(feat, handles); 
     

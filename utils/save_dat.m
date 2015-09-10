@@ -3,7 +3,7 @@ function handles = save_dat(handles, data, seq, feat)
     ix = handles.iter_cnt;
     handles.save_data.state{ix} = handles.task.state;
     handles.save_data.cursor(ix) = handles.window.cursor_pos(2);
-    handles.save_data.target(ix) = handles.task.targ_y_pos;
+    handles.save_data.target(ix) = handles.task.target_y_pos;
     handles.save_data.hold_times{ix} = handles.task.hold;
 
     handles.save_data.decoded_pos(ix) = handles.decoding.decoded_position;

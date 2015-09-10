@@ -33,7 +33,13 @@ neural_sources.names = {'sim_nexus', 'nexus'};
 neural_sources.obj = {@sim_nexus_interface, @nexus_interface};
 
 %Init task
-handles.task = target_task([.4, .1]);
+task_sources = struct();
+task_sources.names = {'','target_task', 'target_touch_task'};
+task_sources.obj = {'',@target_task, @target_touch_task};
+
+task_ix = get(handles.task_list_pulldown, 'Value');
+handles.task = task_sources.obj{task_ix}([.4, .1]);
+%handles.task = target_task([.4, .1]);
 
 %Load reward sounds
 handles.reward_sounds = struct;

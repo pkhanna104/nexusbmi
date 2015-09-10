@@ -19,12 +19,13 @@ classdef target_touch_task < handle
         target_y_pos;
         tap_cnt;
         tap_val;
-    
-
+        total_taps;
+        ard;
+        tap_bool;
     end
     
     methods
-        function obj = target_task(time)
+        function obj = target_touch_task(time)
             obj.state_name_array = {'wait','target','hold','tapping','reward'};
             obj.FSM = {
                        {'wait','target', @obj.start_target}; 
@@ -48,20 +49,20 @@ classdef target_touch_task < handle
             obj.target_generator = obj.four_targ_gen(100);
             obj.tap_cnt = 0;
             obj.total_taps = 5;
-            obj.tap_val = 0;
+            obj.tap_bool = 0;
+            obj.ard = NaN;
+            
+            
         end
         
         function handles = cycle(obj, handles)
-            %Update tapping count:
-            %Count as tap if previous state was 0, and current state is 1
-            if obj.tap_val ==0
-                curr_val = handles.touch_sensor.read();
-                if curr_val == 1
-                    obj.tap_cnt = obj.tap_cnt+1;
+            try
+                if isnan(obj.ard)
+                    obj.ard = arduino(get(handles.arduino_comport, 'String'));
+                    pinMode(obj.ard, 8, 'input')
                 end
-                obj.tap_val = curr_val;
+            catch
             end
-            
             
             %Run through FSM
             check_func = obj.state_ref{obj.state_ind};
@@ -81,8 +82,11 @@ classdef target_touch_task < handle
             if obj.target_y_pos ~= handles.window.target_pos(2)
                 handles.window.target_pos(2) = obj.target_y_pos;
             end
+            
+            %Update Tapping? 
+            obj.tap_bool = digitalRead(obj.ard,8)
                 
-            end
+        end
         
         function tf = start_target(obj, handles)
             obj.tap_cnt = 0;
@@ -122,8 +126,13 @@ classdef target_touch_task < handle
         
         function tf = end_tapping(obj, handles)
             tf = 0;
+            if obj.tap_bool
+                obj.tap_cnt = obj.tap_cnt + 1;
+            end
+            
             if obj.tap_cnt > obj.total_taps
                 tf = 1;
+                obj.tap_cnt = 0;
             end
             
             if tf
@@ -132,6 +141,7 @@ classdef target_touch_task < handle
                 obj.point_counter = obj.rew_cnt;
                 disp('REWARD!')
             end
+        end
         
         function tf = ITI_end(obj, handles)
             if obj.ts > obj.ITI

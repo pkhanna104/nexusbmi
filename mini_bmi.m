@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 07-May-2015 12:19:28
+% Last Modified by GUIDE v2.5 09-Sep-2015 18:55:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -80,19 +80,6 @@ if exist('config.txt','file')==2
         
 else
     h = errordlg('Run Config File maker in /nexusbmi/config/make_config_file.m!');
-end
-%2 for pk-mbp, 1 for UCSF, 3 for Toshiba
-handles.ucsf = 3;
-
-if handles.ucsf == 1
-    handles.root_path = 'C:\Nexus\Preeya\UCSF_minibmi4\';
-    handles.dec_path = 'C:\Nexus\Preeya\UCSF_minibmi4\decoder\';
-elseif handles.ucsf ==2
-    handles.root_path = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi4/';
-    handles.dec_path = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi4/decoder/';
-elseif handles.ucsf == 3
-    handles.root_path = 'C:\Users\George\Preeya\nexusbmi\';
-    handles.dec_path = 'C:\Users\George\Preeya\nexusbmi\decoder\';
 end
 
 addpath(genpath(handles.root_path));
@@ -697,6 +684,52 @@ guidata(hObject,handles);
 % --- Executes during object creation, after setting all properties.
 function high_frac_lim_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to high_frac_lim_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in task_list_pulldown.
+function task_list_pulldown_Callback(hObject, eventdata, handles)
+% hObject    handle to task_list_pulldown (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns task_list_pulldown contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from task_list_pulldown
+
+
+% --- Executes during object creation, after setting all properties.
+function task_list_pulldown_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to task_list_pulldown (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function arduino_comport_Callback(hObject, eventdata, handles)
+% hObject    handle to arduino_comport (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of arduino_comport as text
+%        str2double(get(hObject,'String')) returns contents of arduino_comport as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function arduino_comport_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to arduino_comport (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
