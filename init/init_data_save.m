@@ -31,4 +31,6 @@ function handles = init_data_save(handles)
     x.decoded_pos = zeros(x.tot_task_iters, 1);
     x.ideal_pos = zeros(x.tot_task_iters, 1);
     
+    %Save Arduino stuff: 
+    x.arduino = zeros(x.tot_task_iters*20, 2);    
     handles.save_data = x;

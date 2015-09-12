@@ -22,6 +22,10 @@ classdef target_touch_task < handle
         total_taps;
         ard;
         tap_bool;
+        sub_cycle;
+        task_fs;
+        mod_check_neural;
+        sub_loop_time;
     end
     
     methods
@@ -51,41 +55,48 @@ classdef target_touch_task < handle
             obj.total_taps = 5;
             obj.tap_bool = 0;
             obj.ard = NaN;
-            
-            
+            obj.sub_cycle = 0;
+            obj.task_fs = 20;
+            obj.sub_loop_time = 1/obj.task_fs;
+            obj.mod_check_neural = obj.loop_time / (1/obj.task_fs);
         end
         
         function handles = cycle(obj, handles)
             try
                 if isnan(obj.ard)
-                    obj.ard = arduino(get(handles.arduino_comport, 'String'));
+                    com_port = get(handles.arduino_comport, 'String');
+                    delete(instrfind({'Port'},{com_port}))
+                    obj.ard = arduino(com_port);
                     pinMode(obj.ard, 8, 'input')
                 end
             catch
             end
             
-            %Run through FSM
-            check_func = obj.state_ref{obj.state_ind};
-            for i = 1:size(check_func,2)
-                func = obj.FSM{check_func{1,i}}{3};
-                tf = func(handles);
-                
-                if tf %Update State
-                    obj.state = obj.FSM{check_func{1,i}}(2);
-                    obj.state_ind = find(ismember(obj.state_name_array, obj.state));
-                    obj.ts = 0;
-                else
-                    obj.ts = obj.ts + obj.loop_time;
+            %Run through FSM every 0.4 sec: 
+            if mod(obj.sub_cycle , obj.mod_check_neural)==0
+                disp(strcat('in task: ', num2str(obj.sub_cycle)))
+                check_func = obj.state_ref{obj.state_ind};
+                for i = 1:size(check_func,2)
+                    func = obj.FSM{check_func{1,i}}{3};
+                    tf = func(handles);
+
+                    if tf %Update State
+                        obj.state = obj.FSM{check_func{1,i}}(2);
+                        obj.state_ind = find(ismember(obj.state_name_array, obj.state));
+                        obj.ts = 0;
+                    else
+                        obj.ts = obj.ts + obj.loop_time;
+                    end
+                end
+
+                if obj.target_y_pos ~= handles.window.target_pos(2)
+                    handles.window.target_pos(2) = obj.target_y_pos;
                 end
             end
             
-            if obj.target_y_pos ~= handles.window.target_pos(2)
-                handles.window.target_pos(2) = obj.target_y_pos;
-            end
-            
             %Update Tapping? 
-            obj.tap_bool = digitalRead(obj.ard,8)
-                
+            obj.tap_bool = digitalRead(obj.ard,8);
+            obj.sub_cycle = obj.sub_cycle + 1;
         end
         
         function tf = start_target(obj, handles)
@@ -167,6 +178,8 @@ classdef target_touch_task < handle
                 targ_y_pos = [targ_y_pos; Y(idx_shuff)];
             end
         end
+        
+        
 
         
     end

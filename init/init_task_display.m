@@ -61,6 +61,8 @@ handles.window.cursor = scatter(handles.window.ax, handles.window.cursor_pos(1),
     handles.window.cursor_pos(2),handles.window.cursor_default_size, ...
     handles.window.cursor_color, 'filled');
 
+handles.window.tap_dot = scatter(handles.window.ax, 5, 5, 0.5*handles.window.target_default_size,...
+    'r','filled');
 
 % %Set current text for score!'
 str = ['\fontsize{20} \color{white} Score:' num2str(handles.task.point_counter)];
@@ -77,6 +79,9 @@ wt_arr = loc(2) + linspace(-.5*mapped_mario*wd/ht, .5*mapped_mario*wd/ht, wd);
 oned = 1:size(handles.mario.up,1);
 handles.mario.im = image(wt_arr, ht_arr, handles.mario.up(fliplr(oned),:,:),'parent',handles.window.ax);
 
-grey = rgb2gray(double(handles.mario.up(fliplr(oned),:,:)));
-g = grey>3;
+%grey = rgb2gray(double(handles.mario.up(fliplr(oned),:,:)));
+x = handles.mario.up(fliplr(oned),:,:);
+r = x(:,:,1);g=x(:,:,2);b=x(:,:,3);
+y = (0.299*r) + (0.587*g) + (0.114*b);
+g = y>3;
 set(handles.mario.im,'alphadata',g);
