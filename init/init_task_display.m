@@ -77,6 +77,6 @@ wt_arr = loc(2) + linspace(-.5*mapped_mario*wd/ht, .5*mapped_mario*wd/ht, wd);
 oned = 1:size(handles.mario.up,1);
 handles.mario.im = image(wt_arr, ht_arr, handles.mario.up(fliplr(oned),:,:),'parent',handles.window.ax);
 
-grey = rgb2gray(handles.mario.up(fliplr(oned),:,:));
+grey = rgb2gray(double(handles.mario.up(fliplr(oned),:,:)));
 g = grey>3;
 set(handles.mario.im,'alphadata',g);
