@@ -54,12 +54,13 @@ classdef sim_nexus_interface < handle
 %             nex_inst.startDataSession =1;
         end
         
-        function [Data, seq] = get_neural(obj, handles)
+        function [Data, seq, T] = get_neural(obj, handles)
             width = handles.feature_extractor.width;
             %D = obj.inst.getDataPacket;
             %Data = D.getData;
             
-            Data = {rand(width,1), rand(width,1)};
+            Data = {rand(width,1), rand(1,1), rand(width,1), rand(1,1)};
+            T = toc(handles.tic);
             %disp(rem(obj.time_cnt, 40))
 %             if rem(obj.time_cnt, 40) > 20
 %                 x = obj.time_series(1:width);

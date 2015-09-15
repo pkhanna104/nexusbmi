@@ -14,13 +14,15 @@ function handles = init_data_save(handles)
     x.cursor_size = handles.window.cursor_radius;
     x.target_size = handles.window.target_radius;
     x.task_params = handles.task;
-
     x.hold_times = {};
-    x.start_loop_time = zeros(x.tot_task_iters, 1);
     
     %Save neural info:
     x.rawdata_timeseries_m1 = zeros(x.tot_task_iters, 400);
     x.rawdata_timeseries_stn = zeros(x.tot_task_iters, 400);
+    x.rawdata_power_ch2 = {};
+    x.rawdata_power_ch4 = {};
+    x.rawdata_abs_time = zeros(x.tot_task_iters,1);
+    
     x.features = zeros(x.tot_task_iters, 100);
     x.packet_seq = zeros(x.tot_task_iters, 2);
     
@@ -32,5 +34,7 @@ function handles = init_data_save(handles)
     x.ideal_pos = zeros(x.tot_task_iters, 1);
     
     %Save Arduino stuff: 
-    x.arduino = zeros(x.tot_task_iters*20, 2);    
+    x.arduino.cap_touch = zeros(x.tot_task_iters*20, 1);
+    x.arduino.acc = zeros(x.tot_task_iters*20, 3);
+    x.arduino.abs_time = zeros(x.tot_task_iters*20, 1);
     handles.save_data = x;

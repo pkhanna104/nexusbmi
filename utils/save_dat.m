@@ -25,12 +25,16 @@ if ~isempty(data)
     end
     
     
-    handles.save_data.rawdata_timeseries_m1(ix,1:length(data{1})) = data{1};
-    handles.save_data.rawdata_timeseries_stn(ix,1:length(data{2})) = data{2};
+    handles.save_data.rawdata_timeseries_m1(ix,1:length(data{3})) = data{3};
+    handles.save_data.rawdata_timeseries_stn(ix,1:length(data{1})) = data{1};
+    handles.save_data.rawdata_power_ch2{ix} = data{2};
+    handles.save_data.rawdata_power_ch4{ix} = data{4};
     handles.save_data.features(ix,1:length(feat)) = feat;
     handles.save_data.packet_seq(ix,:) = seq;
 end
 
-handles.save_data.arduino((ix*(handles.task.mod_check_neural-1)) +...
-    handles.task.sub_cycle) = handles.task.tap_bool;
+ard_ix = handles.task.sub_cycle;
+handles.save_data.arduino.cap_touch(ard_ix) = handles.task.tap_bool;
+handles.save_data.arduino.acc(ard_ix,:) = handles.task.acc_dat; %TODO
+handles.save_data.arduino.t(ard_ix) = handles.task.sub_cycle_abs_time; %TODO
 end

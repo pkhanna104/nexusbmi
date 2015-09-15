@@ -17,8 +17,17 @@ classdef target_task < handle
         point_counter;
         rew_flag;
         target_y_pos;
-    
-
+        
+        
+        ard;
+        sub_cycle;
+        task_fs;
+        sub_loop_time;
+        mod_check_neural;
+        sub_cycle_abs_time;
+        acc_dat;
+        tap_bool;
+        
     end
     
     methods
@@ -43,30 +52,44 @@ classdef target_task < handle
             obj.rew_cnt = 0;
             obj.point_counter = 0;
             obj.target_generator = obj.four_targ_gen(100);
+            obj.ard = NaN;
+            obj.acc_dat = [0 0 0];
+            obj.sub_cycle = 0;
+            obj.task_fs = 20;
+            obj.sub_loop_time = 1/obj.task_fs;
+            obj.mod_check_neural = obj.loop_time / (1/obj.task_fs);
         end
         
         function handles = cycle(obj, handles)
+            if mod(obj.sub_cycle , obj.mod_check_neural)==0
             
-            %Run through FSM
-            check_func = obj.state_ref{obj.state_ind};
-            for i = 1:size(check_func,2)
-                func = obj.FSM{check_func{1,i}}{3};
-                tf = func(handles);
-                
-                if tf %Update State
-                    obj.state = obj.FSM{check_func{1,i}}(2);
-                    obj.state_ind = find(ismember(obj.state_name_array, obj.state));
-                    obj.ts = 0;
-                else
-                    obj.ts = obj.ts + obj.loop_time;
+                %Run through FSM
+                check_func = obj.state_ref{obj.state_ind};
+                for i = 1:size(check_func,2)
+                    func = obj.FSM{check_func{1,i}}{3};
+                    tf = func(handles);
+
+                    if tf %Update State
+                        obj.state = obj.FSM{check_func{1,i}}(2);
+                        obj.state_ind = find(ismember(obj.state_name_array, obj.state));
+                        obj.ts = 0;
+                    else
+                        obj.ts = obj.ts + obj.loop_time;
+                    end
                 end
-            end
-            
-            if obj.target_y_pos ~= handles.window.target_pos(2)
-                handles.window.target_pos(2) = obj.target_y_pos;
-            end
+
+                if obj.target_y_pos ~= handles.window.target_pos(2)
+                    handles.window.target_pos(2) = obj.target_y_pos;
+                end
                 
             end
+            
+             %Update Accel? 
+            obj.acc_dat = [0 0 0];%[analogRead(obj.ard, A0), analogRead(obj.ard, A1), analogRead(obj.ard, A2)];
+            obj.sub_cycle = obj.sub_cycle + 1;
+            obj.sub_cycle_abs_time = toc(handles.tic);
+            obj.tap_bool = 0;
+        end
         
         
         function tf = start_target(obj, handles)

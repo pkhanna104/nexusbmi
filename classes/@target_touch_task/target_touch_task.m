@@ -26,6 +26,8 @@ classdef target_touch_task < handle
         task_fs;
         mod_check_neural;
         sub_loop_time;
+        sub_cycle_abs_time;
+        acc_dat;
     end
     
     methods
@@ -52,26 +54,19 @@ classdef target_touch_task < handle
             obj.point_counter = 0;
             obj.target_generator = obj.four_targ_gen(100);
             obj.tap_cnt = 0;
-            obj.total_taps = 5;
+            obj.total_taps = 1;
             obj.tap_bool = 0;
             obj.ard = NaN;
             obj.sub_cycle = 0;
             obj.task_fs = 20;
             obj.sub_loop_time = 1/obj.task_fs;
             obj.mod_check_neural = obj.loop_time / (1/obj.task_fs);
+            obj.acc_dat = [0 0 0];
+            obj.sub_cycle_abs_time = 0;
         end
         
         function handles = cycle(obj, handles)
-            try
-                if isnan(obj.ard)
-                    com_port = get(handles.arduino_comport, 'String');
-                    delete(instrfind({'Port'},{com_port}))
-                    obj.ard = arduino(com_port);
-                    pinMode(obj.ard, 8, 'input')
-                end
-            catch
-            end
-            
+
             %Run through FSM every 0.4 sec: 
             if mod(obj.sub_cycle , obj.mod_check_neural)==0
                 disp(strcat('in task: ', num2str(obj.sub_cycle)))
@@ -96,7 +91,9 @@ classdef target_touch_task < handle
             
             %Update Tapping? 
             obj.tap_bool = digitalRead(obj.ard,8);
+            obj.acc_dat = [0 0 0];%[analogRead(obj.ard, A0), analogRead(obj.ard, A1), analogRead(obj.ard, A2)];
             obj.sub_cycle = obj.sub_cycle + 1;
+            obj.sub_cycle_abs_time = toc(handles.tic);
         end
         
         function tf = start_target(obj, handles)
@@ -130,6 +127,8 @@ classdef target_touch_task < handle
         function tf = end_hold(obj, handles)
             if obj.ts > obj.hold
                 tf = 1;
+                set(handles.window.target, 'MarkerFaceColor', 'c');
+                set(handles.window.tap_text,'String', handles.tap_on_str);
             else
                 tf = 0;
             end
@@ -141,9 +140,10 @@ classdef target_touch_task < handle
                 obj.tap_cnt = obj.tap_cnt + 1;
             end
             
-            if obj.tap_cnt > obj.total_taps
+            if obj.tap_cnt >= obj.total_taps
                 tf = 1;
                 obj.tap_cnt = 0;
+                set(handles.window.tap_text,'String', handles.tap_off_str);
             end
             
             if tf
@@ -178,9 +178,6 @@ classdef target_touch_task < handle
                 targ_y_pos = [targ_y_pos; Y(idx_shuff)];
             end
         end
-        
-        
-
-        
+              
     end
 end

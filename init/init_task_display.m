@@ -61,8 +61,11 @@ handles.window.cursor = scatter(handles.window.ax, handles.window.cursor_pos(1),
     handles.window.cursor_pos(2),handles.window.cursor_default_size, ...
     handles.window.cursor_color, 'filled');
 
-handles.window.tap_dot = scatter(handles.window.ax, 5, 5, 0.5*handles.window.target_default_size,...
-    'r','filled');
+handles.window.tap_dot = scatter(handles.window.ax, 8, 5, 0.5*handles.window.target_default_size,...
+    'k','filled');
+handles.tap_off_str = ['\fontsize{18} \color{black} TAP!'];
+handles.tap_on_str = ['\fontsize{18} \color{red} TAP!'];
+handles.window.tap_text = text(7, 3, handles.tap_off_str,'parent', handles.window.ax);
 
 % %Set current text for score!'
 str = ['\fontsize{20} \color{white} Score:' num2str(handles.task.point_counter)];
