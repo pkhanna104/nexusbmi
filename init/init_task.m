@@ -34,15 +34,15 @@ neural_sources.obj = {@sim_nexus_interface, @nexus_interface};
 
 %Init task
 task_sources = struct();
-task_sources.names = {'','target_task', 'target_touch_task'};
-task_sources.obj = {'',@target_task, @target_touch_task};
+task_sources.names = {'','target_task', 'target_touch_task','movement_task'};
+task_sources.obj = {'',@target_task, @target_touch_task, @movement_task};
 
 task_ix = get(handles.task_list_pulldown, 'Value');
 hold_mn = str2num(get(handles.holdMean, 'String'));
 hold_var = str2num(get(handles.holdVar, 'String'));
 handles.task = task_sources.obj{task_ix}([hold_mn, hold_var]);
 
-if isprop(handles.task,'ard')
+if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
     if isnan(handles.task.ard)
         com_port = get(handles.arduino_comport, 'String');
         delete(instrfind({'Port'},{com_port}))

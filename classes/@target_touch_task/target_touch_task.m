@@ -91,7 +91,7 @@ classdef target_touch_task < handle
             
             %Update Tapping? 
             obj.tap_bool = digitalRead(obj.ard,8);
-            obj.acc_dat = [0 0 0];%[analogRead(obj.ard, A0), analogRead(obj.ard, A1), analogRead(obj.ard, A2)];
+            obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);
         end

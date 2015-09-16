@@ -1,8 +1,13 @@
 function make_decoder(handles)
 
 %Make decoder;
-dat = handles.save_data;
-    
+try
+    dat = handles.save_data;
+catch
+    [FileName,PathName] = uigetfile('*.mat','Select the MATLAB data file');
+    data = load(strcat(PathName,FileName));
+    dat = data.dat;
+end
 %Find modulation
 %data: samples x channels
 %S: frequency x channels/trials
@@ -12,7 +17,8 @@ params = struct('fpass',[0 150],'Fs',dat.extractor_params.fs,'tapers',[3 5]);
 Fs = dat.extractor_params.fs;
 n_samp = floor(.4*Fs);
 
-[S,f] = mtspectrumc(dat.rawdata_timeseries_stn(1:handles.iter_cnt,1:n_samp-1)', params);
+iter_cnt = length(dat.abs_time);
+[S,f] = mtspectrumc(dat.rawdata_timeseries_stn(1:iter_cnt,1:n_samp-1)', params);
 
 % params = struct('fpass',[0 radio_data.fs/2],'Fs',radio_data.fs,'tapers',[3 5]);
 % [S,f] = mtspectrumc(reshape(radio_data.m1(100000+[1:400*100]),[400,100]), params);

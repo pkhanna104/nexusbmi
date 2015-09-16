@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 09-Sep-2015 18:55:35
+% Last Modified by GUIDE v2.5 16-Sep-2015 09:16:53
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -739,3 +739,12 @@ function arduino_comport_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in ard_check.
+function ard_check_Callback(hObject, eventdata, handles)
+% hObject    handle to ard_check (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of ard_check
