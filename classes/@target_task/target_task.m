@@ -34,12 +34,12 @@ classdef target_task < handle
         function obj = target_task(time)
             obj.state_name_array = {'wait','target','hold','reward'};
             obj.FSM = {
-                       {'wait','target', @obj.start_target}; 
-                       {'target','hold', @obj.enter_target};
-                       {'hold','target', @obj.leave_early};
-                       {'hold','reward', @obj.end_hold};
-                       {'reward','wait', @obj.ITI_end};
-                       };
+                {'wait','target', @obj.start_target};
+                {'target','hold', @obj.enter_target};
+                {'hold','target', @obj.leave_early};
+                {'hold','reward', @obj.end_hold};
+                {'reward','wait', @obj.ITI_end};
+                };
             obj.state_ref = { {1}; {2}; {3, 4}; {5}};
             obj.hold_time_mean = time(1);
             obj.hold_time_std =time(2);
@@ -62,13 +62,13 @@ classdef target_task < handle
         
         function handles = cycle(obj, handles)
             if mod(obj.sub_cycle , obj.mod_check_neural)==0
-            
+                
                 %Run through FSM
                 check_func = obj.state_ref{obj.state_ind};
                 for i = 1:size(check_func,2)
                     func = obj.FSM{check_func{1,i}}{3};
                     tf = func(handles);
-
+                    
                     if tf %Update State
                         obj.state = obj.FSM{check_func{1,i}}(2);
                         obj.state_ind = find(ismember(obj.state_name_array, obj.state));
@@ -77,21 +77,24 @@ classdef target_task < handle
                         obj.ts = obj.ts + obj.loop_time;
                     end
                 end
-
+                
                 if obj.target_y_pos ~= handles.window.target_pos(2)
                     handles.window.target_pos(2) = obj.target_y_pos;
                 end
                 
             end
             
-            %Update Accel? 
-            if ~isnan(obj.ard)
+            %Update Accel?
+            try
+                if isnan(obj.ard)
+                end
+            catch
                 obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
             end
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);
             obj.tap_bool = 0;
-           
+            
         end
         
         
@@ -102,7 +105,7 @@ classdef target_task < handle
             obj.target_generator = obj.target_generator(2:end);
             tf = 1;
         end
- 
+        
         function tf = enter_target(obj, handles)
             d = abs(handles.window.cursor_pos(2) - obj.target_y_pos);
             if d < handles.window.target_radius
@@ -142,23 +145,23 @@ classdef target_task < handle
                 tf = 0;
             end
         end
-
+        
         function targ_y_pos = four_targ_gen(obj, n_targets)
             block = 3;
-
+            
             y = [-6 -2 2 6]';
             Y = repmat(y, [block 1]);
-
+            
             n_reps = round(n_targets/(4*block));
-
+            
             targ_y_pos = [];
-
+            
             for i = 1:n_reps
                 idx_shuff = randperm(block*4);
                 targ_y_pos = [targ_y_pos; Y(idx_shuff)];
             end
         end
-
+        
         
     end
 end

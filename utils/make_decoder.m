@@ -17,7 +17,7 @@ params = struct('fpass',[0 150],'Fs',dat.extractor_params.fs,'tapers',[3 5]);
 Fs = dat.extractor_params.fs;
 n_samp = floor(.4*Fs);
 
-iter_cnt = length(dat.abs_time);
+iter_cnt = dat.iter_cnt;
 [S,f] = mtspectrumc(dat.rawdata_timeseries_stn(1:iter_cnt,1:n_samp-1)', params);
 
 % params = struct('fpass',[0 radio_data.fs/2],'Fs',radio_data.fs,'tapers',[3 5]);
