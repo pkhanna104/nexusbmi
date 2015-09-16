@@ -1,4 +1,4 @@
-function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds] = parse_dat(blocks, day)
+function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state] = parse_dat(blocks, day)
 
     %Get times, and target onsets;
     % blocks = 'ab';
@@ -12,7 +12,7 @@ function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds] = par
 
 
     ft = []; raw_td_m1 = []; raw_td_stn = []; raw_pxx = []; abs_t=[]; targ=[];
-    curs=[]; rew_inds = [];
+    curs=[]; rew_inds = []; state = [];
 
     for ai = 1:length(blocks)
         alpha = blocks(ai);
@@ -20,6 +20,8 @@ function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds] = par
         load(dat_fname)
         iter_cnt = dat.iter_cnt - 1;
 
+        dat.state{1} = 'wait';
+        state = [state; dat.state(1:iter_cnt)];
         ft = [ft; dat.features(1:iter_cnt,3)];
         raw_td_m1 = [raw_td_m1; dat.rawdata_timeseries_m1(1:iter_cnt,1:169)];
         raw_td_stn = [raw_td_stn; dat.rawdata_timeseries_stn(1:iter_cnt,1:169)];
