@@ -18,7 +18,7 @@ Fs = dat.extractor_params.fs;
 n_samp = floor(.4*Fs);
 
 iter_cnt = dat.iter_cnt;
-[S,f] = mtspectrumc(dat.rawdata_timeseries_stn(1:iter_cnt,1:n_samp-1)', params);
+[S,f] = mtspectrumc(dat.rawdata_timeseries_m1(1:iter_cnt,1:n_samp-1)', params);
 
 % params = struct('fpass',[0 radio_data.fs/2],'Fs',radio_data.fs,'tapers',[3 5]);
 % [S,f] = mtspectrumc(reshape(radio_data.m1(100000+[1:400*100]),[400,100]), params);
@@ -110,22 +110,29 @@ decoder.std = quarter_step/4;
 decoder.feature_band = [lower_lim, upper_lim];
 %decoder.feature_band = handles.feature_extractor.f_ranges(ft_ind(ft_ind==1),:);
 
-if isfield(handles, 'decoder_suffix')
-    handles.decoder_suffix = [handles.decoder_suffix '_' answer{1} '-' answer{2}];
-else
+try
+    if isfield(handles, 'decoder_suffix')
+        handles.decoder_suffix = [handles.decoder_suffix '_' answer{1} '-' answer{2}];
+    else
+        handles.decoder_suffix = [answer{1} '-' answer{2}];
+    end
+catch
     handles.decoder_suffix = [answer{1} '-' answer{2}];
 end
-
+    
 filename = get_data_fname('decoder',handles);
 save(filename, 'decoder')
 
 global nex_inst nex_init;
 
-if isfield(handles.neural_source_name,'nexus') && (handles.neural_source_name.nexus ==1)
+try
+    if isfield(handles.neural_source_name,'nexus') && (handles.neural_source_name.nexus ==1)
     %nex_inst.setNexusConfiguration(10,2) % reset to defaults
     %nex_inst.disconnect
-    handles.neural_source.cleanup_neural()
+        handles.neural_source.cleanup_neural()
     %handles.neural_source.inst.dispose % clean up properly
+    end
+catch
 end
 
 

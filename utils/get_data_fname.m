@@ -15,7 +15,12 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
         if isfield(handles, 'dec_suffix')
             suffx = handles.dec_suffix;
         end
-        data_dir = handles.dec_path;
+        try
+            data_dir = handles.dec_path;
+        catch
+             [label paths] = textread('config.txt', '%s %s',5);
+            data_dir = paths{3};
+        end
     end
     
 
