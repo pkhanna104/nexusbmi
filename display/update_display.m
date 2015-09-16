@@ -25,13 +25,18 @@ if strcmp(handles.task.state, 'reward')
     str = ['\fontsize{20} \color{white} Score:' num2str(handles.task.point_counter)];
     set(handles.window.text,'string',str);
 
-
 elseif strcmp(handles.task.state, 'wait')
     set(handles.window.target, 'MarkerFaceColor', handles.window.target_color);
     set(handles.window.cursor, 'MarkerFaceColor', 'c');
     set(handles.window.cursor, 'xdata', 0);
     set(handles.window.target, 'SizeData', handles.window.target_default_size);
     
+end
+
+if handles.task.tap_bool
+    set(handles.window.tap_dot, 'MarkerFaceColor', 'r');
+else
+    set(handles.window.tap_dot, 'MarkerFaceColor', 'k')
 end
 
 blit_display(handles.window.ax);

@@ -22,6 +22,12 @@ classdef target_touch_task < handle
         total_taps;
         ard;
         tap_bool;
+        sub_cycle;
+        task_fs;
+        mod_check_neural;
+        sub_loop_time;
+        sub_cycle_abs_time;
+        acc_dat;
     end
     
     methods
@@ -48,44 +54,46 @@ classdef target_touch_task < handle
             obj.point_counter = 0;
             obj.target_generator = obj.four_targ_gen(100);
             obj.tap_cnt = 0;
-            obj.total_taps = 5;
+            obj.total_taps = 1;
             obj.tap_bool = 0;
             obj.ard = NaN;
-            
-            
+            obj.sub_cycle = 0;
+            obj.task_fs = 20;
+            obj.sub_loop_time = 1/obj.task_fs;
+            obj.mod_check_neural = obj.loop_time / (1/obj.task_fs);
+            obj.acc_dat = [0 0 0];
+            obj.sub_cycle_abs_time = 0;
         end
         
         function handles = cycle(obj, handles)
-            try
-                if isnan(obj.ard)
-                    obj.ard = arduino(get(handles.arduino_comport, 'String'));
-                    pinMode(obj.ard, 8, 'input')
+
+            %Run through FSM every 0.4 sec: 
+            if mod(obj.sub_cycle , obj.mod_check_neural)==0
+                disp(strcat('in task: ', num2str(obj.sub_cycle)))
+                check_func = obj.state_ref{obj.state_ind};
+                for i = 1:size(check_func,2)
+                    func = obj.FSM{check_func{1,i}}{3};
+                    tf = func(handles);
+
+                    if tf %Update State
+                        obj.state = obj.FSM{check_func{1,i}}(2);
+                        obj.state_ind = find(ismember(obj.state_name_array, obj.state));
+                        obj.ts = 0;
+                    else
+                        obj.ts = obj.ts + obj.loop_time;
+                    end
                 end
-            catch
-            end
-            
-            %Run through FSM
-            check_func = obj.state_ref{obj.state_ind};
-            for i = 1:size(check_func,2)
-                func = obj.FSM{check_func{1,i}}{3};
-                tf = func(handles);
-                
-                if tf %Update State
-                    obj.state = obj.FSM{check_func{1,i}}(2);
-                    obj.state_ind = find(ismember(obj.state_name_array, obj.state));
-                    obj.ts = 0;
-                else
-                    obj.ts = obj.ts + obj.loop_time;
+
+                if obj.target_y_pos ~= handles.window.target_pos(2)
+                    handles.window.target_pos(2) = obj.target_y_pos;
                 end
-            end
-            
-            if obj.target_y_pos ~= handles.window.target_pos(2)
-                handles.window.target_pos(2) = obj.target_y_pos;
             end
             
             %Update Tapping? 
-            obj.tap_bool = digitalRead(obj.ard,8)
-                
+            obj.tap_bool = digitalRead(obj.ard,8);
+            obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
+            obj.sub_cycle = obj.sub_cycle + 1;
+            obj.sub_cycle_abs_time = toc(handles.tic);
         end
         
         function tf = start_target(obj, handles)
@@ -119,6 +127,8 @@ classdef target_touch_task < handle
         function tf = end_hold(obj, handles)
             if obj.ts > obj.hold
                 tf = 1;
+                set(handles.window.target, 'MarkerFaceColor', 'c');
+                set(handles.window.tap_text,'String', handles.tap_on_str);
             else
                 tf = 0;
             end
@@ -130,9 +140,10 @@ classdef target_touch_task < handle
                 obj.tap_cnt = obj.tap_cnt + 1;
             end
             
-            if obj.tap_cnt > obj.total_taps
+            if obj.tap_cnt >= obj.total_taps
                 tf = 1;
                 obj.tap_cnt = 0;
+                set(handles.window.tap_text,'String', handles.tap_off_str);
             end
             
             if tf
@@ -167,7 +178,6 @@ classdef target_touch_task < handle
                 targ_y_pos = [targ_y_pos; Y(idx_shuff)];
             end
         end
-
-        
+              
     end
 end

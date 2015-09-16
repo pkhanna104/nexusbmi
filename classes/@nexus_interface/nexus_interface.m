@@ -60,20 +60,23 @@ classdef nexus_interface < handle
             end 
         end
         
-        function [Data, seq] = get_neural(obj, handles)
+        function [Data, seq, T] = get_neural(obj, handles)
             global nex_inst
             %D = obj.inst.getDataPacket;
             %iCode = obj.inst.getLastInsResponseCode;
             
             %From Medtronic: Each packet in format of column vector:
-            [packet_status,seqnum1,seqnum2,datapacket1,datapacket3,D]=get_data_packet_pk(nex_inst);
+            [packet_status,seqnum1,seqnum2,dp1, dp2, dp3, dp4,D]=get_data_packet_pk(nex_inst);
+            T = toc(handles.tic);
             fprintf('packet status: %d',packet_status);
             
             if packet_status ~= 0
                 %One or two packets received
                 current_missed_packets = D.getNumMissedPatterns;
-                Data = {datapacket1, datapacket3};
+                Data = {dp1, dp2, dp3, dp4};
+                
                 seq = [seqnum1, seqnum2];
+                
             
             else
                 %No packets received :( 

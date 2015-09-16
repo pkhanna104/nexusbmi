@@ -92,7 +92,9 @@ classdef nexus_power_extractor < feature_extractor
                 %data = recent_neural{obj.used_chan};
                 
                 %M1 channel: 
-                data = recent_neural{2};
+                data = recent_neural{3};
+                
+    %            data = recent_neural{2};
     %             if obj.use_differential_feat
     %                 ref_data = recent_neural{obj.differential_chan, 1};% Check nexus format
     %                 data = data - ref_data;
