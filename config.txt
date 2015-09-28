@@ -1,5 +1,5 @@
 config paths
-root C:\Users\Preeya\Documents\GitHub\Nexusbmi\
-dec C:\Users\Preeya\Documents\GitHub\Nexusbmi\decoder\
-dat C:\Users\Preeya\Documents\GitHub\Nexusbmi\data\
-med C:\Users\Preeya\Documents\GitHub\Nexusbmi\media\
+root C:\Nexus\preeya\github_repo\nexusbmi\
+dec C:\Nexus\preeya\github_repo\nexusbmi\decoder\
+dat C:\Nexus\preeya\github_repo\nexusbmi\data\
+med C:\Nexus\preeya\github_repo\nexusbmi\media\

@@ -14,6 +14,7 @@ classdef nexus_power_extractor < feature_extractor
         ftfeat_index;
         f_max = 150;
         last_features;
+        beta_pow_chan;
     end
     
     methods
@@ -53,7 +54,10 @@ classdef nexus_power_extractor < feature_extractor
             obj.range_inds = bandc;        
             obj.f_ranges     = extractor_params.f_ranges;
             obj.n_features = length(extractor_params.used_chan) * size(obj.f_ranges,1);
-            obj.last_features = zeros(obj.n_features,1);
+            
+            obj.last_features = struct();
+            obj.last_features.fd = [0];
+            obj.last_features.td = zeros(obj.n_features,1);
             obj.task_f_ranges = extractor_params.task_f_ranges;
             
             disp(strcat('n_features ',num2str(obj.n_features)));
@@ -93,6 +97,7 @@ classdef nexus_power_extractor < feature_extractor
                 
                 %M1 channel: 
                 data = recent_neural{3};
+                beta = recent_neural{4};
                 
     %            data = recent_neural{2};
     %             if obj.use_differential_feat
@@ -117,8 +122,9 @@ classdef nexus_power_extractor < feature_extractor
 
                 % compute average power of each band of interest
                 % pow = zeros(size(obj.ranges,1),size(S,2));
-
-                features = zeros(obj.n_features,1);
+                features = struct();
+                features.td = zeros(obj.n_features,1);
+                features.fd = beta;
                 cur = 0;
                 for c = 1:size(obj.f_ranges,1)
                     temp = S(obj.range_inds{c},:);    
@@ -134,7 +140,7 @@ classdef nexus_power_extractor < feature_extractor
                     %This is stupidly complicated, but basically, each
                     %'feat' is  a single number, so features is an
                     % [n_iter x 100] matrix  
-                    features( (1 : length(feat)) + cur ) = feat;
+                    features.td( (1 : length(feat)) + cur ) = feat;
                     cur = cur + length(feat);                                
                 end
 

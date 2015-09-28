@@ -24,12 +24,16 @@ if ~isempty(data)
         sound(y, params(1), params(2));
     end
     
+    try
+        handles.save_data.rawdata_timeseries_m1(ix,1:length(data{3})) = data{3};
+        handles.save_data.rawdata_timeseries_stn(ix,1:length(data{1})) = data{1};
+        handles.save_data.rawdata_power_ch2{ix} = data{2};
+        handles.save_data.rawdata_power_ch4{ix} = data{4};
+    catch
+    end
     
-    handles.save_data.rawdata_timeseries_m1(ix,1:length(data{3})) = data{3};
-    handles.save_data.rawdata_timeseries_stn(ix,1:length(data{1})) = data{1};
-    handles.save_data.rawdata_power_ch2{ix} = data{2};
-    handles.save_data.rawdata_power_ch4{ix} = data{4};
-    handles.save_data.features(ix,1:length(feat)) = feat;
+    
+    handles.save_data.features(ix,1:length(feat.fd)) = feat.fd;
     handles.save_data.packet_seq(ix,:) = seq;
 end
 

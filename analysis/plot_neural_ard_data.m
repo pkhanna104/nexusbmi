@@ -19,8 +19,8 @@ pxx2 = zeros(length(t),1);
 
 for i=1:length(pxx)
     try
-        pxx(i) = dat.rawdata_power_ch2{i}(1);
-        pxx2(i) = dat.rawdata_power_ch2{i}(2);
+        pxx(i) = dat.rawdata_power_ch4{i}(1);
+        pxx2(i) = dat.rawdata_power_ch4{i}(2);
     catch
         disp(strcat('empty: ', num2str(i)))
     end
