@@ -57,7 +57,7 @@ classdef target_task < handle
             obj.sub_cycle = 0;
             obj.task_fs = 20;
             obj.sub_loop_time = 1/obj.task_fs;
-            obj.mod_check_neural = obj.loop_time / (1/obj.task_fs);
+            obj.mod_check_neural = (obj.loop_time / (1/obj.task_fs))-2;
         end
         
         function handles = cycle(obj, handles)

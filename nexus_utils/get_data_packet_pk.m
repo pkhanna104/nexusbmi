@@ -4,6 +4,8 @@ packet_status=0;
 seqnum1 = 0;
 seqnum2 = 0;
 datapacket1 = 0;
+datapacket2 = 0;
+datapacket4 = 0;
 datapacket3 = 0;
     
 %Get the data and figure out what was inside of it
@@ -31,7 +33,6 @@ if isempty(D)
     % No packet was returned
     % display the reason it is empty
     fprintf('Empty Packet = %d,', inst.getLastInsResponseCode()); 
-
 else
     Data = D.getData;
     seqnum1=D.getPatternNum1;
