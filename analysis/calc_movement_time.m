@@ -1,67 +1,53 @@
-%Get times, and target onsets; 
-block = 'd';
-day = '091615';
+function [rch_time, targ_inds] = calc_movement_time(block, day)
 
-%Find data path:
-[label paths] = textread('config.txt', '%s %s',5);
-if strcmp(label{4},'dat')
-    dir = paths{4};
-end
-
-for ai = 1:length(blocks)
-    alpha = blocks(ai);
-    dat_fname = ['dat' day alpha '_.mat'];
-    load(dat_fname)
-    iter_cnt = dat.iter_cnt;
-    ft = dat.features(1:iter_cnt,3);
+    cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
+    figure(99); hold all;
     
-function [FT, RAW, TARG, CURS, REW, idx] = concat_dat(blocks, start_ind, rm_targs)
+    [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state] = parse_dat(block, day);
 
-dir = 'C:\Users\George\Downloads\UCSF_minibmi5\';
-dir2 = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi5/';
-
-%blocks = 'gh';
-%start_ind = [141, 1];
-
-FT = [];
-RAW = [];
-TARG = [];
-CURS = [];
-REW = [];
-idx = [];
-ind_offs = 0;
-
-%Stack data: 
-for ai = 1:length(blocks)
-    alpha = blocks(ai);
-    fname1 = [dir 'data\dat050815' alpha '_.mat'];
-    fname2 = [dir2 'data/dat050815' alpha' '_.mat'];
-    load(fname1)
-
-    ft = dat.features(:,3);
-    ix_zer = find(ft==0);
-   
-    act_curs = dat.cursor(ix_zer);
-    c1 = dat.cursor(ix_zer-1);
-    c2 = (2*act_curs) - c1;
-
-    ft_interp = (c2*25)+300;
-    ft(ix_zer) = ft_interp;
-
-    FT = [FT; ft(start_ind(ai):end)];
-    RAW = [RAW; dat.rawdata_timeseries_stn(start_ind(ai):end,:)];
-
-    [targ_locs, rew_inds] = get_targ_loc(dat);
-    TARG = [TARG; targ_locs(start_ind(ai):end)];
-    CURS = [CURS; dat.cursor(start_ind(ai):end)];
+    targ_inds = targ(rew_inds);
+    targ_unique = unique(targ_inds);
+    rch_time = zeros(length(targ_inds),1);
     
-    rews = rew_inds(rew_inds>start_ind(ai));
-    blk_rews = rews-start_ind(ai)+1+ind_offs';
-    blk_rews = blk_rews(1:end-rm_targs(ai));
-    REW = [REW blk_rews];
+    curs_cell = {};
     
-    ind_offs = ind_offs+length(ft(start_ind(ai):end));
-    
-    idx = [idx length(FT)];
+    %Calculate time to movement
+    for i=1:length(targ_unique)
+        tmp = find(targ_inds==targ_unique(i));
+        targ_rew_ix = rew_inds(tmp);
+        rch_ix = [];
+        curs_targ = zeros(length(targ_rew_ix), 5);
+        
+        %Step backward from rew_ind to get time of 'wait' 
+        for t = 1:length(targ_rew_ix)
+            srch = 1;
+            ix = 0;
+            while srch
+                if strcmp(state{targ_rew_ix(t)-ix}, 'wait')
+                    srch = 0;
+                    rch = ix;
+                else
+                    ix = ix + 1;
+                end
+            end
+            ting = find(rew_inds==targ_rew_ix(t));
+            rch_time(ting) = rch;
+            rch_ix = [rch_ix rch];
+            curs_targ(t,:) = curs(targ_rew_ix(t)-4:targ_rew_ix(t));
+        end
+        curs_cell{i} = curs_targ;
+        
+        figure(99)
+        plot(targ_rew_ix, rch_ix, '.-', 'color',cmap{i})
+        xlabel('Task Iteration')
+        ylabel('Iteration Times')
+        
+        figure(98); hold all;
+        plot(1:5, mean(curs_cell{i}, 1), '.-','color', cmap{i})
+        xlabel('Time (.4 sec steps)')
+        ylabel('Cursor')
+        
+    end
     
 end
+
