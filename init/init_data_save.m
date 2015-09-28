@@ -37,4 +37,5 @@ function handles = init_data_save(handles)
     x.arduino.cap_touch = zeros(x.tot_task_iters*20, 1);
     x.arduino.acc = zeros(x.tot_task_iters*20, 3);
     x.arduino.abs_time = zeros(x.tot_task_iters*20, 1);
+    x.arduino.beep = zeros(x.tot_task_iters*20, 1);
     handles.save_data = x;

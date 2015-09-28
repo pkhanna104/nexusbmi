@@ -28,6 +28,7 @@ classdef movement_task < handle
         tap_bool;
         
         beep;
+        beep_bool;
     end
     
     methods
@@ -54,9 +55,12 @@ classdef movement_task < handle
             obj.sub_cycle = 0;
             obj.task_fs = 20;
             obj.sub_loop_time = 1/obj.task_fs;
-            obj.mod_check_neural = obj.loop_time / (1/obj.task_fs);
             obj.target_y_pos = nan;
             obj.beep = wavread('beep-01a.wav');
+            obj.tap_bool = 0;
+            obj.mod_check_neural = (obj.loop_time / (1/obj.task_fs))-2;
+            obj.sub_cycle_abs_time = 0;
+            obj.beep_bool = 0;
         end
         
         function handles = cycle(obj, handles)
@@ -79,17 +83,12 @@ classdef movement_task < handle
                
             end
             
-            %Update Accel? 
-            try
-                if isnan(obj.ard)
-                end
-            catch
-                obj.acc_dat = [0 0 0];%[analogRead(obj.ard, A0), analogRead(obj.ard, A1), analogRead(obj.ard, A2)];
-            end
+            %Update Accel
+            obj.tap_bool = digitalRead(obj.ard,8);
+            obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);
-            obj.tap_bool = 0;
-           
+            
         end
         
         function tf = start_hold(obj, handles)
@@ -102,12 +101,14 @@ classdef movement_task < handle
             if obj.hold < obj.ts
                 tf = 1;
                 soundsc(obj.beep,140000)
+                obj.beep_bool = 1;
             else
                 tf = 0;
             end
         end
         
         function tf = ITI_end(obj, handles)
+            obj.beep_bool = 0;
             if obj.ts > obj.ITI
                 tf = 1;
                 obj.rew_flag = 0;

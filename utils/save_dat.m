@@ -35,6 +35,11 @@ end
 
 ard_ix = handles.task.sub_cycle;
 handles.save_data.arduino.cap_touch(ard_ix) = handles.task.tap_bool;
-handles.save_data.arduino.acc(ard_ix,:) = handles.task.acc_dat; %TODO
-handles.save_data.arduino.t(ard_ix) = handles.task.sub_cycle_abs_time; %TODO
+handles.save_data.arduino.acc(ard_ix,:) = handles.task.acc_dat; 
+handles.save_data.arduino.t(ard_ix) = handles.task.sub_cycle_abs_time; 
+try
+    handles.save_data.arduino.beep(ard_ix) = handles.task.beep_bool;
+catch
+    dummy=0;
+end
 end

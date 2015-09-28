@@ -33,5 +33,7 @@ plot(t, pxx2)
 ard_t = dat.arduino.abs_time;
 ard_t = dat.arduino.t;
 acc = dat.arduino.acc(1:length(ard_t),:);
+cap = dat.arduino.cap_touch(1:length(ard_t));
 hold all
 plot(ard_t, acc)
+plot(ard_t, (cap*10)+500)
