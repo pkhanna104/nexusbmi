@@ -15,22 +15,14 @@ classdef nexus_power_extractor < feature_extractor
         f_max = 150;
         last_features;
         beta_pow_chan;
+        domain; %td or pxx for time domain or power channel
     end
     
     methods
         function obj = nexus_power_extractor(extractor_params)
             
-            if extractor_params.differential_chan==0
-                obj.use_differential_feat = 0;
-            else
-                obj.use_differential_feat = 1;
-            end
-            
-            obj.differential_chan = extractor_params.differential_chan;
-            
             %Time 
             obj.width = round(extractor_params.width_t/1000*extractor_params.fs);
-            
             
             %Get frequencies 
             test = zeros(obj.width,1);
@@ -40,11 +32,17 @@ classdef nexus_power_extractor < feature_extractor
             obj.params     = struct('fpass',[0 obj.f_max],'Fs',obj.fs,'tapers',[3 5]);
             
             [~,f] = mtspectrumc(double(test),obj.params);
-            
             % nfft=max(2^(nextpow2(obj.width)),obj.width);
             % [f,~]=getfgrid(extractor_params.fs,nfft,[0 obj.f_max]);
             
-            % frequency range indices
+
+            %Get domain: 
+            if isfield(extractor_params,'domain')
+                obj.domain=extractor_params.domain;
+            else
+                obj.domain = 'td';
+            end
+]            % frequency range indices
             bandc = {};
             for c = 1:size(extractor_params.f_ranges,1)
                 bandc{c} = find((f >= extractor_params.f_ranges(c,1)) & ...
@@ -53,7 +51,7 @@ classdef nexus_power_extractor < feature_extractor
                         
             obj.range_inds = bandc;        
             obj.f_ranges     = extractor_params.f_ranges;
-            obj.n_features = length(extractor_params.used_chan) * size(obj.f_ranges,1);
+            obj.n_features = size(obj.f_ranges,1);
             
             obj.last_features = struct();
             obj.last_features.fd = [0];
@@ -61,17 +59,17 @@ classdef nexus_power_extractor < feature_extractor
             obj.task_f_ranges = extractor_params.task_f_ranges;
             
             disp(strcat('n_features ',num2str(obj.n_features)));
-            obj.used_chan  = extractor_params.used_chan;
-            obj.used_chan_array = {}; % have every frequency use same channels for now
-            
-            for c = 1:size(obj.f_ranges,1)
-                obj.used_chan_array{c,1} = extractor_params.used_chan;
-            end
+            %obj.used_chan_array = {}; % have every frequency use same channels for now
+%             
+%             for c = 1:size(obj.f_ranges,1)
+%                 obj.used_chan_array{c,1} = extractor_params.used_chan;
+%             end
             
             obj.chnfeat_index = repmat(obj.used_chan(:),(size(obj.f_ranges,1)),1);
             obj.ftfeat_index = reshape(repmat(1:size(obj.f_ranges,1),length(obj.used_chan),1),...
                 size(obj.f_ranges,1)*length(obj.used_chan),1);
           
+           
             obj.task_indices_f_ranges = zeros(length(obj.f_ranges),1);
             
             %Which is the task relevant f_range?
@@ -96,15 +94,9 @@ classdef nexus_power_extractor < feature_extractor
                 %data = recent_neural{obj.used_chan};
                 
                 %M1 channel: 
-                data = recent_neural{3};
-                beta = recent_neural{4};
+                data = recent_neural{obj.used_chan};
+                %beta = recent_neural{4};
                 
-    %            data = recent_neural{2};
-    %             if obj.use_differential_feat
-    %                 ref_data = recent_neural{obj.differential_chan, 1};% Check nexus format
-    %                 data = data - ref_data;
-    %             end
-
                 if (obj.f_ranges(1,2)-obj.f_ranges(1,1) < 10)
                     obj.params.pad = 2;
                 end
@@ -118,36 +110,44 @@ classdef nexus_power_extractor < feature_extractor
                 end
                 %disp('data2');
                 size(data)
-                [S,~] = mtspectrumc(data,obj.params);
+                
+                
+                if strcmp(domain,'td')
+                    [S,~] = mtspectrumc(data,obj.params);
 
-                % compute average power of each band of interest
-                % pow = zeros(size(obj.ranges,1),size(S,2));
-                features = struct();
-                features.td = zeros(obj.n_features,1);
-                features.fd = beta;
-                cur = 0;
-                for c = 1:size(obj.f_ranges,1)
-                    temp = S(obj.range_inds{c},:);    
-                    temp = sum(temp,1); %SUM across frequencies
-                    %temp = mean(temp,1) <--- this is what Sid/Kelvin used
-    %                 if obj.log_flag
-    %                     feat = log10(temp);
-    %                 else
-    %                     feat = temp;
-    %                 end : MOVE LOG TO calc_lfp_cursor
-                    feat = temp;
+                    % compute average power of each band of interest
+                    % pow = zeros(size(obj.ranges,1),size(S,2));
+                    features = struct();
+                    features.td = zeros(obj.n_features,1);
+                    features.fd = beta;
+                    cur = 0;
+                    for c = 1:size(obj.f_ranges,1)
+                        temp = S(obj.range_inds{c},:);    
+                        temp = sum(temp,1); %SUM across frequencies
+                        %temp = mean(temp,1) <--- this is what Sid/Kelvin used
+        %                 if obj.log_flag
+        %                     feat = log10(temp);
+        %                 else
+        %                     feat = temp;
+        %                 end : MOVE LOG TO calc_lfp_cursor
+                        feat = temp;
+
+                        %This is stupidly complicated, but basically, each
+                        %'feat' is  a single number, so features is an
+                        % [n_iter x 100] matrix  
+                        features.td( (1 : length(feat)) + cur ) = feat;
+                        cur = cur + length(feat);                                
+                    end
+
+                    if cur ~= obj.n_features
+                        error('Incorrect number of features')
+                    end
                     
-                    %This is stupidly complicated, but basically, each
-                    %'feat' is  a single number, so features is an
-                    % [n_iter x 100] matrix  
-                    features.td( (1 : length(feat)) + cur ) = feat;
-                    cur = cur + length(feat);                                
-                end
-
-                if cur ~= obj.n_features
-                    error('Incorrect number of features')
+                elseif strcmp(obj.domain, 'pxx')
+                    features = data;
                 end
                 obj.last_features = features;
+                    
             end
         
         end    

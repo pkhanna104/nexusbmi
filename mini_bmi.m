@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 12-Oct-2015 22:26:56
+% Last Modified by GUIDE v2.5 14-Oct-2015 13:43:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -184,39 +184,42 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in nexusSource.
-function nexusSource_Callback(hObject, eventdata, handles)
-% hObject    handle to nexusSource (see GCBO)
+% --- Executes on button press in nexusSource_td.
+function nexusSource_td_Callback(hObject, eventdata, handles)
+% hObject    handle to nexusSource_td (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of nexusSource
+% Hint: get(hObject,'Value') returns toggle state of nexusSource_td
 nx = get(hObject,'Value');
-handles.neural_source_name.nexus = nx;
+handles.neural_source_name = 'nexus_td';
+handles.extractor_params.nexus_domain = 'td';
 if nx
-    set(handles.simNexusSource,'Value',0);
-    handles.neural_source_name.sim_nexus = 0;
-    handles.neural_source_name.accel = 0;
+    set(handles.simNexusSource_td,'Value',0);
     set(handles.accelSource,'Value',0);
+    set(handles.nexusSource_pxx,'Value',0);
+    set(handles.simNexusSource_pxx,'Value',0);
 end
 
 guidata(hObject, handles);
 
 
-% --- Executes on button press in simNexusSource.
-function simNexusSource_Callback(hObject, eventdata, handles)
-% hObject    handle to simNexusSource (see GCBO)
+% --- Executes on button press in simNexusSource_td.
+function simNexusSource_td_Callback(hObject, eventdata, handles)
+% hObject    handle to simNexusSource_td (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hint: get(hObject,'Value') returns toggle state of simNexusSource
+% Hint: get(hObject,'Value') returns toggle state of simNexusSource_td
 sim_nx = get(hObject,'Value');
-handles.neural_source_name.sim_nexus = sim_nx; 
+handles.neural_source_name = 'sim_nexus_td'; 
+handles.extractor_params.nexus_domain = 'td';
+
 if sim_nx
-    set(handles.nexusSource,'Value',0);
-    handles.neural_source_name.nexus = 0;
-    handles.neural_source_name.accel = 0;
+    set(handles.nexusSource_td,'Value',0);
     set(handles.accelSource,'Value',0);
+    set(handles.nexusSource_pxx, 'Value', 0);
+    set(handles.simNexusSource_pxx,'Value',0);
 end
 if sim_nx
     set(handles.serial_port_box,'String','')
@@ -287,30 +290,6 @@ guidata(hObject, handles);
 % --- Executes during object creation, after setting all properties.
 function chan_idx_box_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to chan_idx_box (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-function diff_ref_box_Callback(hObject, eventdata, handles)
-% hObject    handle to diff_ref_box (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of diff_ref_box as text
-%        str2double(get(hObject,'String')) returns contents of diff_ref_box as a double
-
-handles.extractor_params.differential_chan = str2double(get(hObject,'String'));
-guidata(hObject, handles);
-
-% --- Executes during object creation, after setting all properties.
-function diff_ref_box_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to diff_ref_box (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -766,12 +745,12 @@ function accelSource_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 acc = get(handles.accelSource, 'Value');
-handles.neural_source_name.accel = acc;
+handles.neural_source_name = 'accel';
 if acc
-    handles.neural_source_name.nexus = 0;
-    handles.neural_source_name.sim_nexus = 0;
-    set(handles.simNexusSource,'Value',0);
-    set(handles.nexusSource,'Value',0);
+    set(handles.simNexusSource_td,'Value',0);
+    set(handles.nexusSource_td,'Value',0);
+    set(handles.nexusSource_pxx,'Value',0);
+    set(handles.simNexusSource_pd,'Value'0);
 end
 guidata(hObject,handles);
 
@@ -806,3 +785,44 @@ function extractor_drop_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in nexusSource_pxx.
+function nexusSource_pxx_Callback(hObject, eventdata, handles)
+% hObject    handle to nexusSource_pxx (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+nx = get(handles.nexusSource_pxx, 'Value');
+handles.extractor_params.nexus_domain = 'pxx';
+handles.neural_source_name = 'nexus_pxx';
+
+if nx
+    set(handles.simNexusSource_td,'Value',0);
+    set(handles.nexusSource_td,'Value',0);
+    set(handles.accelSource,'Value',0);
+    set(handles.simNexusSource_pxx,'Value',0);
+end
+guidata(hObject,handles);
+
+% Hint: get(hObject,'Value') returns toggle state of nexusSource_pxx
+
+
+% --- Executes on button press in simNexusSource_pxx.
+function simNexusSource_pxx_Callback(hObject, eventdata, handles)
+% hObject    handle to simNexusSource_pxx (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+nx = get(handles.simNexusSource_pxx, 'Value');
+handles.extractor_params.nexus_domain = 'pxx';
+handles.neural_source_name = 'sim_nexus_pxx';
+
+if nx
+    set(handles.simNexusSource_td,'Value',0);
+    set(handles.nexusSource_td,'Value',0);
+    set(handles.accelSource,'Value',0);
+    set(handles.nexusSource_pxx,'Value',0);
+end
+guidata(hObject,handles);
+
+
+% Hint: get(hObject,'Value') returns toggle state of simNexusSource_pxx
