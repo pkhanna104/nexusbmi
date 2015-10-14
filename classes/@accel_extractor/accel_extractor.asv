@@ -1,0 +1,24 @@
+classdef accel_extractor < feature_extractor
+% mtm method for power spectrum extraction
+    
+    properties
+        task_indices_f_ranges
+    end
+    
+    methods
+        function obj = accel_extractor(extractor_params)
+            obj.task_indices_f_ranges = 2; %Accelerometer in buffer
+            
+        end                        
+
+        function features = extract_features(obj,recent_neural)
+            features = zeros(1,len(recent_neural));
+            fo
+            try
+                features = sum(abs(recent_neural));
+            catch
+                features = 0;
+            end
+        end    
+    end
+end

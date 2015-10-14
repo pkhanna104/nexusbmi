@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 16-Sep-2015 09:16:53
+% Last Modified by GUIDE v2.5 12-Oct-2015 22:26:56
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -193,8 +193,13 @@ function nexusSource_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of nexusSource
 nx = get(hObject,'Value');
 handles.neural_source_name.nexus = nx;
-set(handles.simNexusSource,'Value',~nx);
-handles.neural_source_name.sim_nexus = ~nx;
+if nx
+    set(handles.simNexusSource,'Value',0);
+    handles.neural_source_name.sim_nexus = 0;
+    handles.neural_source_name.accel = 0;
+    set(handles.accelSource,'Value',0);
+end
+
 guidata(hObject, handles);
 
 
@@ -207,11 +212,16 @@ function simNexusSource_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of simNexusSource
 sim_nx = get(hObject,'Value');
 handles.neural_source_name.sim_nexus = sim_nx; 
-set(handles.nexusSource,'Value',~sim_nx);
-handles.neural_source_name.nexus = ~sim_nx;
+if sim_nx
+    set(handles.nexusSource,'Value',0);
+    handles.neural_source_name.nexus = 0;
+    handles.neural_source_name.accel = 0;
+    set(handles.accelSource,'Value',0);
+end
 if sim_nx
     set(handles.serial_port_box,'String','')
 end
+
 guidata(hObject, handles);
 
 
@@ -748,3 +758,51 @@ function ard_check_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of ard_check
+
+
+% --- Executes on button press in accelSource.
+function accelSource_Callback(hObject, eventdata, handles)
+% hObject    handle to accelSource (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+acc = get(handles.accelSource, 'Value');
+handles.neural_source_name.accel = acc;
+if acc
+    handles.neural_source_name.nexus = 0;
+    handles.neural_source_name.sim_nexus = 0;
+    set(handles.simNexusSource,'Value',0);
+    set(handles.nexusSource,'Value',0);
+end
+guidata(hObject,handles);
+
+
+
+% Hint: get(hObject,'Value') returns toggle state of accelSource
+
+
+% --- Executes on selection change in extractor_drop.
+function extractor_drop_Callback(hObject, eventdata, handles)
+% hObject    handle to extractor_drop (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns extractor_drop contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from extractor_drop
+
+contents = get(hObject,'String');
+val = get(hObject,'Value');
+handles.extractor_name = contents{val};
+guidata(hObject,handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function extractor_drop_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to extractor_drop (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

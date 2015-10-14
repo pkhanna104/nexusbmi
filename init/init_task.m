@@ -29,8 +29,8 @@ handles.stop = 0;
 
 %Dict of sources / features / etc.
 neural_sources = struct();
-neural_sources.names = {'sim_nexus', 'nexus'};
-neural_sources.obj = {@sim_nexus_interface, @nexus_interface};
+neural_sources.names = {'sim_nexus', 'nexus','accel'};
+neural_sources.obj = {@sim_nexus_interface, @nexus_interface, @accel};
 
 %Init task
 task_sources = struct();
@@ -110,7 +110,20 @@ else
     handles.decoding.lp_filter = 1;
 end
 
-handles.feature_extractor = nexus_power_extractor(handles.extractor_params);
+extractor_sources = struct();
+extractor_sources.names = {'Nexus Power Ext.', 'Accel Ext.'};
+extractor_sources.obj = {@nexus_power_extractor, @accel_extractor};
+
+if isfield(handles, 'extractor_name')
+    ext_str = handles.extractor_name;
+    for e=1:length(extractor_sources.names)
+        if strcmp(extractor_sources.names{e}, ext_str)
+            handles.feature_extractor = extractor_sources.obj{e}(handles.extractor_params);
+        end
+    end
+else
+     handles.feature_extractor = nexus_power_extractor(handles.extractor_params);
+end
 
 %Create Task_Data Saving
 handles.iter_cnt = 1;

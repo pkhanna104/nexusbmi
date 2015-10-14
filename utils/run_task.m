@@ -1,6 +1,7 @@
 function handles = run_task(handles)
     loop_start = tic;
     data = []; seq = []; feat = [];
+    
     if (mod(handles.task.sub_cycle, handles.task.mod_check_neural)==0)
         %Get neural data
         %Data output as 1x2 cell array of vectors or 1x2 cell array of nans
