@@ -97,6 +97,10 @@ if load_dec
     ix = get(handles.decoder_list,'Value');
     
     dec  = load(DL{ix});
+    %For compatibility with old decoders
+    if ~isfield(dec.decoder,'method')
+        dec.decoder.method = 'simple';
+    end
     if strcmp(dec.decoder.method, 'simple')
         handles.decoder = decoder_simple(DL{ix},handles);
     elseif strcmp(dec.decoder.method, 'KF')

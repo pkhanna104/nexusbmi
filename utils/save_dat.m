@@ -1,4 +1,4 @@
-function handles = save_dat(handles, data, seq, feat)
+function handles = save_dat(handles, data, seq, feat, load_dec)
 
 ix = handles.iter_cnt;
 if ~isempty(data)
@@ -7,10 +7,12 @@ if ~isempty(data)
     handles.save_data.target(ix) = handles.task.target_y_pos;
     handles.save_data.hold_times{ix} = handles.task.hold;
     
-    handles.save_data.decoded_pos(ix) = handles.decoder.decoded_position(1:end-1);
-    handles.save_data.ideal_pos(ix) = handles.decoder.ideal_position;
-    handles.save_data.assist_level(ix) = handles.decoder.assist_level;
-    handles.save_data.lp_filter(ix) = handles.decoder.lp_filter;
+    if load_dec
+        handles.save_data.decoded_pos(ix) = handles.decoder.decoded_position(1:end-1);
+        handles.save_data.ideal_pos(ix) = handles.decoder.ideal_position;
+        handles.save_data.assist_level(ix) = handles.decoder.assist_level;
+        handles.save_data.lp_filter(ix) = handles.decoder.lp_filter;
+    end
     
     if strcmp(handles.task.state, 'reward') && ~strcmp(handles.save_data.state{ix-1}, 'reward')
         handles.save_data.reward_times{1} = [handles.save_data.reward_times{1} ix];
@@ -44,7 +46,7 @@ handles.save_data.arduino.t(ard_ix) = handles.task.sub_cycle_abs_time;
 
 if isprop(handles.neural_source,'ard_buff')
     handles.neural_source.ard_buff.cap = [handles.neural_source.ard_buff.cap handles.task.tap_bool];
-    handles.neural_source.ard_buff.accel = [handles.neural_source.ard_buff.accel handles.task.acc_dat];
+    handles.neural_source.ard_buff.accel = [handles.neural_source.ard_buff.accel handles.task.acc_dat'];
 end
 
 try

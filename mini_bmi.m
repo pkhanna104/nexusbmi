@@ -112,7 +112,12 @@ function go_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global nex_init nex_inst;
+
+
 load_dec = 1;
+if and(handles.extractor_name(1:3) == 'Acc', get(handles.task_list_pulldown,'Value')==4)
+    load_dec = 0;
+end
 handles = init_task(handles, load_dec);
 keep_running = 1; 
 
@@ -124,7 +129,7 @@ intro_display(handles);
 
 while keep_running
     
-    handles = run_task(handles);
+    handles = run_task(handles, load_dec);
     [handles, keep_running] = update_handles_from_gui(handles);
 
 end

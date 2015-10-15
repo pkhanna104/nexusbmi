@@ -1,4 +1,4 @@
-function handles = run_task(handles)
+function handles = run_task(handles, load_dec)
     loop_start = tic;
     data = []; seq = []; feat = [];
     
@@ -12,7 +12,9 @@ function handles = run_task(handles)
         handles.save_data.rawdata_abs_time(handles.iter_cnt) = T;
         
         %Calculate Stuff
-        handles = handles.decoder.calc_cursor(feat, handles); 
+        if load_dec
+            handles = handles.decoder.calc_cursor(feat, handles); 
+        end
         handles.iter_cnt = handles.iter_cnt+1;
     end
     
@@ -23,7 +25,7 @@ function handles = run_task(handles)
     handles = update_display(handles);
     
     %Save Stuff
-    handles = save_dat(handles, data, seq, feat);
+    handles = save_dat(handles, data, seq, feat, load_dec);
 
     %How long has it been? Wait? 
     y = toc(loop_start);

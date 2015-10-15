@@ -46,6 +46,8 @@ classdef accel < handle
             T = toc(handles.tic);
             obj.time_cnt = obj.time_cnt + 1;
             Data = {[obj.ard_buff.cap], [obj.ard_buff.accel],[0],[0]};
+            obj.ard_buff.cap = [];
+            obj.ard_buff.accel = [];
             seq = [0,0];
             %seq = [obj.cnt1, obj.cnt3];
             %obj.cnt1 = obj.cnt1+2;

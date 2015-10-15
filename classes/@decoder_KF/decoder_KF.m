@@ -95,17 +95,14 @@ classdef decoder_KF < handle
         function handles = calc_cursor(obj, feat, handles)
             % feat is a lfp band x 1 array if time domain
             % else if a pxx channel
-            if strcmp(handles.feature_extractor.domain, 'td')
+            if or(strcmp(handles.feature_extractor.domain, 'td'), strcmp(handles.feature_extractor.domain, 'accel'))
                 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
-                
-                %Normalize features: 
-                sqrt_task_feat = sqrt(feat(task_ind));
-                task_feat = sqrt_task_feat - obj.mn_sqrt_neur;
-                
-            elseif strcmp(handles.feature_extractor.domain, 'pxx')
-                task_feat = sqrt(mean(feat));
+                feat = feat(task_ind);
             end
-            
+
+            %Normalize features: 
+            sqrt_task_feat = sqrt(feat);
+            task_feat = sqrt_task_feat - obj.mn_sqrt_neur;
             
             % Update Parameters:
             obj=obj.run_RML();
@@ -153,18 +150,31 @@ classdef decoder_KF < handle
             pred_x_t = squeeze(obj.x_tm_est_arr(cnt,:))';
             pred_cov_t = squeeze(obj.cov_tm_est_arr(cnt,:,:));
             
-            %Measurment Update
-            K = pred_cov_t*obj.C'*inv(obj.C*pred_cov_t*obj.C' + obj.Q);
-            meas_x_t = pred_x_t + K*(feat - (obj.C*pred_x_t));
-            meas_cov_t = (eye(length(obj.C)) - K*obj.C)*pred_cov_t;
-            obj.x_ms_est_arr(cnt,:) = meas_x_t;
-            obj.cov_ms_est_arr(cnt,:,:) = meas_cov_t;
+            if isnan(feat)
+                disp('skipping this iteration')
+                obj.x_tm_est_arr(cnt+1,:) = pred_x_t;
+                obj.cov_tm_est_arr(cnt+1,:,:) = pred_cov_t;
+                try
+                    ypos = obj.x_ms_est_arr(cnt-1,:);
+                catch
+                    %only if first idx:
+                    ypos = pred_x_t;
+                end
+            else
             
-            ypos = meas_x_t;
-            
-            %Time Update for Next Time: 
-            obj.x_tm_est_arr(cnt+1,:) = obj.A*meas_x_t;
-            obj.cov_tm_est_arr(cnt+1,:,:) = obj.A*meas_cov_t*obj.A' + obj.W;
+                %Measurment Update
+                K = pred_cov_t*obj.C'*inv(obj.C*pred_cov_t*obj.C' + obj.Q);
+                meas_x_t = pred_x_t + K*(feat - (obj.C*pred_x_t));
+                meas_cov_t = (eye(length(obj.C)) - K*obj.C)*pred_cov_t;
+                obj.x_ms_est_arr(cnt,:) = meas_x_t;
+                obj.cov_ms_est_arr(cnt,:,:) = meas_cov_t;
+
+                ypos = meas_x_t;
+
+                %Time Update for Next Time: 
+                obj.x_tm_est_arr(cnt+1,:) = obj.A*meas_x_t;
+                obj.cov_tm_est_arr(cnt+1,:,:) = obj.A*meas_cov_t*obj.A' + obj.W;
+            end
             
         end
         

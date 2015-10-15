@@ -33,6 +33,7 @@ elseif strcmp(source(end-2:end), 'pxx')
 elseif strcmp(source, 'accel')
     %Data is saved as {[obj.ard_buff.cap], [obj.ard_buff.accel],[0],[0]}
     feats = cell2mat(dat.rawdata_power_ch2);
+    feats = sum(feats, 1);
     lower_lim = 0;
     upper_lim = 0;
 end
