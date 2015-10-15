@@ -20,6 +20,8 @@ classdef nexus_power_extractor < feature_extractor
     
     methods
         function obj = nexus_power_extractor(extractor_params)
+            %Chan idx
+            obj.used_chan = extractor_params.used_chan;
             
             %Time 
             obj.width = round(extractor_params.width_t/1000*extractor_params.fs);
@@ -42,7 +44,7 @@ classdef nexus_power_extractor < feature_extractor
             else
                 obj.domain = 'td';
             end
-]            % frequency range indices
+            % frequency range indices
             bandc = {};
             for c = 1:size(extractor_params.f_ranges,1)
                 bandc{c} = find((f >= extractor_params.f_ranges(c,1)) & ...
@@ -112,14 +114,14 @@ classdef nexus_power_extractor < feature_extractor
                 size(data)
                 
                 
-                if strcmp(domain,'td')
+                if strcmp(obj.domain,'td')
                     [S,~] = mtspectrumc(data,obj.params);
 
                     % compute average power of each band of interest
                     % pow = zeros(size(obj.ranges,1),size(S,2));
-                    features = struct();
-                    features.td = zeros(obj.n_features,1);
-                    features.fd = beta;
+                    
+                    features = zeros(obj.n_features,1);
+                    
                     cur = 0;
                     for c = 1:size(obj.f_ranges,1)
                         temp = S(obj.range_inds{c},:);    
@@ -135,13 +137,13 @@ classdef nexus_power_extractor < feature_extractor
                         %This is stupidly complicated, but basically, each
                         %'feat' is  a single number, so features is an
                         % [n_iter x 100] matrix  
-                        features.td( (1 : length(feat)) + cur ) = feat;
+                        features( (1 : length(feat)) + cur ) = feat;
                         cur = cur + length(feat);                                
                     end
 
                     if cur ~= obj.n_features
                         error('Incorrect number of features')
-                    end
+                    end;
                     
                 elseif strcmp(obj.domain, 'pxx')
                     features = data;

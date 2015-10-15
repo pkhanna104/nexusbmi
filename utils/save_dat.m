@@ -7,10 +7,10 @@ if ~isempty(data)
     handles.save_data.target(ix) = handles.task.target_y_pos;
     handles.save_data.hold_times{ix} = handles.task.hold;
     
-    handles.save_data.decoded_pos(ix) = handles.decoding.decoded_position;
-    handles.save_data.ideal_pos(ix) = handles.decoding.ideal_position;
-    handles.save_data.assist_level(ix) = handles.decoding.assist_level;
-    handles.save_data.lp_filter(ix) = handles.decoding.lp_filter;
+    handles.save_data.decoded_pos(ix) = handles.decoder.decoded_position(1:end-1);
+    handles.save_data.ideal_pos(ix) = handles.decoder.ideal_position;
+    handles.save_data.assist_level(ix) = handles.decoder.assist_level;
+    handles.save_data.lp_filter(ix) = handles.decoder.lp_filter;
     
     if strcmp(handles.task.state, 'reward') && ~strcmp(handles.save_data.state{ix-1}, 'reward')
         handles.save_data.reward_times{1} = [handles.save_data.reward_times{1} ix];
@@ -33,7 +33,7 @@ if ~isempty(data)
     end
     
     
-    handles.save_data.features(ix,1:length(feat.fd)) = feat.fd;
+    handles.save_data.features(ix,1:length(feat)) = feat;
     handles.save_data.packet_seq(ix,:) = seq;
 end
 

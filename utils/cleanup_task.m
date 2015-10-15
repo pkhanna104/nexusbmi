@@ -4,9 +4,8 @@ function cleanup_task(handles)
     % Save data:
     dat = handles.save_data;
     dat.iter_cnt = handles.iter_cnt;
-    %Adjust for Berkeley / UCSF:
+    dat.decoder = handles.decoder;
     
-    %handles.ucsf: 1 = ucsf, 2 = pk-mbp;
     filename = get_data_fname('data',handles);
     save(filename,'dat');
     

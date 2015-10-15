@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 14-Oct-2015 13:43:51
+% Last Modified by GUIDE v2.5 15-Oct-2015 10:25:40
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,10 +60,10 @@ handles.output = hObject;
 %from). 
 
 if exist('config.txt','file')==2
-    [label paths] = textread('config.txt', '%s %s',5);
+    [label paths] = textread('config.txt', '%s %s',6);
     
     %Confirm labels are correct
-    corr_labels = {'config','root','dec','dat','med'};
+    corr_labels = {'config','root','dec','dat','med','beep'};
     for l = 1:length(label)
         if ~strcmp(corr_labels{l}, label{l})
             errordlg('Re Run Config File Maker -- error in labels')
@@ -74,6 +74,7 @@ if exist('config.txt','file')==2
     handles.dec_path = paths{3};
     handles.dat_path = paths{4};
     handles.med_path = paths{5};
+    handles.beep_path = paths{6};
         
 else
     h = errordlg('Run Config File maker in /nexusbmi/config/make_config_file.m!');
@@ -358,36 +359,12 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on button press in calibrate_button.
-function calibrate_button_Callback(hObject, eventdata, handles)
-% hObject    handle to calibrate_button (see GCBO)
+% --- Executes on button press in train_decoder_button.
+function train_decoder_button_Callback(hObject, eventdata, handles)
+% hObject    handle to train_decoder_button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-%Collect timeseries data for 1 minute:
-iters = ceil(5/0.4);
-
-load_dec = 0;
-handles = init_task(handles, load_dec);
-
-beep = wavread('beep-01a.wav');
-beep_ok = 0;
-
-for it = 1:iters
-    if mod(beep_ok,5) == 0
-        if rand(1) > .75
-            soundsc(beep,140000)
-            beep_ok = beep_ok + 1;
-        end
-    else
-        beep_ok = beep_ok + 1;
-    end
-        
-    handles = run_task(handles);
-end
-
 make_decoder(handles)
-close(handles.window.task_display)
 
 
 % --- Executes on selection change in decoder_list.
@@ -750,7 +727,7 @@ if acc
     set(handles.simNexusSource_td,'Value',0);
     set(handles.nexusSource_td,'Value',0);
     set(handles.nexusSource_pxx,'Value',0);
-    set(handles.simNexusSource_pd,'Value'0);
+    set(handles.simNexusSource_pxx,'Value',0);
 end
 guidata(hObject,handles);
 
@@ -826,3 +803,26 @@ guidata(hObject,handles);
 
 
 % Hint: get(hObject,'Value') returns toggle state of simNexusSource_pxx
+
+
+% --- Executes on selection change in decoder_method.
+function decoder_method_Callback(hObject, eventdata, handles)
+% hObject    handle to decoder_method (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns decoder_method contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from decoder_method
+
+
+% --- Executes during object creation, after setting all properties.
+function decoder_method_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to decoder_method (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

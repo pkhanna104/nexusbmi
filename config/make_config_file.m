@@ -19,10 +19,13 @@ if str2double(answer{2})==1 %Windows
     dec_path = [root 'decoder\'];
     dat_path = [root 'data\'];
     med_path = [root 'media\'];
+    beep_path = [root 'utils\'];
+    
 elseif str2double(answer{2}) == 2 %Mac
     dec_path = [root 'decoder/'];
     dat_path = [root 'data/'];
     med_path = [root 'media/'];
+    beep_path = [root 'utils/'];
 else
     disp('Machine Type not recognized...try again!')
 end
@@ -33,6 +36,7 @@ fprintf(fid, '%s\n',['root ' root ]);
 fprintf(fid, '%s\n',['dec ' dec_path ]);
 fprintf(fid, '%s\n',['dat ' dat_path ]);
 fprintf(fid, '%s\n',['med ' med_path ]);
+fprintf(fid, '%s\n',['beep ' beep_path ]);
 fclose(fid);
 
     

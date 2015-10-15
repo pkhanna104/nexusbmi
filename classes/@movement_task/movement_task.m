@@ -56,7 +56,7 @@ classdef movement_task < handle
             obj.task_fs = 20;
             obj.sub_loop_time = 1/obj.task_fs;
             obj.target_y_pos = nan;
-            obj.beep = wavread('beep-01a.wav');
+            obj.beep = wavread('beep-02.wav');
             obj.tap_bool = 0;
             obj.mod_check_neural = (obj.loop_time / (1/obj.task_fs))-2;
             obj.sub_cycle_abs_time = 0;

@@ -13,7 +13,7 @@ function [handles, keep_running] = update_handles_from_gui(handles);
     %update assist
     try 
         if ~isempty(getappdata(handles.figure1, 'assist_level'))
-            handles.decoding.assist_level = getappdata(handles.figure1,'assist_level');
+            handles.decoder.assist_level = getappdata(handles.figure1,'assist_level');
         end
     catch 
     end
@@ -21,7 +21,7 @@ function [handles, keep_running] = update_handles_from_gui(handles);
     %update lp filter
     try
         if ~isempty(getappdata(handles.figure1, 'lp_filter'))
-            handles.decoding.lp_filter = getappdata(handles.figure1,'lp_filter');
+            handles.decoder.lp_filter = getappdata(handles.figure1,'lp_filter');
         end
     catch
     end

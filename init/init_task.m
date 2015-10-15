@@ -1,4 +1,4 @@
-function [handles] = init_task(handles,load_dec)
+function [handles] = init_task(handles, load_dec)
 
 %Hack to see if javapath has been added already. If it has, then don't add
 %it again. We do this becuase 'javaaddpath' seems to clear local variables,
@@ -38,6 +38,9 @@ task_sources.names = {'','target_task', 'target_touch_task','movement_task'};
 task_sources.obj = {'',@target_task, @target_touch_task, @movement_task};
 
 task_ix = get(handles.task_list_pulldown, 'Value');
+if task_ix ==1
+    error('Must select a task!')
+end
 hold_mn = str2num(get(handles.holdMean, 'String'));
 hold_var = str2num(get(handles.holdVar, 'String'));
 handles.task = task_sources.obj{task_ix}([hold_mn, hold_var]);
@@ -84,23 +87,26 @@ handles.extractor_params.task_f_ranges = [0, 0];
 % handles.extractor_params.f_ranges = [handles.extractor_params.f_ranges; ...
 %     handles.extractor_params.task_f_ranges];
 
+%Create Task_Data Saving
+handles.iter_cnt = 1;
+handles = init_data_save(handles, load_dec);
+
 %Init Decoder:
 if load_dec
-    if ~isfield(handles,'decoding')
-        DL = get(handles.decoder_list,'String');
-        ix = get(handles.decoder_list,'Value');
-        handles.decoding.file = DL{ix};
+    DL = get(handles.decoder_list,'String');
+    ix = get(handles.decoder_list,'Value');
+    
+    dec  = load(DL{ix});
+    if strcmp(dec.decoder.method, 'simple')
+        handles.decoder = decoder_simple(DL{ix},handles);
+    elseif strcmp(dec.decoder.method, 'KF')
+        handles.decoder = decoder_KF(DL{ix},handles);
     end
     
-    decoder = load([handles.dec_path handles.decoding.file]);
-    handles.decoding.mean = decoder.decoder.mean;
-    handles.decoding.std = decoder.decoder.std;
-    handles.decoding.assist_level = 0;
-    handles.decoding.lp_filter = 1;
-    
+    %Add spectral feature to decoder if necessary
     handles.extractor_params.f_ranges = [handles.extractor_params.f_ranges; ...
-        decoder.decoder.feature_band];
-    handles.extractor_params.task_f_ranges = decoder.decoder.feature_band;
+        handles.decoder.feature_band];
+    handles.extractor_params.task_f_ranges = handles.decoder.feature_band;
     
 else
     % In case of calibration:
@@ -127,38 +133,31 @@ else
      handles.feature_extractor = nexus_power_extractor(handles.extractor_params);
 end
 
-%Create Task_Data Saving
-handles.iter_cnt = 1;
-handles = init_data_save(handles);
-
 %Init Neural Interface
 %Check that a neural source is selected:
 if isfield(handles, 'neural_source_name')
-    sources = fieldnames(handles.neural_source_name);
-    for i = 1:numel(sources)
-        if handles.neural_source_name.(sources{i})
-            if isfield(handles,'neural_source')
+    source = handles.neural_source_name;
+    if isfield(handles,'neural_source')
                 
-                prompt = 'Already a neural source instantiated! Override? 0 or 1';
-                override = input(prompt);
-            else
-                override = 1;
-            end
+        prompt = 'Already a neural source instantiated! Override? 0 or 1';
+        override = input(prompt);
+    else
+        override = 1;
+    end
             
-            if override
-                %Find index for name of neural source:
-                idx = find(ismember(neural_sources.names, sources{i}));
-                
-                if isempty(idx)
-                    disp('Error: neural source not listed in line 9, init task.m')
-                else
-                    %Instantiate neural source object
-                    handles.neural_source = neural_sources.obj{idx}(handles);
-                    handles.neural_source.start_stream;
-                end
-            end
+    if override
+        %Find index for name of neural source:
+        idx = find(ismember(neural_sources.names, source));
+
+        if isempty(idx)
+            disp('Error: neural source not listed in line 9, init task.m')
+        else
+            %Instantiate neural source object
+            handles.neural_source = neural_sources.obj{idx}(handles);
+            handles.neural_source.start_stream;
         end
     end
+        
 else
     disp('Error: No neural source selected')
 end

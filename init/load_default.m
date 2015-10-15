@@ -8,16 +8,17 @@ handles.window.target_radius = 2;
 handles.window.cursor_radius = .001;
 
 % neural source;
-set(handles.simNexusSource, 'Value',0);
-set(handles.nexusSource, 'Value',1);
-handles.neural_source_name.nexus = 1;
+% set(handles.simNexusSource_td, 'Value',0);
+% set(handles.simNexusSource_pxx, 'Value',0);
+% set(handles.nexusSource, 'Value',1);
+% handles.neural_source_name.nexus = 1;
 set(handles.serial_port_box, 'String', 'COM3');
 
 % extractor params;
 set(handles.window_size_box,'String',400);
 set(handles.sampling_freq_box, 'String',422);
 set(handles.chan_idx_box, 'String',1);
-set(handles.diff_ref_box, 'String',0);
+%set(handles.diff_ref_box, 'String',0);
 
 % set(handles.low_frac_lim_box,'String',25);
 % set(handles.high_frac_lim_box,'String',40);

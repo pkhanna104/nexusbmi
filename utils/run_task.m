@@ -12,7 +12,7 @@ function handles = run_task(handles)
         handles.save_data.rawdata_abs_time(handles.iter_cnt) = T;
         
         %Calculate Stuff
-        handles = calc_cursor(feat, handles); 
+        handles = handles.decoder.calc_cursor(feat, handles); 
         handles.iter_cnt = handles.iter_cnt+1;
     end
     

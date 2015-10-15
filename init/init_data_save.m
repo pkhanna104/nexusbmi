@@ -1,4 +1,4 @@
-function handles = init_data_save(handles)
+function handles = init_data_save(handles, load_dec)
 
     %Save things
     %Things to save: 
@@ -27,7 +27,12 @@ function handles = init_data_save(handles)
     x.packet_seq = zeros(x.tot_task_iters, 2);
     
     x.extractor_params = handles.extractor_params;
-    x.decoder = handles.decoding;
+    
+    %Decoder saving moved to 'cleanup script'
+    %     if load_dec
+    %         x.decoder = handles.decoder;
+    %     end
+    
     x.assist_level = zeros(x.tot_task_iters, 1);
     x.lp_filter = zeros(x.tot_task_iters, 1);
     x.decoded_pos = zeros(x.tot_task_iters, 1);
