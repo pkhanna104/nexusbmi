@@ -9,6 +9,7 @@ classdef decoder_KF < handle
         assist_level
         source
         feature_band
+        
         A
         W
         Q
@@ -21,14 +22,14 @@ classdef decoder_KF < handle
         S_arr
         T_arr
         EBS_arr
+        
         x_tm_est_arr
         x_ms_est_arr
-        
         cov_tm_est_arr
         cov_ms_est_arr
         
         it_cnt
-        
+        mn_sqrt_neur
         
     end
     
@@ -46,6 +47,7 @@ classdef decoder_KF < handle
             obj.W = d.decoder.W;
             obj.Q = d.decoder.Q;
             obj.C = d.decoder.C;
+            obj.mn_sqrt_neur = d.decoder.mn_sqrt_neur;
             
             its = handles.save_data.tot_task_iters;
             obj.A_arr = zeros(its,1);
@@ -64,7 +66,7 @@ classdef decoder_KF < handle
             obj.cov_tm_est_arr = zeros(its, 2,2);
             obj.cov_ms_est_arr = zeros(its, 2,2);
             
-            obj.x_tm_est_arr(1,:) = zeros(1,2);
+            obj.x_tm_est_arr(1,:) = [0, 1];
             obj.cov_tm_est_arr(1,:,:) = obj.W;
             obj.feature_band = d.decoder.feature_band;
             
@@ -95,9 +97,13 @@ classdef decoder_KF < handle
             % else if a pxx channel
             if strcmp(handles.feature_extractor.domain, 'td')
                 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
-                task_feat = mean(feat(task_ind));
+                
+                %Normalize features: 
+                sqrt_task_feat = sqrt(feat(task_ind));
+                task_feat = sqrt_task_feat - obj.mn_sqrt_neur;
+                
             elseif strcmp(handles.feature_extractor.domain, 'pxx')
-                task_feat = mean(feat);
+                task_feat = sqrt(mean(feat));
             end
             
             

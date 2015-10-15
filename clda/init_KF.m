@@ -6,7 +6,10 @@ function decoder = init_KF(feats, decoder)
 if nc==1
     feats = feats';
 end
-neur = sqrt(feats);
+
+%Normalize features:
+sqrt_neur = sqrt(feats);
+neur = sqrt_neur - mean(sqrt_neur);
 
 Y_targ_low = prctile(neur,10);
 Y_targ_hi = prctile(neur, 90);
@@ -23,7 +26,10 @@ X(1:end-1,:) = (Y-C(:,end))/C(:,1:end-1);
 
 %Estimate A, W: 
 A = (X(:,2:end)*X(:,1:end-1)')*inv((X(:,1:end-1)*X(:,1:end-1)'));
+A(end,end) = 1;
+
 W = 1/(length(feats)-1)*((X(:,2:end)*X(:,2:end)') - A*(X(:,1:end-1)*X(:,2:end)'));
+W(end,end) = 0;
 
 %Estimate Q (should be zero):
 Q = 1/length(feats)*((Y*Y') - C*(X*Y'));
@@ -32,3 +38,4 @@ decoder.A = A;
 decoder.W = W;
 decoder.C = C;
 decoder.Q = Q;
+decoder.mn_sqrt_neur = mean(sqrt_neur);

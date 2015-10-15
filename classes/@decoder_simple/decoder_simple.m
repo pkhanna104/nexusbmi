@@ -83,7 +83,7 @@ classdef decoder_simple < handle
             end
             
             ypos = nansum([alpha*obj.ideal_position; ...
-                (1-alpha)*obj.decoded_position],1);
+                (1-alpha)*obj.decoded_position(1:end-1)],1);
             
             % Clip cursor to stay on screen:
             if ypos > 10
@@ -98,6 +98,7 @@ classdef decoder_simple < handle
         
         function ypos = run_decoder(obj, feat)
             ypos = (feat - obj.mean)/obj.std;
+            ypos = [ypos, 1];
             
         end
     end
