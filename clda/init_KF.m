@@ -39,3 +39,6 @@ decoder.W = W;
 decoder.C = C;
 decoder.Q = Q;
 decoder.mn_sqrt_neur = mean(sqrt_neur);
+
+% For potential RML 
+decoder.R_init = 1/size(X,2)*(X*X');

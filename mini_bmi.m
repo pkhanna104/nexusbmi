@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 15-Oct-2015 10:25:40
+% Last Modified by GUIDE v2.5 15-Oct-2015 15:45:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -827,6 +827,61 @@ function decoder_method_CreateFcn(hObject, eventdata, handles)
 % handles    empty - handles not created until after all CreateFcns called
 
 % Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in clda_box.
+function clda_box_Callback(hObject, eventdata, handles)
+% hObject    handle to clda_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of clda_box
+
+
+
+function clda_sec_box_Callback(hObject, eventdata, handles)
+% hObject    handle to clda_sec_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of clda_sec_box as text
+%        str2double(get(hObject,'String')) returns contents of clda_sec_box as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function clda_sec_box_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to clda_sec_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function half_life_box_Callback(hObject, eventdata, handles)
+% hObject    handle to half_life_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of half_life_box as text
+%        str2double(get(hObject,'String')) returns contents of half_life_box as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function half_life_box_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to half_life_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');

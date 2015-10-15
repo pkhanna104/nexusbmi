@@ -1,5 +1,5 @@
 classdef decoder_KF < handle
-        
+    
     properties
         task_indices_f_ranges
         lp_filter
@@ -31,11 +31,25 @@ classdef decoder_KF < handle
         it_cnt
         mn_sqrt_neur
         
+        clda_its
+        clda_on
+        lambda
     end
     
     methods
         function obj = decoder_KF(dec_name, handles)
             %Init
+            clda_secs = str2num(get(handles.clda_sec_box,'String'));
+            if clda_secs>0
+                obj.clda_its = round(clda_secs)/handles.task.loop_time;
+            else
+                obj.clda_its = 0;
+            end
+            
+            %Get lambda:
+            hl = str2num(get(handles.half_life_box,'String'));
+            obj.lambda = (.5^(handles.task.loop_time/hl));
+            
             %obj.it_cnt = handles.iter_cnt;
             obj.assist_level = 0;
             obj.lp_filter = 1;
@@ -50,19 +64,21 @@ classdef decoder_KF < handle
             obj.mn_sqrt_neur = d.decoder.mn_sqrt_neur;
             
             its = handles.save_data.tot_task_iters;
-            obj.A_arr = zeros(its,1);
-            obj.W_arr = zeros(its,1);
-            obj.Q_arr = zeros(its,1);
-            obj.C_arr = zeros(its,1);
+            obj.Q_arr = zeros(its,size(obj.Q,1), size(obj.Q,2));
+            obj.C_arr = zeros(its,size(obj.C,1), size(obj.C,2));
+            obj.Q_arr(1,:,:) = obj.Q;
+            obj.C_arr(1,:,:) = obj.C;
             
-            obj.R_arr = zeros(its,1);
-            obj.S_arr = zeros(its,1);
-            obj.T_arr = zeros(its,1);
+            obj.R_arr = zeros(its,size(obj.A,2),size(obj.A,2));
+            obj.R_arr(1,:,:) = d.decoder.R_init;
+            
+            obj.S_arr = zeros(its,size(obj.C,1), size(obj.A,2));
+            obj.T_arr = zeros(its,size(obj.C,1), size(obj.C,1));
             obj.EBS_arr = zeros(its,1);
-
+            
             obj.x_tm_est_arr = zeros(its, 2);
             obj.x_ms_est_arr = zeros(its, 2);
-        
+            
             obj.cov_tm_est_arr = zeros(its, 2,2);
             obj.cov_ms_est_arr = zeros(its, 2,2);
             
@@ -71,9 +87,9 @@ classdef decoder_KF < handle
             obj.feature_band = d.decoder.feature_band;
             
             %Establish source
-            obj.source = handles.neural_source_name; 
+            obj.source = handles.neural_source_name;
             
-            %For compatibiility with old decoders: 
+            %For compatibiility with old decoders:
             if ~isfield(d.decoder,'source')
                 d.decoder.source = 'nexus_td';
             end
@@ -89,7 +105,7 @@ classdef decoder_KF < handle
                     error(strcat('Source is ',obj.source, ' but Decoder Source is ',d.decoder.source));
                 end
             end
-              
+            
         end
         
         function handles = calc_cursor(obj, feat, handles)
@@ -99,16 +115,18 @@ classdef decoder_KF < handle
                 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
                 feat = feat(task_ind);
             end
-
-            %Normalize features: 
+            
+            %Normalize features:
             sqrt_task_feat = sqrt(feat);
             task_feat = sqrt_task_feat - obj.mn_sqrt_neur;
             
-            % Update Parameters:
-            obj=obj.run_RML();
-            
             % Run decoder
             obj.decoded_position = obj.run_decoder(task_feat, handles.iter_cnt);
+            
+            % Update Parameters:
+            if handles.iter_cnt <= obj.clda_its
+                obj=obj.run_RML(handles.iter_cnt, task_feat, obj.decoded_position);
+            end
             
             %Apply low pass filter:
             if obj.lp_filter > 1
@@ -146,7 +164,7 @@ classdef decoder_KF < handle
         end
         
         function ypos = run_decoder(obj, feat, cnt)
-            %Get last time update step: 
+            %Get last time update step:
             pred_x_t = squeeze(obj.x_tm_est_arr(cnt,:))';
             pred_cov_t = squeeze(obj.cov_tm_est_arr(cnt,:,:));
             
@@ -161,24 +179,48 @@ classdef decoder_KF < handle
                     ypos = pred_x_t;
                 end
             else
-            
+                
                 %Measurment Update
                 K = pred_cov_t*obj.C'*inv(obj.C*pred_cov_t*obj.C' + obj.Q);
                 meas_x_t = pred_x_t + K*(feat - (obj.C*pred_x_t));
                 meas_cov_t = (eye(length(obj.C)) - K*obj.C)*pred_cov_t;
                 obj.x_ms_est_arr(cnt,:) = meas_x_t;
                 obj.cov_ms_est_arr(cnt,:,:) = meas_cov_t;
-
+                
                 ypos = meas_x_t;
-
-                %Time Update for Next Time: 
+                
+                %Time Update for Next Time:
                 obj.x_tm_est_arr(cnt+1,:) = obj.A*meas_x_t;
                 obj.cov_tm_est_arr(cnt+1,:,:) = obj.A*meas_cov_t*obj.A' + obj.W;
             end
             
         end
         
-        function obj = run_RML(obj)
+        function obj = run_RML(obj, cnt, feat, pred_x_t)
+            if isnan(feat)
+                obj.R_arr(cnt+1,:,:) = obj.R_arr(cnt,:,:);
+                obj.S_arr(cnt+1,:,:) = obj.S_arr(cnt,:,:);
+                obj.T_arr(cnt+1,:,:) = obj.T_arr(cnt,:,:);
+                obj.EBS_arr(cnt+1,:,:) = obj.EBS_arr(cnt,:,:);
+                obj.C_arr(cnt+1,:,:) = obj.C_arr(cnt,:,:);
+                obj.Q_arr(cnt+1,:,:) = obj.Q_arr(cnt,:,:);
+            else
+                
+                obj.R_arr(cnt+1,:,:) = obj.lambda*squeeze(obj.R_arr(cnt,:,:))+(pred_x_t*pred_x_t');
+                obj.S_arr(cnt+1,:,:) = obj.lambda*squeeze(obj.S_arr(cnt,:,:))' +(feat*pred_x_t');
+                obj.T_arr(cnt+1,:,:) =obj.lambda*squeeze(obj.T_arr(cnt,:,:)) + (feat*feat');
+                obj.EBS_arr(cnt+1) = obj.lambda*obj.EBS_arr(cnt) + 1;
+                obj.C_arr(cnt+1,:,:) = squeeze(obj.S_arr(cnt+1,:,:))'*inv(squeeze(obj.R_arr(cnt+1,:,:)));
+                obj.Q_arr(cnt+1,:,:) = (1/obj.EBS_arr(cnt+1))*(squeeze(obj.T_arr(cnt+1,:,:))-...
+                    ((squeeze(obj.C_arr(cnt+1,:,:))'*squeeze(obj.S_arr(cnt,:,:)))));
+            end
+            obj.C = squeeze(obj.C_arr(cnt+1,:,:))';
+            obj.Q = squeeze(obj.Q_arr(cnt+1,:,:));
+            
+            if any(isnan(obj.C))
+                disp('stop')
+            end
+            
         end
     end
 end
