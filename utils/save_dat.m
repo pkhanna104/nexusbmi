@@ -34,8 +34,8 @@ if ~isempty(data)
     catch
     end
     
-    
-    handles.save_data.features(ix,1:length(feat)) = feat;
+    dm = handles.feature_extractor.domain;
+    handles.save_data.features(ix,1:length(feat.(dm))) = feat.(dm);
     handles.save_data.packet_seq(ix,:) = seq;
 end
 

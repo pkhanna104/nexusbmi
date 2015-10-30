@@ -39,9 +39,13 @@ classdef decoder_KF < handle
     methods
         function obj = decoder_KF(dec_name, handles)
             %Init
-            clda_secs = str2num(get(handles.clda_sec_box,'String'));
-            if clda_secs>0
-                obj.clda_its = round(clda_secs)/handles.task.loop_time;
+            if get(handles.clda_box,'Value')
+                clda_secs = str2num(get(handles.clda_sec_box,'String'));
+                if clda_secs>0
+                    obj.clda_its = round(clda_secs)/handles.task.loop_time;
+                else
+                    obj.clda_its = 0;
+                end
             else
                 obj.clda_its = 0;
             end
@@ -94,7 +98,7 @@ classdef decoder_KF < handle
                 d.decoder.source = 'nexus_td';
             end
             
-            if and(strcmp(d.decoder.source, 'accel'), ~strcmp(obj.source, 'accel'))
+            if and(strcmp(d.decoder.source, 'accel'), ~or(strcmp(obj.source, 'accel'), strcmp(obj.source, 'sim_accel')))
                 error('Decoder is for an accelerometer source')
             else
                 %Allow for simNexus and Nexus to use same decoders if
@@ -111,9 +115,12 @@ classdef decoder_KF < handle
         function handles = calc_cursor(obj, feat, handles)
             % feat is a lfp band x 1 array if time domain
             % else if a pxx channel
+            tmp_ft = feat.(handles.feature_extractor.domain);
             if or(strcmp(handles.feature_extractor.domain, 'td'), strcmp(handles.feature_extractor.domain, 'accel'))
                 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
-                feat = feat(task_ind);
+                feat = tmp_ft(task_ind);
+            else
+                feat = tmp_ft;
             end
             
             %Normalize features:
@@ -125,7 +132,8 @@ classdef decoder_KF < handle
             
             % Update Parameters:
             if handles.iter_cnt <= obj.clda_its
-                obj=obj.run_RML(handles.iter_cnt, task_feat, obj.decoded_position);
+                intended_pos = handles.task.target_y_pos;
+                obj=obj.run_RML(handles.iter_cnt, task_feat, intended_pos);
             end
             
             %Apply low pass filter:
@@ -186,7 +194,6 @@ classdef decoder_KF < handle
                 meas_cov_t = (eye(length(obj.C)) - K*obj.C)*pred_cov_t;
                 obj.x_ms_est_arr(cnt,:) = meas_x_t;
                 obj.cov_ms_est_arr(cnt,:,:) = meas_cov_t;
-                
                 ypos = meas_x_t;
                 
                 %Time Update for Next Time:
@@ -196,8 +203,8 @@ classdef decoder_KF < handle
             
         end
         
-        function obj = run_RML(obj, cnt, feat, pred_x_t)
-            if isnan(feat)
+        function obj = run_RML(obj, cnt, feat, intended_x)
+            if any([isnan(feat), feat==0, isempty(intended_x)])
                 obj.R_arr(cnt+1,:,:) = obj.R_arr(cnt,:,:);
                 obj.S_arr(cnt+1,:,:) = obj.S_arr(cnt,:,:);
                 obj.T_arr(cnt+1,:,:) = obj.T_arr(cnt,:,:);
@@ -205,9 +212,10 @@ classdef decoder_KF < handle
                 obj.C_arr(cnt+1,:,:) = obj.C_arr(cnt,:,:);
                 obj.Q_arr(cnt+1,:,:) = obj.Q_arr(cnt,:,:);
             else
-                
-                obj.R_arr(cnt+1,:,:) = obj.lambda*squeeze(obj.R_arr(cnt,:,:))+(pred_x_t*pred_x_t');
-                obj.S_arr(cnt+1,:,:) = obj.lambda*squeeze(obj.S_arr(cnt,:,:))' +(feat*pred_x_t');
+                intended_x = [intended_x; 1];
+                obj.R_arr(cnt+1,:,:) = obj.lambda*squeeze(obj.R_arr(cnt,:,:))+(intended_x*intended_x');
+                squeeze(obj.R_arr(cnt+1,:,:))
+                obj.S_arr(cnt+1,:,:) = obj.lambda*squeeze(obj.S_arr(cnt,:,:))' +(feat*intended_x');
                 obj.T_arr(cnt+1,:,:) =obj.lambda*squeeze(obj.T_arr(cnt,:,:)) + (feat*feat');
                 obj.EBS_arr(cnt+1) = obj.lambda*obj.EBS_arr(cnt) + 1;
                 obj.C_arr(cnt+1,:,:) = squeeze(obj.S_arr(cnt+1,:,:))'*inv(squeeze(obj.R_arr(cnt+1,:,:)));

@@ -36,11 +36,12 @@ classdef target_task < handle
             obj.FSM = {
                 {'wait','target', @obj.start_target};
                 {'target','hold', @obj.enter_target};
+                {'target','wait', @obj.timeout};
                 {'hold','target', @obj.leave_early};
                 {'hold','reward', @obj.end_hold};
                 {'reward','wait', @obj.ITI_end};
                 };
-            obj.state_ref = { {1}; {2}; {3, 4}; {5}};
+            obj.state_ref = { {1}; {2, 3}; {4, 5}; {6}};
             obj.hold_time_mean = time(1);
             obj.hold_time_std =time(2);
             obj.state = 'wait';
@@ -125,6 +126,7 @@ classdef target_task < handle
             end
         end
         
+        
         function tf = end_hold(obj, handles)
             if obj.ts > obj.hold
                 tf = 1;
@@ -132,6 +134,14 @@ classdef target_task < handle
                 obj.rew_cnt = obj.rew_cnt+1;
                 obj.point_counter = obj.rew_cnt;
                 disp('REWARD!')
+            else
+                tf = 0;
+            end
+        end
+        
+        function tf = timeout(obj, handles)
+            if obj.ts > handles.timeoutTime
+                tf = 1;
             else
                 tf = 0;
             end

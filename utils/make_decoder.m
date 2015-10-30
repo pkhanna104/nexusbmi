@@ -52,7 +52,8 @@ if strcmp(method,'simple')
     %decoder.feature_band = handles.feature_extractor.f_ranges(ft_ind(ft_ind==1),:);
     
 elseif strcmp(method, 'KF')
-    decoder = init_KF(feats, decoder);
+    targ_pos = dat.target(1:length(feats));
+    decoder = init_KF(feats, decoder, targ_pos);
     decoder.source = source;
 end
 

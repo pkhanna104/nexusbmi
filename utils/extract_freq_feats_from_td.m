@@ -7,12 +7,18 @@ function [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat)
 
     Fs = dat.extractor_params.fs;
     n_samp = floor(.4*Fs);
-
+    nfft=max(2^(nextpow2(n_samp)),n_samp);
     iter_cnt = dat.iter_cnt;
     
     %Assume that we need M1 cortical data
-    [S,f] = mtspectrumc(dat.rawdata_timeseries_m1(1:iter_cnt,1:n_samp-1)', params);
-
+    
+    %[S,f] = mtspectrumc(dat.rawdata_timeseries_m1(1:iter_cnt,1:n_samp-1)', params);
+    [~,f] = pwelch(randn(1,n_samp-1), n_samp-1,[],nfft,Fs);
+    S = zeros(iter_cnt, length(f));
+    for i=1:iter_cnt
+        [S(i,:), ~] = pwelch(dat.rawdata_timeseries_m1(i,1:n_samp-1), n_samp-1, [], nfft, Fs);
+    end
+    S = S';
     % params = struct('fpass',[0 radio_data.fs/2],'Fs',radio_data.fs,'tapers',[3 5]);
     % [S,f] = mtspectrumc(reshape(radio_data.m1(100000+[1:400*100]),[400,100]), params);
     % 

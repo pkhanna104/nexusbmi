@@ -1,6 +1,6 @@
-function decoder = init_KF(feats, decoder)
+function decoder = init_KF(feats, decoder, targ_pos)
 
-%Estimate X_1:T from Y_1:T
+%Estimate X_1:T from Y_1:T -- 
 %First assume no Noise (W = 0) in state space
 [~, nc] = size(feats);
 if nc==1
@@ -11,22 +11,34 @@ end
 sqrt_neur = sqrt(feats);
 neur = sqrt_neur - mean(sqrt_neur);
 
-Y_targ_low = prctile(neur,10);
-Y_targ_hi = prctile(neur, 90);
+%Stupid method: 
+%In neural space: 
+% Y_targ_low = prctile(neur,10);
+% Y_targ_hi = prctile(neur, 90);
+% 
+% %Estimate C matrix:
+% m = (6--6)/(Y_targ_hi - Y_targ_low);
+% b = 6 - (m*Y_targ_hi);
+% 
+% C = [1/m -b/m];
+% Y = [neur ];
+% %X = zeros(size(Y));
+% X = m*Y + b;
+% X = [X; ones(1, size(X,2))];
+%X(1:end-1,:) = (Y-C(:,end))/C(:,1:end-1);
 
-%Estimate C matrix:
-m = (Y_targ_hi - Y_targ_low)/(6--6);
-b = (Y_targ_hi - (m*6));
+Y = [neur];
 
-C = [m b;];
-Y = [feats ];
-X = zeros(size(Y));
-X = [X; ones(1, size(X,2))];
-X(1:end-1,:) = (Y-C(:,end))/C(:,1:end-1);
+%Add a little noise to X: 
+eps = (randn(1, length(targ_pos)) - 0.5)*10^-1;
+X = [targ_pos'+eps; ones(1, length(targ_pos))];
+
+%Estimate C: 
+C = (inv(X*X')*(X*Y'))';
 
 %Estimate A, W: 
 A = (X(:,2:end)*X(:,1:end-1)')*inv((X(:,1:end-1)*X(:,1:end-1)'));
-A(end,end) = 1;
+A(end,end) = 1; %Unnecessary
 
 W = 1/(length(feats)-1)*((X(:,2:end)*X(:,2:end)') - A*(X(:,1:end-1)*X(:,2:end)'));
 W(end,end) = 0;

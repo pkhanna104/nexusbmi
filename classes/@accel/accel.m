@@ -4,6 +4,7 @@ classdef accel < handle
         ard_buff;
         com_port;
         time_cnt;
+        sim_acc;
     end    
     
     methods
@@ -32,6 +33,7 @@ classdef accel < handle
             obj.ard_buff = struct();
             obj.ard_buff.cap = [];
             obj.ard_buff.accel = [];
+            
             
         end
         

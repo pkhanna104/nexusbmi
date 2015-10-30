@@ -13,14 +13,15 @@ classdef accel_extractor < feature_extractor
         end                        
 
         function features = extract_features(obj,recent_neural)
-            features = zeros(1,length(recent_neural));
+            features = struct();
+            features.accel = zeros(1,length(recent_neural));
             %features.fd = zeros(1,length(recent_neural));
             for i=1:length(recent_neural)
                 if obj.task_indices_f_ranges(i)
                     %Acc feature:
-                    features(i) = mean(sum(recent_neural{i}, 1));
+                    features.accel(i) = mean(sum(recent_neural{i}, 1));
                 else
-                    features(i) = sum(abs(recent_neural{i}));
+                    features.accel(i) = sum(abs(recent_neural{i}));
                 end
             end
         end    

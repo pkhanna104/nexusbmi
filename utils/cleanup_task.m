@@ -19,6 +19,12 @@ function cleanup_task(handles)
 
     end
 
+    %Save Last Decoder if CLDA was on: 
+    if get(handles.clda_box,'value')
+        disp('clda');
+        it = dat.iter_cnt;
+        save_last_clda(it, dat.decoder, handles);
+    end
     %Close GUI
     close(handles.figure1)
 

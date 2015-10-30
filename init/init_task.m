@@ -29,8 +29,8 @@ handles.stop = 0;
 
 %Dict of sources / features / etc.
 neural_sources = struct();
-neural_sources.names = {'sim_nexus_td','sim_nexus_pxx', 'nexus_td','nexus_pxx','accel'};
-neural_sources.obj = {@sim_nexus_interface,@sim_nexus_interface, @nexus_interface, @nexus_interface, @accel};
+neural_sources.names = {'sim_nexus_td','sim_nexus_pxx', 'nexus_td','nexus_pxx','accel','sim_accel'};
+neural_sources.obj = {@sim_nexus_interface,@sim_nexus_interface, @nexus_interface, @nexus_interface, @accel, @sim_accel};
 
 %Init task
 task_sources = struct();

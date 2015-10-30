@@ -16,6 +16,7 @@ classdef nexus_power_extractor < feature_extractor
         last_features;
         beta_pow_chan;
         domain; %td or pxx for time domain or power channel
+        nfft;
     end
     
     methods
@@ -31,9 +32,16 @@ classdef nexus_power_extractor < feature_extractor
             
             obj.fs         = extractor_params.fs;
             obj.width_t    = extractor_params.width_t;
-            obj.params     = struct('fpass',[0 obj.f_max],'Fs',obj.fs,'tapers',[3 5]);
             
-            [~,f] = mtspectrumc(double(test),obj.params);
+            
+            %MTM 
+            %obj.params     = struct('fpass',[0 obj.f_max],'Fs',obj.fs,'tapers',[3 5]);
+            %[~,f] = mtspectrumc(double(test),obj.params);
+            
+            %PWELCH
+            obj.nfft=max(2^(nextpow2(obj.width)),obj.width);
+            [~,f] = pwelch(test,obj.width-1,[],obj.nfft,obj.fs); 
+            
             % nfft=max(2^(nextpow2(obj.width)),obj.width);
             % [f,~]=getfgrid(extractor_params.fs,nfft,[0 obj.f_max]);
             
@@ -86,8 +94,10 @@ classdef nexus_power_extractor < feature_extractor
         end                        
 
         function features = extract_features(obj,recent_neural)
-            if isnan(recent_neural{obj.used_chan})
-                features = obj.last_features;
+            features = struct();
+            
+            if any([isnan(recent_neural{obj.used_chan}); isempty(recent_neural{obj.used_chan})])
+                features.(obj.domain) = obj.last_features;
                 disp('last features');
             else
                 %x = recent_neural.read(obj.width)';
@@ -107,7 +117,7 @@ classdef nexus_power_extractor < feature_extractor
                 %[S,f] = mtspectrumc(x(:,ind_chan),obj.params);
                 %Data input form: samples x channels/trials
                 [dr, dc] = size(data);
-                if dr==1
+                if dc==1
                     data = data';
                 end
                 %disp('data2');
@@ -115,12 +125,14 @@ classdef nexus_power_extractor < feature_extractor
                 
                 
                 if strcmp(obj.domain,'td')
-                    [S,~] = mtspectrumc(data,obj.params);
+                    [S,~] = pwelch(data,obj.width-1,[],obj.nfft,obj.fs);
+                    %[Pxx,F] = pwelch(X,WINDOW,NOVERLAP,F,Fs)
+                    %[S,~] = mtspectrumc(data,obj.params);
 
                     % compute average power of each band of interest
                     % pow = zeros(size(obj.ranges,1),size(S,2));
                     
-                    features = zeros(obj.n_features,1);
+                    features.(obj.domain) = zeros(obj.n_features,1);
                     
                     cur = 0;
                     for c = 1:size(obj.f_ranges,1)
@@ -137,7 +149,7 @@ classdef nexus_power_extractor < feature_extractor
                         %This is stupidly complicated, but basically, each
                         %'feat' is  a single number, so features is an
                         % [n_iter x 100] matrix  
-                        features( (1 : length(feat)) + cur ) = feat;
+                        features.(obj.domain)( (1 : length(feat)) + cur ) = feat;
                         cur = cur + length(feat);                                
                     end
 
@@ -146,9 +158,9 @@ classdef nexus_power_extractor < feature_extractor
                     end;
                     
                 elseif strcmp(obj.domain, 'pxx')
-                    features = data;
+                    features.(obj.domain) = data;
                 end
-                obj.last_features = features;
+                obj.last_features = features.(obj.domain);
                     
             end
         

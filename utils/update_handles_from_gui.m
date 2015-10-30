@@ -34,6 +34,14 @@ function [handles, keep_running] = update_handles_from_gui(handles);
     catch
     end
     
+        %update timeout time: 
+    try
+        if ~isempty(getappdata(handles.figure1, 'timeout'))
+            handles.timeoutTime = getappdata(handles.figure1, 'timeout');
+        end
+    catch
+    end
+    
         %update hold var
     try
         if ~isempty(getappdata(handles.figure1, 'hold_var'))

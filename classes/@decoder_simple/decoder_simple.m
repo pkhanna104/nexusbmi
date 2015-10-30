@@ -3,7 +3,7 @@ classdef decoder_simple < handle
     
     properties
         task_indices_f_ranges
-        mean
+        mu
         std
         lp_filter
         decoded_position
@@ -21,7 +21,7 @@ classdef decoder_simple < handle
             
             %Load dec file
             d = load(dec_name);
-            obj.mean = d.decoder.mean;
+            obj.mu = d.decoder.mean;
             obj.std = d.decoder.std;
             obj.feature_band = d.decoder.feature_band;
             
@@ -52,9 +52,9 @@ classdef decoder_simple < handle
             % else if a pxx channel
             if strcmp(handles.feature_extractor.domain, 'td')
                 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
-                task_feat = mean(feat(task_ind));
+                task_feat = mean(feat.td(task_ind));
             elseif strcmp(handles.feature_extractor.domain, 'pxx')
-                task_feat = mean(feat);
+                task_feat = mean(feat.fd);
             end
             
             % Run decoder
@@ -97,7 +97,7 @@ classdef decoder_simple < handle
         end
         
         function ypos = run_decoder(obj, feat)
-            ypos = (feat - obj.mean)/obj.std;
+            ypos = (feat - obj.mu)/obj.std;
             ypos = [ypos, 1];
             
         end
