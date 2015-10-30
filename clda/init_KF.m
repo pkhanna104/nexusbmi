@@ -12,6 +12,16 @@ sqrt_neur = sqrt(feats);
 neur = sqrt_neur - mean(sqrt_neur);
 
 %Stupid method: 
+if length(targ_pos)==0
+    targ_pos = zeros(length(neur),1);
+    low_cut = 0;
+    targs = [-6 -2 2 6];
+    for ii = 1:4
+        cutoff = prctile(neur, ii*25);
+        ix = find(and(neur>= low_cut, neur<cutoff));
+        targ_pos(ix) = targs(ii);
+    end
+end
 %In neural space: 
 % Y_targ_low = prctile(neur,10);
 % Y_targ_hi = prctile(neur, 90);

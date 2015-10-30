@@ -52,7 +52,17 @@ if strcmp(method,'simple')
     %decoder.feature_band = handles.feature_extractor.f_ranges(ft_ind(ft_ind==1),:);
     
 elseif strcmp(method, 'KF')
-    targ_pos = dat.target(1:length(feats));
+    sel = -1;
+    while sel<0
+        sel = input('Use Target Info? 1 for Yes, 0 for No ');
+    end
+    if sel
+        targ_pos = dat.target(1:length(feats));
+        disp('Using targ info')
+    else
+        targ_pos = [];
+    end
+    
     decoder = init_KF(feats, decoder, targ_pos);
     decoder.source = source;
 end
