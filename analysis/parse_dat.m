@@ -1,4 +1,4 @@
-function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state] = parse_dat(blocks, day)
+function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state,ix_boundaries] = parse_dat(blocks, day)
 
     %Get times, and target onsets;
     % blocks = 'ab';
@@ -11,8 +11,8 @@ function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state
     end
 
 
-    ft = []; raw_td_m1 = []; raw_td_stn = []; raw_pxx = []; abs_t=[]; targ=[];
-    curs=[]; rew_inds = []; state = [];
+    ft = []; raw_td_m1 = []; raw_td_stn = []; raw_pxx = []; abs_t=[0]; targ=[];
+    curs=[]; rew_inds = []; state = [];ix_boundaries = [];
 
     for ai = 1:length(blocks)
         alpha = blocks(ai);
@@ -45,12 +45,15 @@ function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state
         px2_mat = cell2mat(px2);
 
         raw_pxx = [raw_pxx; [px1_mat(1:iter_cnt) px2_mat(1:iter_cnt)] ];
-        abs_t = [abs_t; dat.abs_time'];
+        
+        abs_t = [abs_t; abs_t(end)+ dat.abs_time' - dat.abs_time(1)];
 
         prev_len = length(targ);
         targ = [targ; dat.target(1:iter_cnt)];
         curs = [curs; dat.cursor(1:iter_cnt)];
         rew_inds = [rew_inds dat.reward_times{1}+prev_len];
+        ix_boundaries = [ix_boundaries; length(targ)];
     end
+    abs_t = abs_t(2:end);
 end
 
