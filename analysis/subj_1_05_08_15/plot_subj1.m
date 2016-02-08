@@ -1,6 +1,6 @@
 function plot_subj1()
 
-[FT, RAW, TARG, CURS, REW, idx] = concat_dat('gh', [141,1],[0,4]);
+[FT, RAW, TARG, CURS, REW, idx] = concat_dat('cdefgh', [141,1],[0,4]);
 
 cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
 

@@ -1,4 +1,4 @@
-function [rch_time, targ_inds, abs_time, coeffs, abs_tm_lim] = calc_movement_time(block, day, sec_cutoff)
+function [rch_time, targ_inds, abs_time, coeffs, abs_tm_lim] = calc_movement_time2(block, day, sec_cutoff)
 
     cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
     figure(99); hold all;

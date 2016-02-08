@@ -9,7 +9,7 @@ for d = 1:length(days)
 
     params = struct();
     params.tapers = [3 5];
-    params.pad = 3;
+    params.pad = 0;
     params.Fs = 422;
     %labs{d} = strcat(num2str(days{d}), blocks);
     for b = 1:length(blocks)

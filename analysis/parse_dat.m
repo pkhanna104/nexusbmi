@@ -10,13 +10,15 @@ function [ft, raw_td_m1, raw_td_stn, raw_pxx, abs_t, targ, curs, rew_inds, state
         dir = paths{4};
     end
 
-
+    if ~exist('start_it','var')
+        start_it = [];
+    end
     ft = []; raw_td_m1 = []; raw_td_stn = []; raw_pxx = []; abs_t=[0]; targ=[];
     curs=[]; rew_inds = []; state = [];ix_boundaries = [];
 
     for ai = 1:length(blocks)
         alpha = blocks(ai);
-        dat_fname = ['dat' day alpha '_.mat'];
+        dat_fname = strcat(dir,'dat', day, alpha, '_.mat');
         load(dat_fname)
         try
             iter_cnt = dat.iter_cnt - 1;

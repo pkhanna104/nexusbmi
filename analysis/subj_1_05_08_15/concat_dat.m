@@ -1,27 +1,34 @@
-% LP filter your features, then fit mu and std: 
-function [FT, RAW, TARG, CURS, REW, idx] = concat_dat(blocks, start_ind, rm_targs)
+function [FT, RAW, TARG, CURS, REW, idx] = concat_dat(blocks, date, start_ind, rm_targs)
 
-dir = 'C:\Users\George\Downloads\UCSF_minibmi5\';
-dir2 = '/Users/preeyakhanna/Dropbox/Carmena_Lab/UCSF_minibmi5/';
+% Method to concatenate relevant features
+% Inputs: blocks, (format: 'abcdef')
+% Inputs: date, (format: '050815'
+% Inputs: tslice: in seconds time slice (format: {[0 -1], [0 -1], [0 600]})
+%   where -1 means 'go all the way to the end'
+% Input: trim_n_targs: any targets to trim? (format: [ 0 0 0 10])
 
-%blocks = 'gh';
-%start_ind = [141, 1];
+dir = 'C:\Users\Preeya\Documents\GitHub\nexusbmi\';
 
 FT = [];
-RAW = [];
+RAW_stn = [];
+RAW_m1 = [];
+
 TARG = [];
 CURS = [];
 REW = [];
+
 idx = [];
 ind_offs = 0;
 
 %Stack data: 
 for ai = 1:length(blocks)
+    
+    %Load data: 
     alpha = blocks(ai);
-    fname1 = [dir 'data\dat050815' alpha '_.mat'];
-    fname2 = [dir2 'data/dat050815' alpha' '_.mat'];
-    load(fname1)
+    fname = [dir 'data\dat' date alpha '_.mat'];
+    load(fname)
 
+    
     ft = dat.features(:,3);
     ix_zer = find(ft==0);
    
