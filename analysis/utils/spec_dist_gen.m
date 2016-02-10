@@ -1,9 +1,11 @@
-function spec_dist_gen(blocks, date, tslice, tslice_opt, trim_n_targs)
+function spec_dist_gen(blocks, date, tslice, tslice_opt, trim_n_targs, low_high)
 
 % Inputs: See 'concat_dat_gen' for description / format of inputs
 [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs);
 
-targ_locs = sort(unique(TARG(REW)));
+spec_vect_main = {};
+%targ_locs = sort(unique(TARG(REW)));
+targ_locs = [-6 -2 2 6];
 figure()
 
 try
@@ -34,10 +36,12 @@ if spec_plots_v1
     for i = 1:length(targ_locs)
         hold on
         ix = find(TARG==targ_locs(i));
-        [n, x] = hist(FT(ix),bins);
-        disp([num2str(i) 'mean: ' num2str(mean(FT(ix))) ', median: ' num2str(median(FT(ix)))]);
-        norm_n = n/sum(n);
-        plot(gca,x+((i-1)*dbstep),norm_n, '.-','color',cmap{i},'LineWidth',3,'MarkerSize',30)
+        if length(ix) > 0
+            [n, x] = hist(FT(ix),bins);
+            disp([num2str(i) 'mean: ' num2str(mean(FT(ix))) ', median: ' num2str(median(FT(ix)))]);
+            norm_n = n/sum(n);
+            plot(gca,x+((i-1)*dbstep),norm_n, '.-','color',cmap{i},'LineWidth',3,'MarkerSize',30)
+        end
     end
     xlabel('Beta Power','FontSize',20)
     ylabel('Frequency','FontSize',20)
@@ -53,16 +57,18 @@ if spec_plots_v1
     ft_stats = [];
     grp_stats = [];
     for i = 1:length(targ_locs)
+        
         rw_ix = find(TARG(REW)== targ_locs(i));
-        ft_mat = zeros(length(rw_ix), 6);
-        for r = 1:length(rw_ix)
-            rw = REW(rw_ix(r));
-            if rw>6
-                ft_mat(r,:) = FT(rw-5:rw);
-            else
-                ft_mat(r,6-rw+1:end) = FT(1:rw);
+        if ~isempty(rw_ix)
+            ft_mat = zeros(length(rw_ix), 6);
+            for r = 1:length(rw_ix)
+                rw = REW(rw_ix(r));
+                if rw>6
+                    ft_mat(r,:) = FT(rw-5:rw);
+                else
+                    ft_mat(r,6-rw+1:end) = FT(1:rw);
+                end
             end
-        end
         ft_mat(ft_mat==0) = nan;
         sem=nanstd(ft_mat,0, 1)/sqrt(size(ft_mat,1));% standa
         mn = nanmean(ft_mat, 1);
@@ -71,6 +77,7 @@ if spec_plots_v1
         errorbar(t, mn, sem,'color',cmap{i},'LineWidth',3,'MarkerSize',30)
         ft_stats = [ft_stats; ft_mat];
         grp_stats = [grp_stats ones(1,size(ft_mat,1))+i];
+        end
     end
 
      %STATS:
@@ -90,13 +97,12 @@ if spec_plots_v1
      end
     %END STATS
     
-    
-    
     legend('Targ: 1','Targ: 2','Targ: 3','Targ: 4','Location','northwest')
     xlabel('Time Prior to Reward (sec)','FontSize',20)
     ylabel('Beta (10-20 Hz) Power','FontSize',20)
     LEGH = legend;
     set(LEGH,'Location','northwest')
+
 end
 
 %Spec triggered plots:
@@ -138,11 +144,14 @@ if spec_plot==1
     mnimm = [];
     fr_z ={};
     for i = 1:length(targ_locs)
+        
         figure(999)
         subplot(1,4,i)
         rw_ix = find(TARG(REW)== targ_locs(i));
+        if ~isempty(rw_ix)
         raw_mat = zeros(length(rw_ix), 6, 168);
         spec_mat = zeros(length(rw_ix), 6, length(f));
+        spec_vect = zeros(length(rw_ix), length(f));
         
         for r = 1:length(rw_ix)
             rw = REW(rw_ix(r));
@@ -163,6 +172,7 @@ if spec_plot==1
                     spec_mat(r,ixx,:) = Sind;
                 end
             end
+            spec_vect(r,:) = squeeze(mean(spec_mat(r, end-1:end, :),2));
         end
         
         mn = squeeze(nanmean(spec_mat, 1));
@@ -205,14 +215,43 @@ if spec_plot==1
             fr_z{fr, i} = zsc;
         end
         
+        figure(997)
+        hold on;
+        spec_vect_main{i}=spec_vect;
+        z = mean(spec_vect,1);
+        b_mean = nanmean(baseline, 1);
+        b_std = nanstd(baseline, 0 , 1);
+        
+        sem = nanstd(spec_vect-repmat(b_mean, size(spec_vect, 1), 1))/sqrt(size(spec_vect, 1));
+        zsc = (z - b_mean)./(b_std);
+        ix = 1:length(z);
+        if i==low_high(1) || i==low_high(2)
+            plot(f(ix), zsc(ix),'color',cmap{i},'LineWidth',3,'MarkerSize',30)
+            %errorbar(f(ix), zsc(ix), sem(ix),'color',cmap{i},'LineWidth',3,'MarkerSize',30)
+        end
+        
+        if i==4
+            ks = [];
+            for jj=1:length(f)
+                ks = [ks kstest2(spec_vect_main{low_high(1)}(:,jj), spec_vect_main{low_high(2)}(:,jj))];
+            end
+            sig = find(ks==1);
+            if length(sig) > 0
+                plot(f(sig), zeros(length(sig),1), 'k*')
+            else
+                disp('no sig')
+            end
+        end
+                
         %legend('Targ_y: -6','Targ_y: -2','Targ_y: 2','Targ_y:6')
+        end
     end
     
     figure(999)
     tight_subplot(1,4,.1, .1, .1)
     for i = 1:length(targ_locs)
         subplot(1,4,i)
-        set(gca, 'CLim', [-1, 1]);
+        set(gca, 'CLim', [-2, 2]);
     end
     
     figure(998)

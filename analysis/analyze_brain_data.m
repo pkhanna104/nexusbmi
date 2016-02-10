@@ -1,5 +1,7 @@
 function analyze_brain_data(blk, days)
 % analyze_brain_data({['h'],['a'],['jk']}, {'050815','092815','103015'})
+% analyze_brain_data({['h'],['i'],['jk']}, {'050815','092815','103015'})
+
 colors = {[228, 26, 28], [55, 126, 184],[77, 175, 74]};
 labs = {'P1, Stim Off', 'P2, Stim On 130 Hz', 'P3, Stim On 160 Hz'}; 
 for d = 1:length(days)

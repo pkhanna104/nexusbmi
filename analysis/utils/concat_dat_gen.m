@@ -1,4 +1,4 @@
-function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs)
+function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN, time2rew] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs)
 
 % Method to concatenate relevant features
 % Inputs: blocks, (format: 'abcdef')
@@ -9,7 +9,15 @@ function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN] = concat_dat_gen(
 % tslice
 % Input: trim_n_targs: any targets to trim? (format: [ 0 0 0 10])
 
-dir = 'C:\Users\Preeya\Documents\GitHub\nexusbmi\';
+fid = fopen('config.txt','r');
+tmp= {{'',''}};
+while ~strcmp(tmp{1}(1),'root')
+    tmp = textscan(fid, '%s', 2);
+end
+fclose(fid)
+dir = tmp{1}{2};
+
+slash = dir(end);
 
 FT = [];
 RAW_stn = [];
@@ -18,6 +26,7 @@ RAW_m1 = [];
 TARG = [];
 CURS = [];
 REW = [];
+time2rew = [];
 
 PXX_CHAN = [];
 idx = [];
@@ -28,7 +37,7 @@ for ai = 1:length(blocks)
     
     %Load data:
     alpha = blocks(ai);
-    fname = [dir 'data\dat' date alpha '_.mat'];
+    fname = [dir 'data' slash 'dat' date alpha '_.mat'];
     load(fname)
     
     %Get tslice in indices:
@@ -47,8 +56,10 @@ for ai = 1:length(blocks)
     if isfield(dat,'target')
         targ_locs = dat.target;
         rew_inds = dat.reward_times{1};
+        rew_times = get_rew_timez(dat, rew_inds);
     else
         [targ_locs, rew_inds] = get_targ_loc(dat);
+        rew_times = get_rew_timez(dat, rew_inds);
     end
     
     TARG = [TARG; targ_locs(tsl_start:tsl_stop)];
@@ -57,6 +68,8 @@ for ai = 1:length(blocks)
     rews = rew_inds(rew_inds>=tsl_start & rew_inds<= tsl_stop);
     blk_rews = rews-tsl_start+ind_offs';
     REW = [REW blk_rews];
+    
+    time2rew = [time2rew rew_times(rew_inds>=tsl_start & rew_inds<= tsl_stop)];
     
     if isfield(dat, 'rawdata_power_ch4')
         px_chan = cell2mat(dat.rawdata_power_ch4);
@@ -81,4 +94,20 @@ end
 
 if size(FT, 2) < 3
     disp('x')
+end
+end
+
+function time2rew2 = get_rew_timez(dat, rew_times)
+    time2rew2 = [];
+    state = dat.state;
+    for i=1:length(rew_times)
+        r = rew_times(i);
+        j=r;
+        dt = 0; 
+        while (j-dt)>0 && ~strcmp(state{j - dt}, 'wait')
+            dt = dt + 1;
+            
+        end
+        time2rew2 = [time2rew2 dt];
+    end
 end

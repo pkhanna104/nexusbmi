@@ -1,9 +1,22 @@
-function [rew_sim, rew_act] = chance_by_targ(ax, blocks, date, tslice, tslice_opt, trim_n_targs, include_targs, timeout, sim_cnt)
+function [rew_sim, rew_act, slope_dist] = chance_by_targ(ax, blocks, date, tslice, tslice_opt,...
+    trim_n_targs, include_targs, timeout, sim_cnt, target_sizes)
 
-[FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs);
+[FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, px, time2targ_act] = concat_dat_gen(blocks, date,...
+    tslice, tslice_opt, trim_n_targs);
 
+if length(target_sizes) > 1
+    szs = zeros(length(CURS), 1);
+    start_ix = 1;
+    for i =1:length(idx)
+        szs(start_ix:start_ix+idx(i))=target_sizes(i);
+        start_ix = idx(i)+1;
+    end
+else
+    szs = repmat(target_sizes, [length(CURS),1]);
+end
+            
 rew_by_targ = zeros(1,4);
-tg = [-6 -2 2 6];
+tg = [-2 2 6];
 
 for ir = 1:length(REW)
     rew_i = REW(ir);
@@ -13,13 +26,24 @@ for ir = 1:length(REW)
     rew_by_targ(ix) = rew_by_targ(ix)+1;
 end
 
-[rew, rew_cnt, rew_time, time2targ] = calc_chance(CURS, sim_cnt, timeout);
+[rew, rew_cnt, rew_time, time2targ] = calc_chance(CURS, sim_cnt, timeout, szs);
 
 slope_dist = {[], [], [], []};
+
 for i=1:sim_cnt
-    for j=1:4
-        slope_dist{j} = [slope_dist{j} rew_time{i,j}'\time2targ{i,j}'];
+    for j=2:4
+        b = [rew_time{i,j}' ones(length(rew_time{i,j}),1)]\time2targ{i,j}'; 
+        slope_dist{j} = [slope_dist{j} b(1)];
     end
+end
+
+actual_slope = [];
+rew_targ = TARG(REW);
+tg = [-6 -2 2 6];
+for t=1:4
+    ix = find(rew_targ==tg(t));
+    b = [REW(ix)' ones(length(ix),1)]\time2targ_act(ix)';
+    actual_slope = [actual_slope b(1)];
 end
 
 include_ix = [];
@@ -49,6 +73,7 @@ ylabel(ax, 'Simulation Cum. Dist')
 title(ax, strcat('Bootstrap CDF for Targets: ', mat_to_str(include_ix), ': p = ', num2str(p)))
 
 end
+
 
 function str = mat_to_str(mat)
     str = '';

@@ -2,7 +2,7 @@ function plot_targs(blocks, date, tslice, tslice_opt, trim_n_targs, rem_targ_fas
 
 % Inputs: See 'concat_dat_gen' for description / format of inputs
 
-[FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs);
+[FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, pxx, time2rew] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs);
 
 %Target Color Map:
 cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
@@ -16,7 +16,7 @@ for i=2:length(REW)
     rt = REW(i) - (REW(i-1)+4);
     reach_time = [reach_time rt];
 end
-reach_time = reach_time*(.4); 
+reach_time = time2rew*(.4); 
 
 %Path length
 dcurs = abs(diff(CURS));
@@ -51,20 +51,21 @@ for i=1:length(targs)
     %Figure 1, Reward Time
     figure(1);
     subplot(4,1 ,i)
-    plot(t_t(ix_n), rch_t(ix_n),'.','color',cmap{i},'markersize', 20)
+    plot(t_t(ix_n)/60, rch_t(ix_n),'.','color',cmap{i},'markersize', 20)
+    disp(strcat('Target: ',num2str(targs(i)), ' Mean: ', num2str(mean(rch_t(ix_n)))))
     mx= max(rch_t(ix_n));
     %legend(['Target ' num2str(targs(i))])
     hold on
     ylabel('Reach Time, sec.')
     xlabel('Time, sec.')
-    linfit  = regstats(rch_t(ix_n), t_t(ix_n),'linear');
+    linfit  = regstats(rch_t(ix_n), t_t(ix_n)/60,'linear');
     pv_slope = linfit.tstat.pval(2);
     
-    xhat = 0:max(t_t(ix_n))*1.1;
+    xhat = 0:max(t_t(ix_n))*1.1/60;
     yhat = linfit.beta(1)+linfit.beta(2)*xhat;
     hold on;
     plot(xhat, yhat, '--', 'linewidth', 2,'color', cmap{i})
-    xlim([0, max(t_t)*1.1])
+    xlim([0, (max(t_t)*1.1)/60])
     ylim([0, max(rch_t(ix_n))*1.1])
     title(['Target ' num2str(print_targs(i)) ': p = ' num2str(round(pv_slope*1000)/1000) ' slp=' num2str(linfit.beta(2))])
     
