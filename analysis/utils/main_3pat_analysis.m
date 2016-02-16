@@ -65,7 +65,7 @@ spec_dist_early_late(ax2, ax23, 'fjk', '103015', {[1 -1],[1 -1], [1 -1], [1 -1]}
 
 
 
-include_tgs = [-2 6 ];
+include_tgs = [-2 ];
 [rew_sim, rew_act] = chance_by_targ(gca, 'dfjk', '103015', {[1 -1],[1 -1], [1 -1], [1 -1]}, 'ix',...
     0, include_tgs, 60, 1000, 2);
 
