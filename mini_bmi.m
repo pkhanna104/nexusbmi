@@ -125,7 +125,7 @@ keep_running = 1;
 setappdata(handles.figure1, 'stop',0);
 
 
-%intro_display(handles);
+intro_display(handles);
 
 while keep_running
     
