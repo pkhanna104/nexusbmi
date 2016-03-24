@@ -16,7 +16,7 @@ else
 end
             
 rew_by_targ = zeros(1,4);
-tg = [-2 2 6];
+tg = [-6 -2 2 6];
 
 for ir = 1:length(REW)
     rew_i = REW(ir);

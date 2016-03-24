@@ -122,6 +122,8 @@ if spec_plot==1
     params = struct();
     params.Fs = 422;
     
+    %
+    % [Pxx,F] = pwelch(X,WINDOW,NOVERLAP,NFFT,Fs) ret
     [S, f] = pwelch(rand(169,1), 128, 0, 128, params.Fs);
     
     dat = RAW(:,1:168);

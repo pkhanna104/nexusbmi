@@ -6,7 +6,7 @@ function plot_targs(blocks, date, tslice, tslice_opt, trim_n_targs, rem_targ_fas
 
 %Target Color Map:
 cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
-
+time2targ_save = {};
 %Time to targets:
 %Take rew_inds, find previous rew_ind, add 4 for reward length
 
@@ -25,6 +25,8 @@ for i=2:length(REW)
     pl = sum(dcurs(REW(i-1)+4:(REW(i)-1)));
     path_length = [path_length pl];
 end
+
+%Prin
 
 %Plots by Target:
 targ_loc = TARG(REW);
@@ -52,7 +54,10 @@ for i=1:length(targs)
     figure(1);
     subplot(4,1 ,i)
     plot(t_t(ix_n)/60, rch_t(ix_n),'.','color',cmap{i},'markersize', 20)
-    disp(strcat('Target: ',num2str(targs(i)), ' Mean: ', num2str(mean(rch_t(ix_n)))))
+    disp(strcat('Target: ',num2str(targs(i)), ' Mean: ',...
+        num2str(mean(rch_t(ix_n))), 'SEM: ', num2str(std(rch_t(ix_n))/sqrt(length(ix_n)))))
+    time2targ_save{targs(i)+7} =  rch_t(ix_n);
+    
     mx= max(rch_t(ix_n));
     %legend(['Target ' num2str(targs(i))])
     hold on
@@ -111,6 +116,9 @@ for i=1:length(targs)
 %     xlabel('Time, sec.')
     
 end
+
+save(strcat('time2targ_', date, blocks, '.mat'),'time2targ_save')
+
 end
 % 
 % function lin_reg(x,y,ax)

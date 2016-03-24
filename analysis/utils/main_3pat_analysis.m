@@ -1,8 +1,8 @@
 % Plot Targets for All Patients
 
 % Patient 1:
-plot_targs('gh', '050815', {[141 -1],[1 -1]}, 'ix', 0, 0)
-spec_dist_gen('gh', '050815', {[1 -1],[1 -1]}, 'ix', 0, [1, 4]);
+plot_targs('gh', '050815', {[126 -1],[1 -1]}, 'ix', 0, 0)
+spec_dist_gen('gh', '050815', {[126 -1],[1 -1]}, 'ix', 0, [1, 4]);
 
 figure()
 ax1 = subplot(1,2,1);hold on;
@@ -16,11 +16,11 @@ ax23 = subplot(1,3,3);hold on;
 figure()
 ax = gca;
 
-spec_dist_early_late(ax2,ax21,'gh', '050815', {[1 -1],[1 -1]}, 'ix', 0, [1, 4], [10, 20]);
+spec_dist_early_late(ax2,ax21,'gh', '050815', {[126 -1],[1 -1]}, 'ix', 0, [1, 4], [10, 20]);
 spec_dist_early_late(ax1,ax,'cdef', '050815', {[1 -1],[1 -1],[1 -1],[1 -1]}, 'ix', 0, [1, 4], [10, 20])
 
-[rew_sim, rew_act, slope_dist] = chance_by_targ(gca, 'gh', '050815', {[141 -1],[1 -1]}, 'ix',...
-    0,[-6 6], 10e10, 100, [1.75, 2]);
+[rew_sim, rew_act, slope_dist] = chance_by_targ(gca, 'gh', '050815', {[126 -1],[1 -1]}, 'ix',...
+    0,[-6 2 6], 10e10, 1000, [1.75, 2]);
 
 % Patient 2:
 plot_targs('i', '092815', {[1 -1]}, 'ix', 0, 0)
@@ -61,7 +61,6 @@ ax4 = subplot(1,2,2);hold on;
 
 spec_dist_early_late(ax1, ax, 'd', '103015', {[1 -1],[1 -1], [1 -1], [1 -1]}, 'ix', 0, [2, 4], [20, 30]);
 spec_dist_early_late(ax2, ax23, 'fjk', '103015', {[1 -1],[1 -1], [1 -1], [1 -1]}, 'ix', 0, [2, 4], [20, 30]);
-
 
 
 
