@@ -7,9 +7,11 @@ while cnt < 1000
 %     fwrite(b,20)
 %     disp(char(fread(b,7)));
 %     pause(1)
-    fwrite(b, 10)
-    disp(char(fread(b,3)));
+    fwrite(b, 8)
+    ascii = fread(b,3);
+    dec = ascii2dec(ascii);
+    disp(dec)
     %pause(.1)
     cnt = cnt + 1;
+    pause(1)
 end
-    

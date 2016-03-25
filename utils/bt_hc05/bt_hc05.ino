@@ -13,10 +13,7 @@ SoftwareSerial BTserial(2, 3); // RX | TX
 // 
 
 int val=0;
-int touch=0;
-int acc_x=0;
-int acc_y=0;
-int acc_z=0;
+int sens = 0;
 
 void setup() 
 {
@@ -30,28 +27,27 @@ void loop()
 {
   if (Serial.available()>0){
     val = Serial.read();
+    
     //Serial.println("Rec'd");
-    if(val==8);
-    {
-      // BTserial.println("Tent"); 
-      touch = digitalRead(9);
-      Serial.println(touch);
+    //Serial.println(val);
+    
+    if(val==8) {
+      sens = digitalRead(9);
     }
 
-    if(val==0); {
-    acc_x = analogRead(A0);
-    Serial.println(acc_x);
+    else if(val==0) {
+      sens = analogRead(A0);
     }
 
-    if(val==1); {
-      acc_y = analogRead(A1);
-      Serial.println(acc_y);
+    else if(val==1) {
+      sens = analogRead(A1);
     }
  
-    if(val==2); {
-      acc_z = analogRead(A3); 
-      Serial.println(acc_z);     
+    else if(val==2) {
+      sens = analogRead(A3);    
     }
+    
+    Serial.println(sens);
   }
   delay(.5);
 }
