@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 29-Oct-2015 18:22:41
+% Last Modified by GUIDE v2.5 24-Mar-2016 14:28:59
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -124,8 +124,7 @@ keep_running = 1;
 %Set stop button to 'off'
 setappdata(handles.figure1, 'stop',0);
 
-
-intro_display(handles);
+%intro_display(handles);
 
 while keep_running
     
@@ -928,3 +927,12 @@ function timeoutTime_box_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in bt_check_box.
+function bt_check_box_Callback(hObject, eventdata, handles)
+% hObject    handle to bt_check_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of bt_check_box
