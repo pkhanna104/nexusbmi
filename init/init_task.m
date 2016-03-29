@@ -47,10 +47,14 @@ handles.task = task_sources.obj{task_ix}([hold_mn, hold_var]);
 
 if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
     if isnan(handles.task.ard)
-        com_port = get(handles.arduino_comport, 'String');
-        delete(instrfind({'Port'},{com_port}))
-        handles.task.ard = arduino(com_port);
-        pinMode(handles.task.ard, 8, 'input')
+        if get(handles.bt_check_box, 'Value')
+            handles.task.ard = bt_ard();
+        else
+            com_port = get(handles.arduino_comport, 'String');
+            delete(instrfind({'Port'},{com_port}))
+            handles.task.ard = arduino(com_port);
+            pinMode(handles.task.ard, 8, 'input')
+        end
     end
 end
 

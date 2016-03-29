@@ -35,6 +35,8 @@ methods
         ascii = fread(b, 3);
         val = ascii2dec(ascii);
     end
-    
+end
+
+end
                 
     
