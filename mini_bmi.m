@@ -22,7 +22,7 @@ function varargout = mini_bmi(varargin)
 
 % Edit the above text to modify the response to help mini_bmi
 
-% Last Modified by GUIDE v2.5 24-Mar-2016 14:28:59
+% Last Modified by GUIDE v2.5 29-Mar-2016 21:45:58
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -58,6 +58,8 @@ handles.output = hObject;
 %Set system:
 %Assume config file is in current directory (same as one mini_bmi is run
 %from). 
+
+%Vargin are 1: patient_id and 2: add entry to db 3: character choice
 
 if exist('config.txt','file')==2
     [label paths] = textread('config.txt', '%s %s',6);
@@ -112,7 +114,6 @@ function go_button_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global nex_init nex_inst;
-
 
 load_dec = 1;
 if and(handles.extractor_name(1:3) == 'Acc', get(handles.task_list_pulldown,'Value')==4)
@@ -936,3 +937,11 @@ function bt_check_box_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of bt_check_box
+
+% --- Executes on button press in testing_box.
+function testing_box_Callback(hObject, eventdata, handles)
+% hObject    handle to testing_box (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of testing_box

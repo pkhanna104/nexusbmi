@@ -1,8 +1,6 @@
-function [TARG, REW, reach_time, avg, session_length] = db_cleanup(handles, dat, data_filename, only_test)
+function [TARG, REW, reach_time] = db_cleanup(handles, dat, data_filename, only_test)
 
 % Find database file:
-session_length = dat.rawdata_abs_time(dat.iter_cnt - 1) - dat.rawdata_abs_time(1);
-    
 if ~only_test
     db_fname = strcat(handles.root_path, 'db\tasks2.db');
     conn = database(db_fname,[],[],'org.sqlite.JDBC',['jdbc:sqlite:' db_fname]);
@@ -34,6 +32,7 @@ if ~only_test
     export_data{1, 17} = time_str;
 
     % Session length:
+    session_length = dat.rawdata_abs_time(dat.iter_cnt - 1) - dat.rawdata_abs_time(1);
     export_data{1, 3} = session_length;
 
     % Data file name: 
@@ -98,7 +97,6 @@ for i=2:length(REW)
 end
 reach_time = reach_time*(.4);
 
-
 rt_by_targ = [0 0 0 0];
 rt_by_targ_cnt = [0 0 0 0];
 
@@ -107,23 +105,23 @@ targs = [-6, -2, 2, 6];
 for r=1:length(REW)
     t = TARG(REW(r));
     ix = find(targs==t);
-
+    
     rt_by_targ(ix) = rt_by_targ(ix) + reach_time(r);
     rt_by_targ_cnt(ix) = rt_by_targ_cnt(ix) + 1;
 end
 
 avg = rt_by_targ./rt_by_targ_cnt;
 
-if ~only_test
-    export_data{1, 12} = avg(1);
-    export_data{1, 13} = avg(2);
-    export_data{1, 14} = avg(3);
-    export_data{1, 15} = avg(4);
+export_data{1, 12} = avg(1);
+export_data{1, 13} = avg(2);
+export_data{1, 14} = avg(3);
+export_data{1, 15} = avg(4);
 
-    datainsert(conn, 'task_entries', colnames, export_data);
-    close(curs);
-    close(conn);
-end
+
+datainsert(conn, 'task_entries', colnames, export_data);
+close(curs);
+close(conn);
+r
 
 
     

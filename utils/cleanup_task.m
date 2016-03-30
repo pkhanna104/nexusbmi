@@ -12,8 +12,14 @@ function cleanup_task(handles)
     filename = get_data_fname('data',handles);
     save(filename,'dat');
     
-    % Run add entry to db: 
-    db_cleanup(handles, dat, filename)
+    % Add entry to db: 
+    only_test = get(handles.testing_box, 'Value');
+    [TARG, REW, reach_time, avg, session_length] = db_cleanup(handles, dat, filename, only_test);
+    
+    % Make Summary Stats Screen:
+    summary_stats(TARG, REW, reach_time, avg, session_length)
+    
+    % Get stuff for leaderboard screen:
     
     if isfield(handles.neural_source_name,'nexus') && (handles.neural_source_name.nexus ==1)
         %nex_inst.setNexusConfiguration(10,2) % reset to defaults
@@ -28,6 +34,7 @@ function cleanup_task(handles)
         it = dat.iter_cnt;
         save_last_clda(it, dat.decoder, handles);
     end
+           
     %Close GUI
     close(handles.figure1)
 
