@@ -12,6 +12,9 @@ function cleanup_task(handles)
     filename = get_data_fname('data',handles);
     save(filename,'dat');
     
+    % Run add entry to db: 
+    db_cleanup(handles, dat, filename)
+    
     if isfield(handles.neural_source_name,'nexus') && (handles.neural_source_name.nexus ==1)
         %nex_inst.setNexusConfiguration(10,2) % reset to defaults
         handles.neural_source.cleanup_neural()
