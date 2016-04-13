@@ -29,8 +29,13 @@ classdef decoder_simple < handle
             obj.source = handles.neural_source_name; 
             
             %For compatibiility with old decoders: 
-            if ~isfield(d.decoder,'source')
-                d.decoder.source = 'nexus_td';
+            if ~isfield(d.decoder,'source') 
+                if ~isempty(strfind(dec_name, 'pxx'))
+                    d.decoder.source = 'nexus_pxx';
+                else
+                    d.decoder.source = 'nexus_td';
+    
+                end
             end
             
             if and(strcmp(d.decoder.source, 'accel'), ~strcmp(obj.source, 'accel'))

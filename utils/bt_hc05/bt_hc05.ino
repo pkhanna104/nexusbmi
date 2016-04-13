@@ -30,24 +30,15 @@ void loop()
     
     //Serial.println("Rec'd");
     //Serial.println(val);
-    
-    if(val==8) {
-      sens = digitalRead(9);
-    }
 
-    else if(val==0) {
-      sens = analogRead(A0);
-    }
-
-    else if(val==1) {
-      sens = analogRead(A1);
-    }
- 
-    else if(val==2) {
-      sens = analogRead(A3);    
+    if (val==1) {
+      Serial.println(digitalRead(9));
+      Serial.println(analogRead(A0));
+      Serial.println(analogRead(A1));
+      Serial.println(analogRead(A3));
     }
     
-    Serial.println(sens);
+    
   }
-  delay(.5);
+  delayMicroseconds(50);
 }

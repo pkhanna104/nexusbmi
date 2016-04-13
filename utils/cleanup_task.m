@@ -16,11 +16,6 @@ function cleanup_task(handles)
     only_test = get(handles.testing_box, 'Value');
     [TARG, REW, reach_time, avg, session_length] = db_cleanup(handles, dat, filename, only_test);
     
-    % Make Summary Stats Screen:
-    summary_stats(TARG, REW, reach_time, avg, session_length)
-    
-    % Get stuff for leaderboard screen:
-    
     if isfield(handles.neural_source_name,'nexus') && (handles.neural_source_name.nexus ==1)
         %nex_inst.setNexusConfiguration(10,2) % reset to defaults
         handles.neural_source.cleanup_neural()
@@ -34,9 +29,20 @@ function cleanup_task(handles)
         it = dat.iter_cnt;
         save_last_clda(it, dat.decoder, handles);
     end
-           
+    
+    %Turn off BT if used: 
+    if get(handles.bt_check_box, 'Value')
+        fclose(handles.task.ard.bt)
+    end
+    
+    % Make Summary Stats Screen:
+    summary_stats(TARG, REW, reach_time, avg, session_length)
+    
     %Close GUI
     close(handles.figure1)
 
     %Close BMI Window
     close(handles.window.task_display)
+    
+    
+    

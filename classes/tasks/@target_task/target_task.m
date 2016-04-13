@@ -53,10 +53,11 @@ classdef target_task < handle
             obj.rew_cnt = 0;
             obj.point_counter = 0;
             obj.target_generator = obj.four_targ_gen(100);
+            
             obj.ard = NaN;
             obj.acc_dat = [0 0 0];
             obj.sub_cycle = 0;
-            obj.task_fs = 20;
+            obj.task_fs = 10;
             obj.sub_loop_time = 1/obj.task_fs;
             obj.mod_check_neural = (obj.loop_time / (1/obj.task_fs))-2;
         end
@@ -90,7 +91,9 @@ classdef target_task < handle
                 if isnan(obj.ard)
                 end
             catch
-                obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
+                %obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
+                [~, ax, ay, az] = obj.ard.read();
+                obj.acc_dat = [ax, ay, az];
             end
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);

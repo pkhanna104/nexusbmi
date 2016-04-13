@@ -9,32 +9,30 @@ end
 methods
     function obj = bt_ard()
         obj.bt = Bluetooth('HC-05', 1);
-        fopen(obj.bt)
-        flushinput(obj.bt)
+        fopen(obj.bt);
+        flushinput(obj.bt);
     end
     
+    function [d, ax, ay, az] = read(obj)
+        fwrite(obj.bt, 1);
+        ascii = fread(obj.bt, 18);
+        d = ascii2dec(ascii(1:3));
+        ax = ascii2dec(ascii(4:8));
+        ay = ascii2dec(ascii(9:13));
+        az = ascii2dec(ascii(14:18));
+    end
     function val = analogRead(obj, chan)
         fwrite(obj.bt, chan);
-        ascii = fread(b,5);
+        ascii = fread(obj.bt,5);
         val = ascii2dec(ascii);
     end
     
-    function dec = ascii2dec(obj, ascii)
-        c = str2num(char(ascii));
-        mult = 1;
-        dec = 0;
-        for i = 1:length(c)
-            ci = c(end+1-i);
-            dec = dec + (ci*mult);
-            mult = mult * 10;
-        end
-    end
-            
     function val = digitalRead(obj, chan)
         fwrite(obj.bt, chan);
-        ascii = fread(b, 3);
+        ascii = fread(obj.bt, 3);
         val = ascii2dec(ascii);
     end
+    
 end
 
 end
