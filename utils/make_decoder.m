@@ -11,6 +11,7 @@ data = load(strcat(PathName,FileName));
 dat = data.dat;
 
 decoder = struct();
+
 %Get correct source for decoder: 
 %Array of sources: 
 try
@@ -22,15 +23,18 @@ catch
     source = neural_source{Selection};
 end
 
+disp(strcat('Using source: ', source))
+
 if strcmp(source(end-1:end), 'td')
     [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat);
     
 elseif strcmp(source(end-2:end), 'pxx')
-    feats  = cell2mat(dat.rawdata_power_ch2);
+    feats  = cell2mat(dat.rawdata_power_ch4);
     lower_lim = 0;
     upper_lim = 0;
     
 elseif strcmp(source, 'accel')
+    %Deprecated
     %Data is saved as {[obj.ard_buff.cap], [obj.ard_buff.accel],[0],[0]}
     feats = cell2mat(dat.rawdata_power_ch2);
     feats = sum(feats, 1);
@@ -54,8 +58,9 @@ if strcmp(method,'simple')
 elseif strcmp(method, 'KF')
     sel = -1;
     while sel<0
-        sel = input('Use Target Info? 1 for Yes, 0 for No ');
+        sel = input('Use Target Info? 1 for Yes, 0 for No (do not use for movement task decoders): ');
     end
+    
     if sel
         targ_pos = dat.target(1:length(feats));
         disp('Using targ info')
