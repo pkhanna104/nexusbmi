@@ -40,6 +40,7 @@ plot(handles.window.ax, [-3, -3], [-10, 10], '-','color',[131 83 47]/255,'linewi
 plot(handles.window.ax, [3, 3], [-10, 10], '-','color',[131 83 47]/255,'linewidth',5)
 
 Y = [-6, -2, 2, 6];
+
 X = [-3, 2.5];
 for y=1:length(Y)
     for x=1:length(X)
@@ -61,11 +62,13 @@ handles.window.cursor = scatter(handles.window.ax, handles.window.cursor_pos(1),
     handles.window.cursor_pos(2),handles.window.cursor_default_size, ...
     handles.window.cursor_color, 'filled');
 
-handles.window.tap_dot = scatter(handles.window.ax, 8, 5, 0.5*handles.window.target_default_size,...
+handles.window.tap_dot = scatter(handles.window.ax, 5, 5, 0.5*handles.window.target_default_size,...
+    'k','filled');
+handles.window.tap_dot2 = scatter(handles.window.ax, 8, 5, 0.5*handles.window.target_default_size,...
     'k','filled');
 handles.tap_off_str = ['\fontsize{18} \color{black} TAP!'];
 handles.tap_on_str = ['\fontsize{18} \color{red} TAP!'];
-handles.window.tap_text = text(7, 3, handles.tap_off_str,'parent', handles.window.ax);
+handles.window.tap_text = text(5.5, 3, handles.tap_off_str,'parent', handles.window.ax);
 
 % %Set current text for score!'
 str = ['\fontsize{20} \color{white} Score:' num2str(handles.task.point_counter)];

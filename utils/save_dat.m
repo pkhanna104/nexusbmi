@@ -40,12 +40,13 @@ if ~isempty(data)
 end
 
 ard_ix = handles.task.sub_cycle;
-handles.save_data.arduino.cap_touch(ard_ix) = handles.task.tap_bool;
+handles.save_data.arduino.cap_touch(ard_ix,:) = handles.task.tap_bool; %Relevant touch sensor for task
+handles.save_data.arduino.touch_sens(ard_ix,:) = handles.task.touch_sens; %Two touch sensors
 handles.save_data.arduino.acc(ard_ix,:) = handles.task.acc_dat; 
 handles.save_data.arduino.t(ard_ix) = handles.task.sub_cycle_abs_time;
 
 if isprop(handles.neural_source,'ard_buff')
-    handles.neural_source.ard_buff.cap = [handles.neural_source.ard_buff.cap handles.task.tap_bool];
+    handles.neural_source.ard_buff.cap = [handles.neural_source.ard_buff.cap handles.task.touch_sens'];
     handles.neural_source.ard_buff.accel = [handles.neural_source.ard_buff.accel handles.task.acc_dat'];
 end
 
