@@ -1,6 +1,7 @@
-function [rew, rew_cnt, rew_time, time2targ] = calc_chance(decoded_curs, simN,...
-    timeoutTime, targ_sizes)
+function [rew, rew_cnt, rew_time, time2targ, rew_sim_act] = calc_chance(decoded_curs,...
+    targ_locs, rew_ix, asst, simN, timeoutTime, targ_sizes)
 
+targ_locs_gen = targ_locs(rew_ix);
 rew = zeros(simN,1);
 rew_cnt = zeros(simN, 4);
 rew_time = {};
@@ -18,6 +19,9 @@ timeout_cnt = 0;
 for s=1:simN
     state = 'target';
     targ_y_pos = target_gen(1000);
+    if s == simN
+        targ_y_pos = targ_locs_gen;
+    end
     targ = targ_y_pos(1);
     targ_y_pos = targ_y_pos(2:end);
     
@@ -26,14 +30,23 @@ for s=1:simN
         if strcmp(state, 'neutral')
             if neut_cnt > 4
                 state = 'target';
-                targ = targ_y_pos(1);
-                targ_y_pos = targ_y_pos(2:end);
+                
+                try
+                    targ = targ_y_pos(1);
+                    targ_y_pos = targ_y_pos(2:end);
+                catch
+                    targ_y_pos = target_gen(1000);
+                    targ = targ_y_pos(1);
+                    targ_y_pos = targ_y_pos(2:end);
+                end
             else
                 neut_cnt = neut_cnt+1;
             end
         end
         if strcmp(state,'target')
             curs = decoded_curs(c);
+            %curs = curs - (targ_locs(c)*asst/100)+(targ*asst/100);
+            curs = (curs - (targ_locs(c)*asst/100))*(1/((100-asst)/100));%+(targ*asst/100);
             d = abs(curs - targ);
             timeout_cnt = timeout_cnt + 1;
             if d < target_radius
@@ -55,6 +68,8 @@ for s=1:simN
         end
     end
 end
+
+rew_sim_act = rew(simN);
 
 
 

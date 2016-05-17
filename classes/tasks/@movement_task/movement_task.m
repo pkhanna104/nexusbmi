@@ -26,7 +26,7 @@ classdef movement_task < handle
         sub_cycle_abs_time;
         acc_dat;
         tap_bool;
-        
+        touch_sens;
         beep;
         beep_bool;
     end
@@ -52,8 +52,9 @@ classdef movement_task < handle
             obj.point_counter = 0;
             obj.ard = NaN;
             obj.acc_dat = [0 0 0];
+            obj.touch_sens = [0 0];
             obj.sub_cycle = 0;
-            obj.task_fs = 20;
+            obj.task_fs = 10;
             obj.sub_loop_time = 1/obj.task_fs;
             obj.target_y_pos = nan;
             obj.beep = wavread('beep-02.wav');
@@ -84,8 +85,18 @@ classdef movement_task < handle
             end
             
             %Update Accel
-            obj.tap_bool = digitalRead(obj.ard,8);
-            obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
+            try
+                iznotnan = ~isnan(obj.ard);
+            catch
+                iznotnan = 1;
+            end
+            
+            if iznotnan
+                [d1, d2, ax, ay, az] = obj.ard.read();
+                obj.tap_bool = d1;
+                obj.touch_sens = [d1, d2];
+                obj.acc_dat = [ax, ay, az];
+            end
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);
             

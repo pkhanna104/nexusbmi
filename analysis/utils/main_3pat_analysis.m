@@ -4,6 +4,10 @@
 plot_targs('gh', '050815', {[126 -1],[1 -1]}, 'ix', 0, 0)
 spec_dist_gen('gh', '050815', {[126 -1],[1 -1]}, 'ix', 0, [1, 4]);
 
+
+%For darpa:
+%spec_dist_gen('cdef', '050815', {[1 -1],[1 -1],[1 -1],[1 -1]}, 'ix', 0, [1, 4])
+
 figure()
 ax1 = subplot(1,2,1);hold on;
 ax2 = subplot(1,2,2);hold on;
@@ -23,9 +27,16 @@ spec_dist_early_late(ax1,ax,'cdef', '050815', {[1 -1],[1 -1],[1 -1],[1 -1]}, 'ix
     0,[-6 2 6], 10e10, 1000, [1.75, 2]);
 
 % Patient 2:
-plot_targs('i', '092815', {[1 -1]}, 'ix', 0, 0)
-spec_dist_gen('i', '092815', {[1 -1]}, 'ix', 0);
-[rew_sim, rew_act] = chance_by_targ(gca, 'i', '092815', {[1 -1]}, 'ix', 0, [-6 6], 10e10, 1000, 2);
+% plot_targs('i', '092815', {[1 -1]}, 'ix', 0, 0)
+% spec_dist_gen('i', '092815', {[1 -1]}, 'ix', 0, [1, 4]);
+% spec_dist_gen('gh', '092815', {[1 -1],[1 -1]}, 'ix', 0, [1, 4])
+
+plot_targs('i', '092815', {[1 1558]}, 'ix', 0, 0)
+spec_dist_gen('i', '092815', {[1 1558]}, 'ix', 0, [1, 4]);
+spec_dist_gen('gh', '092815', {[1 -1],[1 -1]}, 'ix', 0, [1, 4])
+
+[rew_sim, rew_act] = chance_by_targ(gca, 'i', '092815', {[1 1558]}, 'ix',...
+    0, [-6 -2 2 6], 10e10, 1000, 2, 50);
 
 
 figure()
@@ -83,9 +94,16 @@ ax1 = subplot(3,1,1); hold all;
 ax2 = subplot(3,1,2); hold all;
 ax3 = subplot(3,1,3); hold all;
 
-[rew_sim, rew_act] = chance_by_targ(ax1, 'gh', '050815', {[1 -1],[1 -1]}, 'ix', 0,[-6 2 6], 10e10, 1000);
-[rew_sim, rew_act] = chance_by_targ(ax2, 'i', '092815', {[1 -1]}, 'ix', 0, [-6 6], 10e10, 1000);
+asst = 0;
+[rew_sim, rew_act] = chance_by_targ(ax1, 'gh', '050815', {[1 -1],[1 -1]},...
+    'ix', 0,[-6 2 6], 10e10, 100, [1.75, 2], asst);
 
-include_tgs = [-6 -2 2 6 ];
+asst = 50;
+[rew_sim, rew_act] = chance_by_targ(ax2, 'i', '092815', {[1 1551]},...
+    'ix', 0, [-6 6], 10e10, 100, 2, asst);
+
+asst = 40;
+timeout=60;
+include_tgs = [-2];
 [rew_sim, rew_act] = chance_by_targ(ax3, 'jk', '103015', {[1 -1],[1 -1]}, 'ix',...
-    0, include_tgs, 60, 1000);
+    0, include_tgs, timeout, 100, 2, asst);

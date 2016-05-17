@@ -83,6 +83,18 @@ if spec_plots_v1
      %STATS:
      
      for tt =1:6
+         % Do only for darpa figure:
+         ix1 = find(grp_stats==min(grp_stats));
+         ix2 = find(grp_stats==max(grp_stats));
+         [Hyp,TP,T_CI] = ttest2(ft_stats(ix1,tt), ft_stats(ix2, tt), 'tail', 'both');
+         if Hyp==1
+             disp('Signficant TTest b/w High and Low: ');
+             disp(['P = ' num2str(TP)])
+             disp(['Time point: ' num2str(tt)])
+             disp('')
+             disp('')
+         end
+         
          [p, anovatab, stats] = anova1(ft_stats(:,tt), grp_stats, 'off');
          if p <= .05
             if p <= .05 & p > .01

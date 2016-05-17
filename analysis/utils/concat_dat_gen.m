@@ -1,4 +1,5 @@
-function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN, time2rew] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs)
+function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN, time2rew] = concat_dat_gen(blocks,...
+    date, tslice, tslice_opt, trim_n_targs)
 
 % Method to concatenate relevant features
 % Inputs: blocks, (format: 'abcdef')

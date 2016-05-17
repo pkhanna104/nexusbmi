@@ -1,5 +1,5 @@
 function [rew_sim, rew_act, slope_dist] = chance_by_targ(ax, blocks, date, tslice, tslice_opt,...
-    trim_n_targs, include_targs, timeout, sim_cnt, target_sizes)
+    trim_n_targs, include_targs, timeout, sim_cnt, target_sizes, asst)
 
 [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, px, time2targ_act] = concat_dat_gen(blocks, date,...
     tslice, tslice_opt, trim_n_targs);
@@ -26,7 +26,7 @@ for ir = 1:length(REW)
     rew_by_targ(ix) = rew_by_targ(ix)+1;
 end
 
-[rew, rew_cnt, rew_time, time2targ] = calc_chance(CURS, sim_cnt, timeout, szs);
+[rew, rew_cnt, rew_time, time2targ, rew_sim_act] = calc_chance(CURS, TARG, REW, asst, sim_cnt, timeout, szs);
 
 slope_dist = {[], [], [], []};
 
@@ -53,7 +53,8 @@ for i=1:length(include_targs)
 end
 
 rew_sim = sum(rew_cnt(:, include_ix), 2);
-rew_act = sum(rew_by_targ(include_ix));
+%rew_act = sum(rew_by_targ(include_ix));
+rew_act =rew_sim_act;
 
 [n, x] = hist(rew_sim, 15); 
 cdf = cumsum(n)/sum(n);

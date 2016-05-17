@@ -27,6 +27,7 @@ classdef target_task < handle
         sub_cycle_abs_time;
         acc_dat;
         tap_bool;
+        touch_sens;
         
     end
     
@@ -60,6 +61,7 @@ classdef target_task < handle
             obj.task_fs = 10;
             obj.sub_loop_time = 1/obj.task_fs;
             obj.mod_check_neural = (obj.loop_time / (1/obj.task_fs))-2;
+            obj.touch_sens = [0 0];
         end
         
         function handles = cycle(obj, handles)
@@ -86,13 +88,12 @@ classdef target_task < handle
                 
             end
             
-            %Update Accel?
+            %Update Accel
             try
                 if isnan(obj.ard)
                 end
             catch
-                %obj.acc_dat = [obj.ard.analogRead(0), obj.ard.analogRead(1), obj.ard.analogRead(3)];
-                [~, ax, ay, az] = obj.ard.read();
+                [~, ~, ax, ay, az] = obj.ard.read();
                 obj.acc_dat = [ax, ay, az];
             end
             obj.sub_cycle = obj.sub_cycle + 1;
