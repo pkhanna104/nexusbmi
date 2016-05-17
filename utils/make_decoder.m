@@ -14,14 +14,14 @@ decoder = struct();
 
 %Get correct source for decoder: 
 %Array of sources: 
-try
-    source = dat.decoder.source;
-catch
+% try
+%     source = dat.decoder.source;
+% catch
     neural_source = {'sim_nexus_td','sim_nexus_pxx', 'nexus_td','nexus_pxx','accel'};
     [Selection,ok] = listdlg('PromptString','Select Decoder Source Signal',...
         'ListString',neural_source, 'SelectionMode','single');
     source = neural_source{Selection};
-end
+%end
 
 disp(strcat('Using source: ', source))
 
@@ -29,7 +29,16 @@ if strcmp(source(end-1:end), 'td')
     [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat);
     
 elseif strcmp(source(end-2:end), 'pxx')
-    feats  = cell2mat(dat.rawdata_power_ch4);
+    rect_pwr = {};
+    for ii = 1:length(dat.rawdata_power_ch4)
+        if size(dat.rawdata_power_ch4{ii},1) ~=2
+            rect_pwr{ii} = [];
+            disp(strcat('Skipping ix: ', num2str(ii)));            
+        else
+            rect_pwr{ii} = dat.rawdata_power_ch4{ii};
+        end
+    end
+    feats  = cell2mat(rect_pwr);
     lower_lim = 0;
     upper_lim = 0;
     

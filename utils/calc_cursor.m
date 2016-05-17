@@ -2,10 +2,10 @@ function handles = calc_cursor(feat, handles)
 
 % feat is a lfp band x 1 array (I think)
 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
-task_feat = mean(feat.td(task_ind));
+%task_feat = mean(feat.td(task_ind));
 
 %PD: 
-%task_feat = mean(feat.fd);
+task_feat = mean(feat.td.fd);
 
 % Run decoder
 % scale task feat:
