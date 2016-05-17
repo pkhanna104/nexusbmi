@@ -32,13 +32,12 @@ void loop()
     //Serial.println(val);
 
     if (val==1) {
-      Serial.println(digitalRead(9));
+      Serial.println(digitalRead(8));
+      Serial.println(digitalRead(12));
       Serial.println(analogRead(A0));
       Serial.println(analogRead(A1));
       Serial.println(analogRead(A3));
     }
-    
-    
   }
   delayMicroseconds(50);
 }
