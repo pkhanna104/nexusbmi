@@ -39,6 +39,7 @@ elseif strcmp(source(end-2:end), 'pxx')
         end
     end
     feats  = cell2mat(rect_pwr);
+    feats = mean(feats, 1);
     lower_lim = 0;
     upper_lim = 0;
     
