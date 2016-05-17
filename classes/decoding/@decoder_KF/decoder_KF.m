@@ -172,6 +172,9 @@ classdef decoder_KF < handle
         end
         
         function ypos = run_decoder(obj, feat, cnt)
+            if strcmp(obj.source, 'nexus_pxx')
+                feat = mean(feat);
+            end
             %Get last time update step:
             pred_x_t = squeeze(obj.x_tm_est_arr(cnt,:))';
             pred_cov_t = squeeze(obj.cov_tm_est_arr(cnt,:,:));

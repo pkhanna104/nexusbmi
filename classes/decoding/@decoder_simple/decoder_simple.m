@@ -55,11 +55,16 @@ classdef decoder_simple < handle
         function handles = calc_cursor(obj, feat, handles)
             % feat is a lfp band x 1 array if time domain
             % else if a pxx channel
+            
             if strcmp(handles.feature_extractor.domain, 'td')
                 task_ind = find(handles.feature_extractor.task_indices_f_ranges>0);
                 task_feat = mean(feat.td(task_ind));
             elseif strcmp(handles.feature_extractor.domain, 'pxx')
-                task_feat = mean(feat.fd);
+                try
+                    task_feat = mean(feat.fd);
+                catch
+                    task_feat = mean(feat.pxx);
+                end
             end
             
             % Run decoder
