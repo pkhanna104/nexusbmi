@@ -45,20 +45,6 @@ hold_mn = str2num(get(handles.holdMean, 'String'));
 hold_var = str2num(get(handles.holdVar, 'String'));
 handles.task = task_sources.obj{task_ix}([hold_mn, hold_var]);
 
-if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
-    if isnan(handles.task.ard)
-        if get(handles.bt_check_box, 'Value')
-            handles.task.ard = bt_ard();
-        else
-            com_port = get(handles.arduino_comport, 'String');
-            delete(instrfind({'Port'},{com_port}))
-            handles.task.ard = arduino(com_port);
-            pinMode(handles.task.ard, 8, 'input')
-        end
-    end
-end
-
-
 %Load reward sounds
 handles.reward_sounds = struct;
 handles.reward_sounds.file = {};
@@ -169,6 +155,21 @@ if isfield(handles, 'neural_source_name')
 else
     disp('Error: No neural source selected')
 end
+
+%Initialize arduino
+if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
+    if isnan(handles.task.ard)
+        if get(handles.bt_check_box, 'Value')
+            handles.task.ard = bt_ard();
+        else
+            com_port = get(handles.arduino_comport, 'String');
+            delete(instrfind({'Port'},{com_port}))
+            handles.task.ard = arduino(com_port);
+            pinMode(handles.task.ard, 8, 'input')
+        end
+    end
+end
+
 end
 
 
