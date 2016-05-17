@@ -33,10 +33,24 @@ elseif strcmp(handles.task.state, 'wait')
     
 end
 
-if handles.task.tap_bool
-    set(handles.window.tap_dot, 'MarkerFaceColor', 'r');
-else
-    set(handles.window.tap_dot, 'MarkerFaceColor', 'k')
+if ~isnan(handles.task.tap_bool)
+    if handles.task.tap_bool
+        set(handles.window.tap_dot, 'MarkerFaceColor', 'r');
+    else
+        set(handles.window.tap_dot, 'MarkerFaceColor', 'k')
+    end
+end
+
+try
+    if ~isnan(handles.task.rtap_bool)
+        if handles.task.rtap_bool
+            set(handles.window.tap_dot2, 'MarkerFaceColor', 'r');
+        else
+            set(handles.window.tap_dot2, 'MarkerFaceColor', 'k');
+        end
+    end
+catch
+    tmp=nan;
 end
 
 blit_display(handles.window.ax);
