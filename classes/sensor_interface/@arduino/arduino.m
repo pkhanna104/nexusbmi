@@ -421,6 +421,15 @@ classdef arduino < handle
             
         end % pinmode
         
+        %nexusBMI specific read function
+        function [d1, d2, ax, ay, az] = read(a)
+            az = a.analogRead(0);
+            ay = a.analogRead(1);
+            ax = a.analogRead(3);
+            d1 = a.digitalRead(12);
+            d2= a.digitalRead(8);
+        end
+        
         % digital read
         function val=digitalRead(a,pin)
             
