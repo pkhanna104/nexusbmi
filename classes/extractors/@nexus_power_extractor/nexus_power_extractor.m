@@ -49,6 +49,8 @@ classdef nexus_power_extractor < feature_extractor
             %Get domain: 
             if isfield(extractor_params,'domain')
                 obj.domain=extractor_params.domain;
+            elseif isfield(extractor_params, 'nexus_domain')
+                obj.domain=extractor_params.nexus_domain;
             else
                 obj.domain = 'td';
             end
@@ -64,7 +66,7 @@ classdef nexus_power_extractor < feature_extractor
             obj.n_features = size(obj.f_ranges,1);
             
             obj.last_features = struct();
-            obj.last_features.fd = [0];
+            obj.last_features.pxx = [0];
             obj.last_features.td = zeros(obj.n_features,1);
             obj.task_f_ranges = extractor_params.task_f_ranges;
             
@@ -97,7 +99,7 @@ classdef nexus_power_extractor < feature_extractor
             features = struct();
             
             if any([isnan(recent_neural{obj.used_chan}); isempty(recent_neural{obj.used_chan})])
-                features.(obj.domain) = obj.last_features;
+                features.(obj.domain) = obj.last_features.(obj.domain);
                 disp('last features');
             else
                 %x = recent_neural.read(obj.width)';
@@ -121,7 +123,7 @@ classdef nexus_power_extractor < feature_extractor
                     data = data';
                 end
                 %disp('data2');
-                size(data)
+                %size(data)
                 
                 
                 if strcmp(obj.domain,'td')

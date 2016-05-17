@@ -14,8 +14,7 @@ classdef nexus_interface < handle
             global nex_init nex_inst;
             
             if nex_init
-                fprintf('nexus already connected!')
-            
+                fprintf('nexus already connected!')            
             else
                 %initiate nexus interface
                 nex_inst = mdt.neuro.nexus.NexusInstrument.getInstance; 
@@ -52,7 +51,10 @@ classdef nexus_interface < handle
             global nex_inst
             
             %obj.inst.startSensing;
+            tmp = nex_inst.stopDataSession;
+            pause(1);
             obj.status = nex_inst.startDataSession;
+            
             if obj.status == 0
                 fprintf('data session enablesd\n');
             else
@@ -80,7 +82,7 @@ classdef nexus_interface < handle
             
             else
                 %No packets received :( 
-                Data = {nan, nan};
+                Data = {nan, nan, nan, nan};
                 seq = [0, 0];
                 
             end
