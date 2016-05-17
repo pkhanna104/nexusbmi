@@ -2,16 +2,19 @@ function decoder = init_KF(feats, decoder, targ_pos)
 
 %Estimate X_1:T from Y_1:T -- 
 %First assume no Noise (W = 0) in state space
-[~, nc] = size(feats);
+[nr, nc] = size(feats);
 if nc==1
     feats = feats';
 end
-
+if nr == 2 %Power features
+    feats = reshape(feats, [nc * nr, 1])';
+    targ_pos = reshape([targ_pos targ_pos]', [2*length(targ_pos), 1]);
+end
 %Normalize features:
 sqrt_neur = sqrt(feats);
 neur = sqrt_neur - mean(sqrt_neur);
 
-%Stupid method: 
+%Method where target positions are assigned based on percentiles:
 if length(targ_pos)==0
     targ_pos = zeros(length(neur),1);
     low_cut = 0;
