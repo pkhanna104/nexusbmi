@@ -93,12 +93,14 @@ classdef target_task < handle
                 if isnan(obj.ard)
                 end
             catch
-                [~, ~, ax, ay, az] = obj.ard.read();
+                [d1, d2, ax, ay, az] = obj.ard.read();
                 obj.acc_dat = [ax, ay, az];
             end
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);
-            obj.tap_bool = 0;
+            obj.tap_bool = d1;
+            obj.touch_sens = [d1, d2];
+            obj.sub_cycle_abs_time = toc(handles.tic);
             
         end
         
