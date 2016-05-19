@@ -90,13 +90,12 @@ for ai = 1:length(blocks)
             while strcmp(states{rew_inds(i)-offs},'tapping')
                 offs = offs +1;
             end
-            tapping_start_offset(i, 1) = offs-1;
             
             offs = 1;
-            while ~strcmp(states{rew_inds(i)+offs},'target')
+            while strcmp(states{rew_inds(i)+offs},'tapping')
                 offs = offs +1;
             end
-            tapping_start_offset(i, 2) = offs-1;
+            tapping_start_offset(i) = offs-1;
         end
     end
             
@@ -112,7 +111,7 @@ for ai = 1:length(blocks)
     
     REW = [REW blk_rews];
     
-    taps = tapping_start_offset(rew_inds>=tsl_start & rew_inds<= tsl_stop,:);
+    taps = tapping_start_offset(rew_inds>=ts1_start & rew_inds<= ts1_stop);
     TAPPING_IX = [ TAPPING_IX taps];
     
     time2rew = [time2rew rew_times(rew_inds>=tsl_start & rew_inds<= tsl_stop)];

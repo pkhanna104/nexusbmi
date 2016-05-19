@@ -2,7 +2,7 @@
 
 % Patient 1:
 day = '051816';
-blocks = 'd';
+blocks = 'c';
 ix_to_analyze = {[1, -1]};%, [1, -1]};
 
 %Input: trim_n_targs: any targets to trim? (format: [ 0 0 0 10])

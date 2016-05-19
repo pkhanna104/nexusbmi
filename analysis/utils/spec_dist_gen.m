@@ -4,20 +4,27 @@ function spec_dist_gen(blocks, date, tslice, tslice_opt, trim_n_targs, low_high)
 [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs);
 
 spec_vect_main = {};
-%targ_locs = sort(unique(TARG(REW)));
-targ_locs = [-6 -2 2 6];
+if sum(TARG==0) > 5
+    targ_locs = [-6 0 6];
+else
+    %targ_locs = sort(unique(TARG(REW)));
+    targ_locs = [-6 -2 2 6];
+end
 figure()
 
 try
     if size(FT, 2) >= 3 && sum(FT(:,3))>0
         FT = FT(:,3);
+        spec_plot = 1;
     else
          disp('using power channel as feature')
         FT = PXX_CHAN(1,:);
+        spec_plot = 0;
     end
     spec_plots_v1 = 1;
 catch
     spec_plots_v1 = 0;
+    spec_plot = 0;
 end
 
 cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
@@ -32,7 +39,7 @@ if spec_plots_v1
     db = bins(2)-bins(1);
     dbstep = db/100;
 
-    
+    leg = {};
     for i = 1:length(targ_locs)
         hold on
         ix = find(TARG==targ_locs(i));
@@ -41,11 +48,12 @@ if spec_plots_v1
             disp([num2str(i) 'mean: ' num2str(mean(FT(ix))) ', median: ' num2str(median(FT(ix)))]);
             norm_n = n/sum(n);
             plot(gca,x+((i-1)*dbstep),norm_n, '.-','color',cmap{i},'LineWidth',3,'MarkerSize',30)
+            leg{length(leg)+1} = strcat('Targ: ', num2str(targ_locs(i)));
         end
     end
     xlabel('Beta Power','FontSize',20)
     ylabel('Frequency','FontSize',20)
-    legend('Targ: -6','Targ: -2','Targ: 2','Targ:6')
+    legend(leg)
     LEGH = legend;
     set(LEGH,'Location','northwest')
 
@@ -56,6 +64,7 @@ if spec_plots_v1
     hold on
     ft_stats = [];
     grp_stats = [];
+    leg2 = {};
     for i = 1:length(targ_locs)
         
         rw_ix = find(TARG(REW)== targ_locs(i));
@@ -75,6 +84,7 @@ if spec_plots_v1
               
         t = [.4*-5:.4:0];
         errorbar(t, mn, sem,'color',cmap{i},'LineWidth',3,'MarkerSize',30)
+        leg2{length(leg2)+1} = strcat('Targ: ', num2str(targ_locs(i)));
         ft_stats = [ft_stats; ft_mat];
         grp_stats = [grp_stats ones(1,size(ft_mat,1))+i];
         end
@@ -109,7 +119,7 @@ if spec_plots_v1
      end
     %END STATS
     
-    legend('Targ: 1','Targ: 2','Targ: 3','Targ: 4','Location','northwest')
+    legend(leg2,'Location','northwest')
     xlabel('Time Prior to Reward (sec)','FontSize',20)
     ylabel('Beta (10-20 Hz) Power','FontSize',20)
     LEGH = legend;
@@ -118,7 +128,7 @@ if spec_plots_v1
 end
 
 %Spec triggered plots:
-spec_plot = 1;
+
 if spec_plot==1
     if sum(sum(RAW_stn)) == 0
         RAW = RAW_m1;

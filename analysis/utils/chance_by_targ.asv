@@ -2,7 +2,7 @@ function [rew_sim, rew_act, slope_dist] = chance_by_targ(ax, blocks, date, tslic
     trim_n_targs, include_targs, timeout, sim_cnt, target_sizes, asst)
 
 [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, px, time2targ_act...
-    TAPPING_IX, task_name] = concat_dat_gen(blocks, date,...
+    tapping_start_offset, task_name] = concat_dat_gen(blocks, date,...
     tslice, tslice_opt, trim_n_targs);
 
 if length(target_sizes) > 1
@@ -15,14 +15,9 @@ if length(target_sizes) > 1
 else
     szs = repmat(target_sizes, [length(CURS),1]);
 end
-        
-if strcmp(task_name, 'target_task')
-    rew_by_targ = zeros(1,4);
-    tg = [-6 -2 2 6];
-elseif strcmp(task_name, 'target_tapping')
-    rew_by_targ = zeros(1, 3);
-    tg = [-6 0 6];
-end
+            
+rew_by_targ = zeros(1,4);
+tg = [-6 -2 2 6];
 
 for ir = 1:length(REW)
     rew_i = REW(ir);
@@ -32,8 +27,7 @@ for ir = 1:length(REW)
     rew_by_targ(ix) = rew_by_targ(ix)+1;
 end
 
-[rew, rew_cnt, rew_time, time2targ, rew_sim_act] = calc_chance(CURS, TARG, ...
-    REW, asst, sim_cnt, timeout, szs, task_name, TAPPING_IX);
+[rew, rew_cnt, rew_time, time2targ, rew_sim_act] = calc_chance(CURS, TARG, REW, asst, sim_cnt, timeout, szs);
 
 slope_dist = {[], [], [], []};
 
@@ -48,7 +42,8 @@ end
 
 actual_slope = [];
 rew_targ = TARG(REW);
-for t=1:length(tg)
+tg = [-6 -2 2 6];
+for t=1:4
     ix = find(rew_targ==tg(t));
     b = [REW(ix)' ones(length(ix),1)]\time2targ_act(ix)';
     actual_slope = [actual_slope b(1)];

@@ -3,7 +3,7 @@ function [rew, rew_cnt, rew_time, time2targ, rew_sim_act] = calc_chance(decoded_
 
 if strcmp(task_name, 'target_tapping')
     tapping_time = mean(tapping_ix(1,tapping_ix(1,:)>1));
-    reset_time = mean(tapping_ix(2,tapping_ix(2,:)));
+    reset_time = mean(tapping_ix(2,tapping_ix(2,:)>4));
     pause_time = round(tapping_time+reset_time);
     targ_exc = [0];
     exc_pause_time =4;
@@ -11,10 +11,9 @@ if strcmp(task_name, 'target_tapping')
 elseif strmcp(task_name, 'target_task')
     tapping_time = 0;
     reset_time = 4;
-    pause_time = round(tapping_time+reset_time);
-    targ_exc = [];
+   pause_time = round(tapping_time+reset_time); 
 end
-
+    
 targ_locs_gen = [targ_locs(rew_ix) ; targ_locs(rew_ix(end)+5); targ_locs(rew_ix(end)+5)];
 rew = zeros(simN,1);
 rew_cnt = zeros(simN, 4);
@@ -42,12 +41,12 @@ for s=1:simN
     end
     
     if s == simN
-        targ_y_pos = [targ_locs_gen; three_targ_co_gen(1000)];
+        targ_y_pos = targ_locs_gen;
         size(targ_y_pos)
     end
     targ = targ_y_pos(1);
     
-    if sum(targ==targ_exc) >0
+    if sum(targ==exc) >0
         trial_pause_time = exc_pause_time;
     else
         trial_pause_time = pause_time;
@@ -64,12 +63,12 @@ for s=1:simN
                 targ = targ_y_pos(1);
                 targ_y_pos = targ_y_pos(2:end);
                 
-                if sum(targ==targ_exc) >0
-                    trial_pause_time = exc_pause_time;
-                else
-                    trial_pause_time = pause_time;
-                end
-                
+                    if sum(targ==exc) >0
+        trial_pause_time = exc_pause_time;
+    else
+        trial_pause_time = pause_time;
+                    end
+    
             else
                 neut_cnt = neut_cnt+1;
             end
@@ -104,35 +103,35 @@ rew_sim_act = rew(simN);
 
 
 
-    function targ_y_pos = target_gen(n_targets)
-        block = 3;
-        
-        y = [-6 -2 2 6]';
-        Y = repmat(y, [block 1]);
-        
-        n_reps = round(n_targets/(4*block));
-        
-        targ_y_pos = [];
-        
-        for i = 1:n_reps
-            idx_shuff = randperm(block*4);
-            targ_y_pos = [targ_y_pos; Y(idx_shuff)];
-        end
-    end
+function targ_y_pos = target_gen(n_targets)
+    block = 3;
+    
+    y = [-6 -2 2 6]';
+    Y = repmat(y, [block 1]);
 
-    function targ_y_pos = three_targ_co_gen(n_targets)
-        block = 2;
-        y = [-6, 6]';
-        Y = repmat(y, [block, 1]);
-        n_reps = round(n_targets/(2*block));
-        
-        targ_y_pos = [];
-        for i = 1:n_reps
-            idx_shuff = randperm(block*2);
-            for j = 1:length(idx_shuff)
-                targ_y_pos = [targ_y_pos; Y(idx_shuff(j)); 0];
-            end
+    n_reps = round(n_targets/(4*block));
+
+    targ_y_pos = [];
+
+    for i = 1:n_reps
+        idx_shuff = randperm(block*4);
+        targ_y_pos = [targ_y_pos; Y(idx_shuff)];
+    end
+end
+
+function targ_y_pos = three_targ_co_gen(n_targets)
+    block = 2;
+    y = [-6, 6]';
+    Y = repmat(y, [block, 1]);
+    n_reps = round(n_targets/(2*block));
+
+    targ_y_pos = [];
+    for i = 1:n_reps
+        idx_shuff = randperm(block*2);
+        for j = 1:length(idx_shuff)
+            targ_y_pos = [targ_y_pos; Y(idx_shuff(j)); 0];
         end
     end
+end
 
 end

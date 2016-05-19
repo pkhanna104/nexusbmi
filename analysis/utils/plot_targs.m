@@ -62,18 +62,23 @@ for i=1:length(targs)
     %legend(['Target ' num2str(targs(i))])
     hold on
     ylabel('Reach Time, sec.')
-    xlabel('Time, sec.')
-    linfit  = regstats(rch_t(ix_n), t_t(ix_n)/60,'linear');
-    pv_slope = linfit.tstat.pval(2);
+    xlabel('Time, Min.')
+    if length(ix_n) > 1
+        linfit  = regstats(rch_t(ix_n), t_t(ix_n)/60,'linear');
+        pv_slope = linfit.tstat.pval(2);
     
-    xhat = 0:max(t_t(ix_n))*1.1/60;
-    yhat = linfit.beta(1)+linfit.beta(2)*xhat;
-    hold on;
-    plot(xhat, yhat, '--', 'linewidth', 2,'color', cmap{i})
+        xhat = 0:max(t_t(ix_n))*1.1/60;
+        yhat = linfit.beta(1)+linfit.beta(2)*xhat;
+        hold on;
+        plot(xhat, yhat, '--', 'linewidth', 2,'color', cmap{i})
+    end
     xlim([0, (max(t_t)*1.1)/60])
     ylim([0, max(rch_t(ix_n))*1.1])
-    title(['Target ' num2str(print_targs(i)) ': p = ' num2str(round(pv_slope*1000)/1000) ' slp=' num2str(linfit.beta(2))])
-    
+    try
+        title(['Target ' num2str(targs(i)) ': p = ' num2str(round(pv_slope*1000)/1000) ' slp=' num2str(linfit.beta(2))])
+    catch
+        title(['Target ' num2str(targs(i))])
+    end
     xl = get(gca,'XLim');
     set(gca,'XLim',[0 xl(2)])
     
