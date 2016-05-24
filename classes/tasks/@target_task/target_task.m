@@ -53,7 +53,8 @@ classdef target_task < handle
             obj.rew_flag = 0;
             obj.rew_cnt = 0;
             obj.point_counter = 0;
-            obj.target_generator = obj.four_targ_gen(100);
+            %obj.target_generator = obj.four_targ_gen(100);
+            obj.target_generator = obj.three_targ_co_gen(100);
             
             obj.ard = NaN;
             obj.acc_dat = [0 0 0];
@@ -95,11 +96,11 @@ classdef target_task < handle
             catch
                 [d1, d2, ax, ay, az] = obj.ard.read();
                 obj.acc_dat = [ax, ay, az];
+                obj.tap_bool = d1;
+                obj.touch_sens = [d1, d2];
             end
             obj.sub_cycle = obj.sub_cycle + 1;
             obj.sub_cycle_abs_time = toc(handles.tic);
-            obj.tap_bool = d1;
-            obj.touch_sens = [d1, d2];
             obj.sub_cycle_abs_time = toc(handles.tic);
             
         end
@@ -178,6 +179,20 @@ classdef target_task < handle
             end
         end
         
+        function targ_y_pos = three_targ_co_gen(obj, n_targets)
+            block = 2;
+            y = [-6, 6]';
+            Y = repmat(y, [block, 1]);
+            n_reps = round(n_targets/(2*block));
+            
+            targ_y_pos = [];
+            for i = 1:n_reps
+                idx_shuff = randperm(block*2);
+                for j = 1:length(idx_shuff)
+                    targ_y_pos = [targ_y_pos; Y(idx_shuff(j)); 0];
+                end
+            end
+        end
         
     end
 end

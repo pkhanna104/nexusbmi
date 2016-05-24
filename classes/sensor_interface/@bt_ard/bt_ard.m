@@ -15,6 +15,7 @@ methods
     end
     
     function [d1, d2, ax, ay, az] = read(obj)
+        flushinput(obj.bt);
         fwrite(obj.bt, 1);
         try
             ascii = fread(obj.bt, 21);

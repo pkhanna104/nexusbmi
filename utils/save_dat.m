@@ -40,7 +40,7 @@ if ~isempty(data)
 end
 
 ard_ix = handles.task.sub_cycle;
-handles.save_data.arduino.cap_touch(ard_ix,:) = handles.task.tap_bool; %Relevant touch sensor for task
+%handles.save_data.arduino.cap_touch(ard_ix,:) = handles.task.tap_bool; %Relevant touch sensor for task
 handles.save_data.arduino.touch_sens(ard_ix,:) = handles.task.touch_sens; %Two touch sensors
 handles.save_data.arduino.acc(ard_ix,:) = handles.task.acc_dat; 
 handles.save_data.arduino.t(ard_ix) = handles.task.sub_cycle_abs_time;

@@ -99,7 +99,11 @@ classdef nexus_power_extractor < feature_extractor
             features = struct();
             
             if any([isnan(recent_neural{obj.used_chan}); isempty(recent_neural{obj.used_chan})])
-                features.(obj.domain) = obj.last_features.(obj.domain);
+                try
+                    features.(obj.domain) = obj.last_features.(obj.domain);
+                catch
+                    features.(obj.domain) = obj.last_features;
+                end
                 disp('last features');
             else
                 %x = recent_neural.read(obj.width)';
