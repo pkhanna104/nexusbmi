@@ -25,3 +25,15 @@ plot(dat.abs_time, mean(arr_ch4(:, 1:end-1),1))
 xlim([0, dat.abs_time(end)])
 legend('Beta Power Channel')
 
+figure;
+targ = dat.target(1:end-1);
+targ(targ<-8) = 0;
+plot(dat.abs_time,targ,'k--')
+hold on
+ch4 = rect_cell2mat(dat.rawdata_power_ch4, [2, 1]);
+arr_ch4 = cell2mat(ch4);
+[AX,H1,H2] = plotyy(dat.abs_time, dat.cursor(1:end-1), dat.abs_time, mean(arr_ch4(:, 1:end-1),1))
+legend('Target Pos.', 'Cursor Pos.', 'Power Channel')
+set(get(AX(1),'Ylabel'),'String','Screen Pos') 
+set(get(AX(2),'Ylabel'),'String','Power Channel') 
+xlabel('Time, sec.')
