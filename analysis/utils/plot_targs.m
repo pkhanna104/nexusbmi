@@ -2,13 +2,61 @@ function plot_targs(blocks, date, tslice, tslice_opt, trim_n_targs, rem_targ_fas
 
 % Inputs: See 'concat_dat_gen' for description / format of inputs
 
-[FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, pxx, time2rew] = concat_dat_gen(blocks, date, tslice, tslice_opt, trim_n_targs);
+[FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, pxx, time2rew, TAPPING_IX,...
+    task, trial_outcome] = concat_dat_gen(blocks, date, tslice,...
+    tslice_opt, trim_n_targs);
+
+
+
 
 %Target Color Map:
 cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
 time2targ_save = {};
 %Time to targets:
 %Take rew_inds, find previous rew_ind, add 4 for reward length
+
+%Plot percent correct by target: 
+mins_per_epoch = 5;
+epoch_step = round(mins_per_epoch*60/0.4);
+end_ = trial_outcome(end, 1);
+epoch_ix = 1:epoch_step:end_;
+
+unique_targs = sort(unique(trial_outcome(:,2)));
+perc_corr = zeros(length(unique_targs), length(epoch_ix)-1);
+avg_beta_power = zeros(length(epoch_ix)-1, 1);
+
+for e=1:length(epoch_ix(1:end-1))
+    avg_beta_power(e) = mean(mean(FT(epoch_ix(e):epoch_ix(e+1), :)));
+    time_ix = find(and(trial_outcome(:,1)<=epoch_ix(e+1), trial_outcome(:,1)>epoch_ix(e)));
+    
+    for t=1:length(unique_targs)
+        targ_ix = find(trial_outcome(time_ix,2)==unique_targs(t));
+        if ~isempty(targ_ix)
+            outcome = trial_outcome(time_ix(targ_ix), 3);
+            perc_corr(t, e) = length(outcome(outcome==9))/length(outcome);
+        end
+    end
+end
+time_ax = epoch_ix*0.4/(60);
+
+figure(123);
+subplot(2,1,1);
+lab = {};
+for t=1:length(unique_targs)
+    plot(gca, time_ax(1:end-1), perc_corr(t,:), '-', 'color', cmap{t},...
+        'linewidth', 3);
+    hold on;
+    lab{t} = strcat('Targ: ', num2str(unique_targs(t)));
+end
+legend(lab);
+xlabel('Time in Minutes')
+ylabel(strcat('Percent Correct in ', num2str(mins_per_epoch), ' min. Epochs'))
+ylim([-.1, 1.1])
+
+subplot(2, 1, 2)
+plot(time_ax(1:end-1), avg_beta_power)
+xlabel('Time in Minutes')
+ylabel(strcat('Avg. Beta Power in ', num2str(mins_per_epoch), ' min. Epochs'))
 
 %Reach Time for Rewarded Targets: 
 reach_time = [REW(1)];

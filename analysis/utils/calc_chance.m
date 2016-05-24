@@ -2,13 +2,14 @@ function [rew, rew_cnt, rew_time, time2targ, rew_sim_act] = calc_chance(decoded_
     targ_locs, rew_ix, asst, simN, timeoutTime, targ_sizes, task_name, tapping_ix)
 
 if strcmp(task_name, 'target_tapping')
+    tapping_ix = tapping_ix';
     tapping_time = mean(tapping_ix(1,tapping_ix(1,:)>1));
     reset_time = mean(tapping_ix(2,tapping_ix(2,:)));
     pause_time = round(tapping_time+reset_time);
     targ_exc = [0];
     exc_pause_time =4;
     
-elseif strmcp(task_name, 'target_task')
+elseif strcmp(task_name, 'target_task')
     tapping_time = 0;
     reset_time = 4;
     pause_time = round(tapping_time+reset_time);
@@ -36,7 +37,7 @@ for s=1:simN
         targ_y_pos = three_targ_co_gen(1000);
         tg = [-6 1; 0 2; 6 3];
         
-    elseif strmcp(task_name, 'target_task')
+    elseif strcmp(task_name, 'target_task')
         targ_y_pos = target_gen(1000);
         tg = [-6 1; -2 2; 2 3; 6 4];
     end

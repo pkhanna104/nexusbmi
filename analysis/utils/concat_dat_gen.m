@@ -1,5 +1,5 @@
 function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN,...
-    time2rew, TAPPING_IX, task] = concat_dat_gen(blocks, date, tslice,...
+    time2rew, TAPPING_IX, task, trial_outcome, targ_len] = concat_dat_gen(blocks, date, tslice,...
     tslice_opt, trim_n_targs)
 
 % Method to concatenate relevant features
@@ -24,11 +24,14 @@ slash = dir(end);
 FT = [];
 RAW_stn = [];
 RAW_m1 = [];
-TAPPING_IX = []
+TAPPING_IX = [];
 TARG = [];
 CURS = [];
 REW = [];
 time2rew = [];
+
+trial_outcome = [];
+targ_len = [];
 
 PXX_CHAN = [];
 idx = [];
@@ -93,7 +96,7 @@ for ai = 1:length(blocks)
             tapping_start_offset(i, 1) = offs-1;
             
             offs = 1;
-            while ~strcmp(states{rew_inds(i)+offs},'target')
+            while and(~strcmp(states{rew_inds(i)+offs},'target'), rew_inds(i)+offs < length(states))
                 offs = offs +1;
             end
             tapping_start_offset(i, 2) = offs-1;
@@ -111,9 +114,12 @@ for ai = 1:length(blocks)
     blk_rews = rews-tsl_start+ind_offs';
     
     REW = [REW blk_rews];
+    [outcomez, targ_lenz] = get_trial_outcome(dat, ind_offs);
+    trial_outcome = [trial_outcome; outcomez];
+    targ_len = [targ_len, targ_lenz];
     
     taps = tapping_start_offset(rew_inds>=tsl_start & rew_inds<= tsl_stop,:);
-    TAPPING_IX = [ TAPPING_IX taps];
+    TAPPING_IX = [ TAPPING_IX; taps];
     
     time2rew = [time2rew rew_times(rew_inds>=tsl_start & rew_inds<= tsl_stop)];
     
