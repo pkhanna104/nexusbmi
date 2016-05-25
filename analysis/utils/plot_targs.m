@@ -3,10 +3,8 @@ function plot_targs(blocks, date, tslice, tslice_opt, trim_n_targs, rem_targ_fas
 % Inputs: See 'concat_dat_gen' for description / format of inputs
 
 [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, pxx, time2rew, TAPPING_IX,...
-    task, trial_outcome] = concat_dat_gen(blocks, date, tslice,...
+    task, trial_outcome, targ_len] = concat_dat_gen(blocks, date, tslice,...
     tslice_opt, trim_n_targs);
-
-
 
 
 %Target Color Map:
@@ -15,7 +13,10 @@ time2targ_save = {};
 %Time to targets:
 %Take rew_inds, find previous rew_ind, add 4 for reward length
 
-%Plot percent correct by target: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% Plot percent correct by target %%%%%%%%%: 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 mins_per_epoch = 5;
 epoch_step = round(mins_per_epoch*60/0.4);
 end_ = trial_outcome(end, 1);
@@ -54,30 +55,42 @@ ylabel(strcat('Percent Correct in ', num2str(mins_per_epoch), ' min. Epochs'))
 ylim([-.1, 1.1])
 
 subplot(2, 1, 2)
+hold on;
 plot(time_ax(1:end-1), avg_beta_power)
 xlabel('Time in Minutes')
 ylabel(strcat('Avg. Beta Power in ', num2str(mins_per_epoch), ' min. Epochs'))
 
-%Reach Time for Rewarded Targets: 
-reach_time = [REW(1)];
-for i=2:length(REW)
-    rt = REW(i) - (REW(i-1)+4);
-    reach_time = [reach_time rt];
-end
-reach_time = time2rew*(.4); 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%Path length
-dcurs = abs(diff(CURS));
-path_length = [sum(dcurs(REW(1)-1))];
-for i=2:length(REW)
-    pl = sum(dcurs(REW(i-1)+4:(REW(i)-1)));
-    path_length = [path_length pl];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Neurofeedback Reach Time for Rewarded Targets: %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+if strcmp(task, 'target_task')
+    reach_time = [REW(1)];
+    for i=2:length(REW)
+        rt = REW(i) - (REW(i-1)+4);
+        reach_time = [reach_time rt];
+    end
+    reach_time = time2rew*(.4); 
+    targ_loc = TARG(REW);
+elseif strcmp(task, 'target_tapping')
+    ix__ = find(trial_outcome(:,3)==9);
+    reach_time = 0.4*targ_len(ix__);
+    targ_loc = trial_outcome(ix__, 2);
+    tapping_time = ((REW - trial_outcome(ix__,1)' - targ_len(ix__))*.4);
 end
 
-%Prin
+% %Path length
+% dcurs = abs(diff(CURS));
+% path_length = [sum(dcurs(REW(1)-1))];
+% for i=2:length(REW)
+%     pl = sum(dcurs(REW(i-1)+4:(REW(i)-1)));
+%     path_length = [path_length pl];
+% end
 
 %Plots by Target:
-targ_loc = TARG(REW);
 targs = unique(targ_loc);
 print_targs = 1:length(targs);
 
@@ -90,6 +103,11 @@ idx_time = idx*.4;
 for i=1:length(targs)
     ix = find(targ_loc==targs(i));
     rch_t = reach_time(ix);
+    
+    if strcmp(task, 'target_tapping')
+        tp_t = tapping_time(ix);
+    end
+    
     t_t = rew_time(ix);
     
     if rem_targ_faster_than_n_secs > 0
@@ -98,7 +116,10 @@ for i=1:length(targs)
         ix_n = 1:length(rch_t);
     end
     
-    %Figure 1, Reward Time
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Figure 1, NF Target Time
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     figure(1);
     subplot(4,1 ,i)
     plot(t_t(ix_n)/60, rch_t(ix_n),'.','color',cmap{i},'markersize', 20)
@@ -130,8 +151,43 @@ for i=1:length(targs)
     xl = get(gca,'XLim');
     set(gca,'XLim',[0 xl(2)])
     
-    
-    %Figure 2, First 5 min, last 5 min:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Figure 2, Tapping Time
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    if strcmp(task, 'target_tapping')
+        figure(2);
+        plot(t_t(ix_n)/60, tp_t(ix_n),'.','color',cmap{i},'markersize', 20)
+        disp(strcat('Target: ',num2str(targs(i)), ' Mean: ',...
+        num2str(mean(tp_t(ix_n))), 'SEM: ', num2str(std(tp_t(ix_n))/sqrt(length(ix_n)))))
+
+        mx= max(tp_t(ix_n));
+        hold on
+        ylabel('Tapping Time, sec.')
+        xlabel('Time, Min.')
+        if length(ix_n) > 1
+            linfit  = regstats(tp_t(ix_n), t_t(ix_n)/60,'linear');
+            pv_slope = linfit.tstat.pval(2);
+
+            xhat = 0:max(t_t(ix_n))*1.1/60;
+            yhat = linfit.beta(1)+linfit.beta(2)*xhat;
+            hold on;
+            plot(xhat, yhat, '--', 'linewidth', 2,'color', cmap{i})
+        end
+        xlim([0, (max(t_t)*1.1)/60])
+        ylim([0, max(tp_t(ix_n))*1.1])
+        try
+            title(['Target ' num2str(targs(i)) ': p = ' num2str(round(pv_slope*1000)/1000) ' slp=' num2str(linfit.beta(2))])
+        catch
+            title(['Target ' num2str(targs(i))])
+        end
+        xl = get(gca,'XLim');
+        set(gca,'XLim',[0 xl(2)])
+    end
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %Figure 2, First Half, Second Half:
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
     xx = rch_t(ix_n);
     n_tg = floor(length(xx)/2);
     
@@ -170,7 +226,7 @@ for i=1:length(targs)
     
 end
 
-save(strcat('time2targ_', date, blocks, '.mat'),'time2targ_save')
+%save(strcat('time2targ_', date, blocks, '.mat'),'time2targ_save')
 
 end
 % 

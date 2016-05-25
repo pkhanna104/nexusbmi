@@ -77,8 +77,8 @@ for s=1:simN
         end
         if strcmp(state,'target')
             curs = decoded_curs(c);
-            %curs = curs - (targ_locs(c)*asst/100)+(targ*asst/100);
-            curs = (curs - (targ_locs(c)*asst/100))*(1/((100-asst)/100));%+(targ*asst/100);
+            curs = curs - (targ_locs(c)*asst/100)+(targ*asst/100);
+            %curs = (curs - (targ_locs(c)*asst/100))*(1/((100-asst)/100));%+(targ*asst/100);
             d = abs(curs - targ);
             timeout_cnt = timeout_cnt + 1;
             if d < target_radius
