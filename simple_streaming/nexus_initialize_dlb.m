@@ -2,10 +2,10 @@ clc
 
 javaaddpath('C:\Nexus\jssc.jar')
 javaaddpath('C:\Nexus\nexus.jar')
-% javaclasspath ;
+javaclasspath ;
 inst = mdt.neuro.nexus.NexusInstrument.getInstance;
 
-serial_port = 'COM6';
+serial_port = 'COM5';
 connected=false;
 
 %Connect to device

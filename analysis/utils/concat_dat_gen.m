@@ -1,6 +1,6 @@
 function [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, PXX_CHAN,...
-    time2rew, TAPPING_IX, task, trial_outcome, targ_len] = concat_dat_gen(blocks, dates, tslice,...
-    tslice_opt, trim_n_targs)
+    time2rew, TAPPING_IX, task, trial_outcome, targ_len, bool_rt] = concat_dat_gen(blocks,...
+    dates, tslice, tslice_opt, trim_n_targs)
 
 % Method to concatenate relevant features
 % Inputs: blocks, (format: 'abcdef')
@@ -32,6 +32,7 @@ time2rew = [];
 
 trial_outcome = [];
 targ_len = [];
+bool_rt = [];
 
 PXX_CHAN = [];
 idx = [];
@@ -53,6 +54,7 @@ else
     baseException = MException(msgID,msg);
     throw(baseException)
 end
+
 %Stack data:
 for di = 1:length(dates)
     date = dates{di};
@@ -133,18 +135,23 @@ for di = 1:length(dates)
         blk_rews = rews-tsl_start+ind_offs';
         
         REW = [REW blk_rews];
-        [outcomez, targ_lenz] = get_trial_outcome(dat, ind_offs);
-        trial_outcome = [trial_outcome; outcomez];
+        try
+            [outcomez, targ_lenz, bool_rt_blk] = get_trial_outcome(dat, ind_offs);
+            trial_outcome = [trial_outcome; outcomez];
+            bool_rt = [bool_rt bool_rt_blk];
+            
         
-        % TODO FIX 
-        if length(find(outcomez(:,3)==9)) == length(blk_rews)
-        else
+            if length(find(outcomez(:,3)==9)) ~= length(blk_rews)
+                disp('ERROR : Wrong number of blk_rews compared to trial_outcome')
+            end
+
+            targ_len = [targ_len, targ_lenz];
+
+            taps = tapping_start_offset(rew_inds>=tsl_start & rew_inds<= tsl_stop,:);
+            TAPPING_IX = [ TAPPING_IX; taps];
+        catch
+            disp('Ignore get_trial_outcome')
         end
-        
-        targ_len = [targ_len, targ_lenz];
-        
-        taps = tapping_start_offset(rew_inds>=tsl_start & rew_inds<= tsl_stop,:);
-        TAPPING_IX = [ TAPPING_IX; taps];
         
         time2rew = [time2rew rew_times(rew_inds>=tsl_start & rew_inds<= tsl_stop)];
         

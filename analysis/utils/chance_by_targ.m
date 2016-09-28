@@ -60,9 +60,13 @@ for i=1:length(include_targs)
     include_ix = [include_ix ii];
 end
 
-rew_sim = sum(rew_cnt(:, include_ix), 2);
-rew_act = sum(rew_by_targ(include_ix));
-%rew_act =rew_sim_act;
+%% Place to decide what the red line is! 
+
+rew_sim = sum(rew_cnt(1:end-1, include_ix), 2);
+%rew_act = sum(rew_by_targ(include_ix));
+rew_act = sum(rew_cnt(end, include_ix), 2);
+
+%%
 
 [n, x] = hist(rew_sim, 15); 
 cdf = cumsum(n)/sum(n);

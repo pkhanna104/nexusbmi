@@ -10,13 +10,15 @@ if strcmp(task_name, 'target_tapping')
     exc_pause_time =4;
     
 elseif strcmp(task_name, 'target_task')
+    ix_null = find(targ_locs==0);
+    decoded_curs(ix_null) = -10000;
     tapping_time = 0;
     reset_time = 4;
     pause_time = round(tapping_time+reset_time);
     targ_exc = [];
 end
 
-targ_locs_gen = [targ_locs(rew_ix) ; targ_locs(rew_ix(end)+5); targ_locs(rew_ix(end)+5)];
+targ_locs_gen = [targ_locs(rew_ix)];
 rew = zeros(simN,1);
 rew_cnt = zeros(simN, 4);
 rew_time = {};
@@ -43,7 +45,12 @@ for s=1:simN
     end
     
     if s == simN
-        targ_y_pos = [targ_locs_gen; three_targ_co_gen(1000)];
+        if strcmp(task_name, 'target_tapping')
+            targ_y_pos = [targ_locs_gen; three_targ_co_gen(1000)];
+        elseif strcmp(task_name, 'target_task')
+            targ_y_pos = [targ_locs_gen; target_gen(1000)];
+        end
+        
         size(targ_y_pos)
     end
     targ = targ_y_pos(1);
@@ -56,7 +63,7 @@ for s=1:simN
     
     targ_y_pos = targ_y_pos(2:end);
     
-    for c=1:length(decoded_curs)
+    for c=1:length(decoded_curs(2:end))
         target_radius = targ_sizes(c);
         
         if strcmp(state, 'neutral')
@@ -78,7 +85,7 @@ for s=1:simN
         if strcmp(state,'target')
             curs = decoded_curs(c);
             curs = curs - (targ_locs(c)*asst/100)+(targ*asst/100);
-            %curs = (curs - (targ_locs(c)*asst/100))*(1/((100-asst)/100));%+(targ*asst/100);
+            %curs = (curs - (targ_locs(c)*asst/100))*(1/((100-asst)/100));
             d = abs(curs - targ);
             timeout_cnt = timeout_cnt + 1;
             if d < target_radius

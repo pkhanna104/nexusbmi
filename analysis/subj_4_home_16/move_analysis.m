@@ -13,7 +13,8 @@ for t=1:length(time_beep)
     ix_neur = [ix_neur am];
 end
 
-Fs = dat.extractor_params.fs;
+%Fs = dat.extractor_params.fs;
+Fs = 200;
 n_samp = floor(.4*Fs);
 nfft=max(2^(nextpow2(n_samp)),n_samp);
 iter_cnt = dat.iter_cnt;
@@ -25,10 +26,10 @@ S = zeros(iter_cnt, length(f));
 for i=1:iter_cnt
     [S(i,:), ~] = pwelch(time_ser(i,1:n_samp-1), n_samp-1, [], nfft, Fs);
 end
-S = S';
+S = abs(S');
 
 %%%%%%%%%%%%%%%%%%%% FIGURE 1 -- Spectrogram  & Pxx %%%%%%%%%%%%%%%%%%%%%%%
-figure(1);
+figure();
 subplot(2, 1, 1)
 imagesc([1:iter_cnt]*.4, f(f<100), log10(S(f<100, :)))
 hold on;
@@ -38,17 +39,23 @@ end
 xlabel('Time, sec.')
 ylabel('Freq, Hz.')
 title('Pwelch')
+xlim([0, iter_cnt*.4])
+
 
 subplot(2, 1, 2)
-ch2 = cell2mat(dat.rawdata_power_ch2);
+ch2 = cell2mat(rect_cell2mat(dat.rawdata_power_ch2, [2, 1]));
 ch2 = reshape(ch2, [prod(size(ch2)), 1]);
 
-ch4 = cell2mat(dat.rawdata_power_ch4);
+ch4 = cell2mat(rect_cell2mat(dat.rawdata_power_ch4, [2, 1]));
 ch4 = reshape(ch4, [prod(size(ch4)), 1]);
 plot(linspace(0, iter_cnt*.4, length(ch2)), ch2);
 hold all;
+for t=1:length(ix_neur)
+    plot([ix_neur(t), ix_neur(t)]*.4, [0, 1024], 'r-')
+end
 plot(linspace(0, iter_cnt*.4, length(ch4)), ch4);
 legend('Ch2.', 'Ch4.')
+xlim([0, iter_cnt*.4])
 
 %%%%%%%%%%%%%%%%%%%% FIGURE 2 -- PSDs pre/post_move %%%%%%%%%%%%%%%%%%%%%%%
 S_pre = [];
@@ -69,15 +76,10 @@ for t=1:length(ix_neur)
     end
 end
 
-figure(2)
+figure()
 plot(log10(mean(S_pre, 2)))
 hold all
 plot(log10(mean(S_post, 2)))
 legend('Pre', 'Post')
-
-%%%%%%%%%%%%%%%%%%%% FIGURE 2 -- PSDs pre/post_move %%%%%%%%%%%%%%%%%%%%%%%
-
-
-
 
 

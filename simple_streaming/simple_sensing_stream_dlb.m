@@ -1,10 +1,10 @@
 %basic sensing data to retrieve data and 
 
-STN_data = NaN(1,80);
-M1_data = NaN(1,80);
+STN_data = NaN(1,200);
+M1_data = NaN(1,200);
 data_packets = NaN(1,2);
 missed_packets = NaN(1,1);
-desired_num_runs = 20;
+desired_num_runs = 200;
 packetTime = 0;
 
 tic

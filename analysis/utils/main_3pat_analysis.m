@@ -88,15 +88,16 @@ include_tgs = [-2 ];
 
 
 %3 patient chance plot: 
-f = figure(55);
+f = figure(56);
 ax = gca(f);
 ax1 = subplot(3,1,1); hold all;
 ax2 = subplot(3,1,2); hold all;
 ax3 = subplot(3,1,3); hold all;
 
+include_tgs = [-6 6];
 asst = 0;
 [rew_sim, rew_act] = chance_by_targ(ax1, 'gh', '050815', {[1 -1],[1 -1]},...
-    'ix', 0,[-6 2 6], 10e10, 100, [1.75, 2], asst);
+    'ix', 0, include_tgs, 10e10, 100, [1.75, 2], asst);
 
 asst = 50;
 [rew_sim, rew_act] = chance_by_targ(ax2, 'i', '092815', {[1 1551]},...
