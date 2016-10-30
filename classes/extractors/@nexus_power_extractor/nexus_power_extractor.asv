@@ -24,7 +24,11 @@ classdef nexus_power_extractor < feature_extractor
             %Chan idx
             obj.used_chan = extractor_params.used_chan;
             
-                %Time 
+            %Make sure you get right channel: 
+            if strextractor_params.nexus_domain, 'td'
+                assert(or(obj.used_chan == 2, obj.used_chan==4))
+            
+            %Time 
             obj.width = round(extractor_params.width_t/1000*extractor_params.fs);
             
             %Get frequencies 
@@ -54,15 +58,6 @@ classdef nexus_power_extractor < feature_extractor
             else
                 obj.domain = 'td';
             end
-            
-            %Make sure channel matchs: 
-            if strmatch(obj.domain, 'td')
-                assert(or(obj.used_chan == 1, obj.used_chan==3))
-            elseif strmatch(obj.domain, 'pd')
-                assert(or(obj.used_chan == 2, obj.used_chan==4))
-            end
-            
-            
             % frequency range indices
             bandc = {};
             for c = 1:size(extractor_params.f_ranges,1)

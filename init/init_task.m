@@ -34,8 +34,8 @@ neural_sources.obj = {@sim_nexus_interface,@sim_nexus_interface, @nexus_interfac
 
 %Init task
 task_sources = struct();
-task_sources.names = {'','target_task', 'target_touch_task','movement_task'};
-task_sources.obj = {'',@target_task, @target_touch_task, @movement_task};
+task_sources.names = {'','target_task', 'target_touch_task','movement_task', 'finger_tapping'};
+task_sources.obj = {'',@target_task, @target_touch_task, @movement_task, @finger_tapping_task};
 
 task_ix = get(handles.task_list_pulldown, 'Value');
 if task_ix ==1
@@ -79,7 +79,7 @@ handles.extractor_params.task_f_ranges = [0, 0];
 
 %Create Task_Data Saving
 handles.iter_cnt = 1;
-handles = init_data_save(handles, load_dec);
+handles = init_data_save_HD5(handles);
 
 %Init Decoder:
 if load_dec
@@ -164,8 +164,24 @@ if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
         else
             com_port = get(handles.arduino_comport, 'String');
             delete(instrfind({'Port'},{com_port}))
-            handles.task.ard = arduino(com_port);
-            pinMode(handles.task.ard, 8, 'input')
+            
+            %Old arduino class:
+            %handles.task.ard = arduino(com_port);
+            %pinMode(handles.task.ard, 8, 'input')
+            
+            %New arduino class run in paralell
+            %Write file to continue: 
+            [label paths] = textread('config.txt', '%s %s',5);
+            data_dir = paths{3};
+            
+            fID = fopen(strcat(data_dir, 'shared_process.txt'), 'w');
+            x = 'continue';
+            fprintf(fID,'%s', x );
+            fclose(fID);
+            
+            fname_h5 = get_data_fname('txt', handles);
+            serial_job = batch('run_slim_arduino', 0, {fname_h5, com_port, handles.tic}, 'matlabpool', 1);
+            fprintf('Sent Arduino to separate process\n')
         end
     end
 end

@@ -2,9 +2,11 @@ function handles = run_task(handles, load_dec)
     loop_start = tic;
     data = []; seq = []; feat = [];
     
-    if (mod(handles.task.sub_cycle, handles.task.mod_check_neural)==0)
+    if toc(handles.task.mod_check_neural_cnt) > handles.task.loop_time
+    %if (mod(handles.task.sub_cycle, handles.task.mod_check_neural)==0)
         %Get neural data
         %Data output as 1x2 cell array of vectors or 1x2 cell array of nans
+        handles.neural_data_avail = true;
         [data, seq, T] = handles.neural_source.get_neural(handles);
         disp('Data shape: ')
         size(data)
@@ -16,7 +18,10 @@ function handles = run_task(handles, load_dec)
             handles = handles.decoder.calc_cursor(feat, handles); 
         end
         handles.iter_cnt = handles.iter_cnt+1;
+    else
+        handles.neural_data_avail = false;
     end
+        
     
     %Task State Update
     handles = handles.task.cycle(handles);
@@ -25,14 +30,15 @@ function handles = run_task(handles, load_dec)
     handles = update_display(handles);
     
     %Save Stuff
-    handles = save_dat(handles, data, seq, feat, load_dec);
+    handles = save_dat_HD5(handles, data, seq, feat, load_dec);
+    %handles = save_dat(handles, data, seq, feat, load_dec);
 
     %How long has it been? Wait? 
     y = toc(loop_start);
-    pause(max(0, handles.task.sub_loop_time - y))
-    %pause(max(0, handles.task.loop_time-y));
+    %pause(max(0, handles.task.sub_loop_time - y))
+    pause(max(0, handles.task.loop_time-y));
     
     %handles.save_data.loop_time(handles.iter_cnt-1) = toc(loop_start);
-    handles.save_data.abs_time(handles.iter_cnt-1) = toc(handles.tic);
-    
+    %handles.save_data.abs_time(handles.iter_cnt-1) = toc(handles.tic);
+    save_time_h5(handles, toc(handles.tic));
 end

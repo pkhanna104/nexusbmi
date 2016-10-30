@@ -6,12 +6,7 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
     
     suffx = '';
     
-    if strcmp(type(1:3), 'dat')
-        if isfield(handles, 'dat_suffix')
-            suffx = handles.dat_suffix;
-        end
-        data_dir = handles.dat_path;
-    elseif strcmp(type(1:3), 'dec')
+    if strcmp(type(1:3), 'dec')
         if isfield(handles, 'dec_suffix')
             suffx = handles.dec_suffix;
         end
@@ -21,6 +16,12 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
              [label paths] = textread('config.txt', '%s %s',5);
             data_dir = paths{3};
         end
+    else
+        % All data files: ('ard', 'dat', 'h5')
+        if isfield(handles, 'dat_suffix')
+            suffx = handles.dat_suffix;
+        end
+        data_dir = handles.dat_path;
     end
     
 
@@ -45,4 +46,13 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
         curex = text(1);
     end
     
-    data_filename_ucsf    = [data_dir type(1:3) datestr(date,'mmddyy') curex '_' get(suffx,'String') '.mat'];
+    if strcmp(type(1:2), 'h5')
+        data_filename_ucsf  = [data_dir type(1:3) datestr(date,'mmddyy') curex '_' get(suffx,'String') '.h5'];
+    elseif strcmp(type(1:3), 'ard')
+        data_filename_ucsf  = [data_dir type(1:3) datestr(date,'mmddyy') curex '_' get(suffx,'String') '_ard.h5'];
+    elseif strcmp(type(1:3), 'txt')
+        data_filename_ucsf  = [data_dir type(1:3) datestr(date,'mmddyy') curex '_' get(suffx,'String') '_ard.txt'];
+    else
+        data_filename_ucsf  = [data_dir type(1:3) datestr(date,'mmddyy') curex '_' get(suffx,'String') '.mat'];
+    end
+        

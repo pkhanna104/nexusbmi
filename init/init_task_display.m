@@ -68,6 +68,7 @@ handles.window.tap_dot2 = scatter(handles.window.ax, 8, 5, 0.5*handles.window.ta
     'k','filled');
 handles.tap_off_str = ['\fontsize{18} \color{black} TAP!'];
 handles.tap_on_str = ['\fontsize{18} \color{red} TAP!'];
+
 handles.window.tap_text = text(5.5, 3, handles.tap_off_str,'parent', handles.window.ax);
 
 % %Set current text for score!'

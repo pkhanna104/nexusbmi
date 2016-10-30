@@ -32,8 +32,17 @@ function cleanup_task(handles)
     
     %Turn off BT if used: 
     if get(handles.bt_check_box, 'Value')
-        fclose(handles.task.ard.bt)
+        fclose(handles.task.ard.bt);
     end
+    
+    %Write to exp.txt to stop: 
+    [~, paths] = textread('config.txt', '%s %s',5);
+    data_dir = paths{3};
+
+    fID = fopen(strcat(data_dir, 'shared_process.txt'), 'w');
+    x = 'stop';
+    fprintf(fID,'%s', x );
+    fclose(fID);
     
     % Make Summary Stats Screen:
     summary_stats(TARG, REW, reach_time, avg, session_length)

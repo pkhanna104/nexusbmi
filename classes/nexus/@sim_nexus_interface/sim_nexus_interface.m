@@ -59,7 +59,7 @@ classdef sim_nexus_interface < handle
             %D = obj.inst.getDataPacket;
             %Data = D.getData;
             
-            Data = {rand(width,1), rand(1,1), rand(width,1), rand(1,1)};
+            Data = {rand(width,1), rand(2,1), rand(width,1), rand(2,1)};
             T = toc(handles.tic);
             %disp(rem(obj.time_cnt, 40))
 %             if rem(obj.time_cnt, 40) > 20

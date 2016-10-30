@@ -1,0 +1,81 @@
+function handles = save_dat_HD5(handles, data, seq, feat, load_dec)
+
+fname_h5 = handles.save_data_h5;
+ix = handles.iter_cnt;
+handles.save_data.target(ix) = handles.task.target_y_pos;
+
+if ~isempty(data)
+    handles.save_data.state{ix} = handles.task.state;
+    h5write(fname_h5, '/task/cursor', handles.window.cursor_pos(2), [1, ix], [1, 1]);
+    h5write(fname_h5, '/task/target',  handles.task.target_y_pos, [1, ix], [1, 1]);
+    
+    %h5write(fname_h5, '/task_events/hold_times', handles.task.hold, [1, ix], [1, 1]);
+       
+    if load_dec
+        h5write(fname_h5, '/task/decoded_pos',  handles.decoder.decoded_position(1:end-1), [1, ix], [1, 1]);
+        h5write(fname_h5, '/task/ideal_pos',  handles.decoder.ideal_position, [1, ix], [1, 1]);
+        handles.save_data.assist_level(ix) = handles.decoder.assist_level;
+        handles.save_data.lp_filter(ix) = handles.decoder.lp_filter;
+%         h5write(fname_h5, '/task_params/assist_level',  handles.decoder.assist_level, [1, ix], [1, 1]);
+%         h5write(fname_h5, '/task_params/lp_filter',  handles.decoder.lp_filter, [1, ix], [1, 1]);
+    end
+
+    if strcmp(handles.task.state, 'reward') && ~strcmp(handles.save_data.state{ix-1}, 'reward')
+        handles.save_data.reward_times{1} = [handles.save_data.reward_times{1} ix];
+        handles.rew_cnt = handles.rew_cnt + 1;
+        h5write(fname_h5, '/task_events/reward_times', ix, [1, handles.rew_cnt], [1,1]);
+        
+        %Play a reward sound :)
+        z = randperm(length(handles.reward_sounds.file));
+        ix = z(1);
+        
+        y = handles.reward_sounds.file{ix};
+        params = handles.reward_sounds.params{ix};
+        sound(y, params(1), params(2));
+    end
+    
+    
+    h5write(fname_h5, '/neural/timeseries_m1', data{3}, [1, ix], [length(data{3}), 1]);
+    h5write(fname_h5, '/neural/timeseries_stn', data{1}, [1, ix], [length(data{1}), 1]);
+    h5write(fname_h5, '/neural/pxx_ch2', data{2}, [1, ix], [2, 1]);
+    h5write(fname_h5, '/neural/pxx_ch4', data{4}, [1, ix], [2, 1]);
+    dm = handles.feature_extractor.domain;
+    h5write(fname_h5, '/neural/features',feat.(dm)',[1, ix], [length(feat.(dm)), 1]);        
+    h5write(fname_h5, '/neural/packet_seq',seq', [1, ix], [2, 1]); 
+    
+%     try
+%     catch
+%         disp('skipping saving neural data ... uh oh')
+%     end
+    
+    %Return a string with .mat ending
+    %Create H5 file: 
+    %NEEDED: PLACE TO LIST handles.task.FSM, task_params (handles.task),
+    %extractor params
+    
+    
+	  h5write(fname_h5, '/task/state_ix',handles.task.state_ind, [1, ix], [1, 1]); 
+%     h5write(fname_h5, '/task_params/cursor_rad',handles.window.cursor_radius, [1, ix], [1, 1]); 
+%     h5write(fname_h5, '/task_params/target_rad',handles.window.target_radius, [1, ix], [1, 1]); 
+%     try
+%         h5write(fname_h5, '/task_params/assist_level',handles.decoding.assist_level, [1, ix], [1, 1]); 
+%     catch
+%         h5write(fname_h5, '/task_params/assist_level',str2double(get(handles.assist_level, 'String')), [1, ix], [1,1]);
+%     end
+%     
+%     try
+%         h5write(fname_h5, '/task_params/lp_filter',handles.decoding.lp_filter, [1, ix], [1, 1]); 
+%     catch
+%         h5write(fname_h5, '/task_params/lp_filter',str2double(get(handles.lp_filter_box, 'String')), [1, ix], [1, 1]); 
+%     end
+%     h5write(fname_h5, '/task_params/nf_timeout_time',handles.timeoutTime, [1, ix], [1, 1]); 
+    
+    handles.save_data.state{ix} = handles.task.state;
+    handles.save_data.target(ix) = handles.task.target_y_pos;
+    handles.save_data.hold_times{ix} = handles.task.hold;
+    
+    handles.save_data.cursor_size(ix) =  handles.window.cursor_radius;
+    handles.save_data.target_size(ix) =  handles.window.target_radius;
+    handles.save_data.timeoutTime(ix) = 
+
+end

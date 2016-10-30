@@ -1,9 +1,9 @@
-function handles = init_data_save(handles, load_dec)
+function handles = init_data_save(handles)
 
     %Save things
     %Things to save: 
     x = struct;
-    x.tot_task_iters = 600;
+    x.tot_task_iters = 4500; %Prepare for 30 minutes of recording (30*60*2.5hz)
     
     %Save task info: 
     x.state = cell(x.tot_task_iters,1);
@@ -40,7 +40,7 @@ function handles = init_data_save(handles, load_dec)
     
     %Save Arduino stuff: 
     x.arduino.cap_touch = zeros(x.tot_task_iters*20, 1);
-    x.arduino.acc = zeros(x.tot_task_iters*20, 3);
+    x.arduino.acc = zeros(x.tot_task_iters*20, 2, 3);
     x.arduino.abs_time = zeros(x.tot_task_iters*20, 1);
     x.arduino.beep = zeros(x.tot_task_iters*20, 1);
     handles.save_data = x;
