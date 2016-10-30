@@ -4,6 +4,7 @@ const int acc_y = A1;
 const int acc_z = A2;
 const int acc_L_z = A3;
 const int acc_L_x = A4;
+const int hr = A5;
 
 int capValue;
 int acc_xValue;
@@ -27,6 +28,7 @@ void setup() {
   pinMode(acc_z, INPUT);
   pinMode(acc_L_z, INPUT);
   pinMode(acc_L_x, INPUT);
+  pinMode(hr, INPUT);
 }
 
 void loop() {
@@ -52,6 +54,7 @@ void loop() {
 
       Serial.println(analogRead(acc_L_x));
       Serial.println(analogRead(acc_L_z));
+      Serial.println(analogRead(hr));
     }
     else if (c == 'e') {
       Serial.println(v);
