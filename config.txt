@@ -1,6 +1,6 @@
 config paths
 root C:\Users\Preeya\Documents\GitHub\nexusbmi\
 dec C:\Users\Preeya\Documents\GitHub\nexusbmi\decoder\
-dat C:\Users\Preeya\Documents\GitHub\nexusbmi\data\
+dat C:\Users\Preeya\Documents\GitHub\nexusbmi\data2\
 med C:\Users\Preeya\Documents\GitHub\nexusbmi\media\
 beep C:\Users\Preeya\Documents\GitHub\nexusbmi\utils\
