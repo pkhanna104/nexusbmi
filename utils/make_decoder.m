@@ -17,7 +17,9 @@ decoder = struct();
 % try
 %     source = dat.decoder.source;
 % catch
-    neural_source = {'sim_nexus_td','sim_nexus_pxx', 'nexus_td','nexus_pxx','accel'};
+    neural_source = {'sim_nexus_td','sim_nexus_pxx', 'nexus_ch1_td',...
+        'nexus_ch3_td', 'nexus_ch2_pxx','nexus_ch4_pxx','accel'};
+    
     [Selection,ok] = listdlg('PromptString','Select Decoder Source Signal',...
         'ListString',neural_source, 'SelectionMode','single');
     source = neural_source{Selection};
@@ -26,16 +28,36 @@ decoder = struct();
 disp(strcat('Using source: ', source))
 
 if strcmp(source(end-1:end), 'td')
-    [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat);
+    if ~isempty(strfind(source, '3'))
+        channel = 3;
+    elseif ~isempty(strfind(source, '1'))
+        channel = 1;
+    elseif ~isempty(strfind(source, 'sim'))
+        channel = 1;
+    else
+        disp('Error! Not a sim channel nor a designated channel')
+    end
+    
+    
+    [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat, channel);
     
 elseif strcmp(source(end-2:end), 'pxx')
+    if ~isempty(strfind(source, '2'))
+        channel = 'rawdata_power_ch2';
+    elseif ~isempty(strfind(source, '4'))
+        channel = 'rawdata_power_ch4';
+    elseif ~isempty(strfind(source, 'sim'))
+        channel = 'rawdata_power_ch4';
+    else
+        disp('Error! Not a sim pxx channel nor a designated channel');
+    end
     rect_pwr = {};
-    for ii = 1:length(dat.rawdata_power_ch4)
-        if size(dat.rawdata_power_ch4{ii},1) ~=2
+    for ii = 1:length(dat.(channel))
+        if size(dat.(channel){ii},1) ~=2
             rect_pwr{ii} = [];
             disp(strcat('Skipping ix: ', num2str(ii)));            
         else
-            rect_pwr{ii} = dat.rawdata_power_ch4{ii};
+            rect_pwr{ii} = dat.(channel){ii};
         end
     end
     feats  = cell2mat(rect_pwr);

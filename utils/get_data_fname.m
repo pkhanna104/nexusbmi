@@ -28,7 +28,7 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
     % get experiment number
     dlist = dir(data_dir);
     
-    str = [type(1:3) datestr(date,'mmddyy')];
+    str = ['dat' datestr(date,'mmddyy')];
     ex = [];
     for k = 1:length(dlist)
         if length(dlist(k).name)>10
