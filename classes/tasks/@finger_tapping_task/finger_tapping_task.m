@@ -12,6 +12,8 @@ classdef finger_tapping_task < handle
         loop_time; %
         ts; %Time in state
         state_ref; %State reference matrix
+        tapping_time;
+        center_pause_time;
         target_generator = rand(1000,1);
         rew_cnt;
         point_counter;
@@ -69,7 +71,8 @@ classdef finger_tapping_task < handle
             % [Rx, Ry, Rz; Lx, Ly, Lz];
             obj.sub_cycle_abs_time = 0;
             obj.target_y_pos = -100;
-            obj.tap_time = 6;
+            obj.tapping_time = 6;
+            obj.center_pause_time = 1;            
             
         end
         
@@ -160,6 +163,9 @@ classdef finger_tapping_task < handle
                 if abs(obj.target_y_pos)>0
                     set(handles.window.target, 'MarkerFaceColor', 'c');
                     set(handles.window.tap_text,'String', handles.tap_on_str);
+                    obj.tap_time = obj.tapping_time;
+                else
+                    obj.tap_time = obj.center_pause_time;
                 end
             else
                 tf = 0;
