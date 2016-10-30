@@ -40,12 +40,26 @@ if ~isempty(data)
     end
     
     try
-        h5write(fname_h5, '/neural/timeseries_m1', data{3}, [1, ix], [length(data{3}), 1]);
-        h5write(fname_h5, '/neural/timeseries_stn', data{1}, [1, ix], [length(data{1}), 1]);
-        h5write(fname_h5, '/neural/pxx_ch2', data{2}, [1, ix], [2, 1]);
-        h5write(fname_h5, '/neural/pxx_ch4', data{4}, [1, ix], [2, 1]);
-        dm = handles.feature_extractor.domain;
-        h5write(fname_h5, '/neural/features',feat.(dm)',[1, ix], [length(feat.(dm)), 1]);        
+        if ~isempty(data{3})
+            h5write(fname_h5, '/neural/timeseries_m1', data{3}, [1, ix], [length(data{3}), 1]);
+        end
+        if ~isempty(data{1})
+            h5write(fname_h5, '/neural/timeseries_stn', data{1}, [1, ix], [length(data{1}), 1]);
+        end
+        
+        if ~isempty(data{2})
+            h5write(fname_h5, '/neural/pxx_ch2', data{2}, [1, ix], [2, 1]);
+        end
+        
+        if ~isempty(data{4})
+            h5write(fname_h5, '/neural/pxx_ch4', data{4}, [1, ix], [2, 1]);
+        end
+            dm = handles.feature_extractor.domain;
+        try
+            h5write(fname_h5, '/neural/features',feat.(dm)',[1, ix], [length(feat.(dm)), 1]);        
+        catch
+            h5write(fname_h5, '/neural/features',feat.(dm),[1, ix], [length(feat.(dm)), 1]); 
+        end
         h5write(fname_h5, '/neural/packet_seq',seq', [1, ix], [2, 1]); 
         
         handles.save_data.rawdata_timeseries_m1(ix,1:length(data{3})) = data{3};
@@ -56,5 +70,6 @@ if ~isempty(data)
     catch
         disp('skipping neural data')
     end
-
+else
+    disp('DATA EMPTY!')
 end

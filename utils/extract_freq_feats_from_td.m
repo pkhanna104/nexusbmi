@@ -1,4 +1,4 @@
-function [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat)    
+function [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat, channel)    
     %Find frequency band relevant: modulation
     %data: samples x channels
     %S: frequency x channels/trials
@@ -16,7 +16,11 @@ function [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat)
     [~,f] = pwelch(randn(1,n_samp-1), n_samp-1,[],nfft,Fs);
     S = zeros(iter_cnt, length(f));
     for i=1:iter_cnt
-        [S(i,:), ~] = pwelch(dat.rawdata_timeseries_m1(i,1:n_samp-1), n_samp-1, [], nfft, Fs);
+        if channel == 1
+            [S(i,:), ~] = pwelch(dat.rawdata_timeseries_stn(i,1:n_samp-1), n_samp-1, [], nfft, Fs);
+        elseif channel == 3
+            [S(i,:), ~] = pwelch(dat.rawdata_timeseries_m1(i,1:n_samp-1), n_samp-1, [], nfft, Fs);
+        end
     end
     S = S';
     % params = struct('fpass',[0 radio_data.fs/2],'Fs',radio_data.fs,'tapers',[3 5]);

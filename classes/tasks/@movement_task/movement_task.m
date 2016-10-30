@@ -29,6 +29,7 @@ classdef movement_task < handle
         touch_sens;
         beep;
         beep_bool;
+        mod_check_neural_cnt;
     end
     
     methods
@@ -62,6 +63,7 @@ classdef movement_task < handle
             obj.mod_check_neural = (obj.loop_time / (1/obj.task_fs))-2;
             obj.sub_cycle_abs_time = 0;
             obj.beep_bool = 0;
+            obj.mod_check_neural_cnt = tic;
         end
         
         function handles = cycle(obj, handles)
@@ -85,20 +87,20 @@ classdef movement_task < handle
             end
             
             %Update Accel
-            try
-                iznotnan = ~isnan(obj.ard);
-            catch
-                iznotnan = 1;
-            end
-            
-            if iznotnan
-                [d1, d2, ax, ay, az] = obj.ard.read();
-                obj.tap_bool = d1;
-                obj.touch_sens = [d1, d2];
-                obj.acc_dat = [ax, ay, az];
-            end
-            obj.sub_cycle = obj.sub_cycle + 1;
-            obj.sub_cycle_abs_time = toc(handles.tic);
+%             try
+%                 iznotnan = ~isnan(obj.ard);
+%             catch
+%                 iznotnan = 1;
+%             end
+%             
+%             if iznotnan
+%                 [d1, d2, ax, ay, az] = obj.ard.read();
+%                 obj.tap_bool = d1;
+%                 obj.touch_sens = [d1, d2];
+%                 obj.acc_dat = [ax, ay, az];
+%             end
+%             obj.sub_cycle = obj.sub_cycle + 1;
+%             obj.sub_cycle_abs_time = toc(handles.tic);
             
         end
         
