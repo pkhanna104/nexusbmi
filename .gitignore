@@ -1,2 +1,4 @@
 config.txt
 *.m~
+data/*
+data2/*
