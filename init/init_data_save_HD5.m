@@ -49,10 +49,16 @@ function handles = init_data_save_HD5(handles, load_dec)
     x.rawdata_timeseries_stn = zeros(x.tot_task_iters, 400);
     x.rawdata_power_ch2 = {};
     x.rawdata_power_ch4 = {};
+    
+    DL = get(handles.decoder_list,'String');
+    ix = get(handles.decoder_list,'Value');
+    dec  = DL{ix};
+    x.decoder_name = dec;
 
     handles.save_data = x;
     handles.save_data_h5 = fname_h5;
     handles.rew_cnt = 0;
+    
     
     fprintf('save_data_h5 added to handles\n')
     

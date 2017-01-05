@@ -18,14 +18,14 @@ function run_slim_arduino(fname, com_port, T)
     % Initialize data file: 
    
     fID = fopen(fname, 'w');
-    fprintf(fID, '%s, %s, %s, %s, %s, %s, %s\n', 'd1', 'ax','ay','az','axL','azL','ts')
+    fprintf(fID, '%s, %s, %s, %s, %s, %s, %s, %s\n', 'd1', 'ax','ay','az','axL','azL','ts', 'hr')
     ix = 0;
     
     while cont
         ix = ix + 1;
         
-        [d1, ax, ay, az, axL, azL] = obj.read();
-        fprintf(fID, '%.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f\n', [d1, ax, ay, az, axL, azL, toc(T)]);         
+        [d1, ax, ay, az, axL, azL, hr] = obj.read();
+        fprintf(fID, '%.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f\n', [d1, ax, ay, az, axL, azL, toc(T), hr]);         
        
         if toc(t) > 5
             %Check file: 'shared_process.txt' in nexusbmi > data

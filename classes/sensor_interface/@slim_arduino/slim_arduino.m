@@ -42,7 +42,7 @@ methods
         
     end
     
-    function [d1, ax, ay, az, axL, azL] = read(obj)
+    function [d1, ax, ay, az, axL, azL, hr] = read(obj)
         %flushinput(obj.cereal);
         
         %Request data (please)
@@ -59,6 +59,7 @@ methods
         az = fscanf(obj.cereal, '%d');
         axL = fscanf(obj.cereal, '%d');
         azL = fscanf(obj.cereal, '%d');
+        hr = fscanf(obj.cereal, '%d');
     end
         
 end
