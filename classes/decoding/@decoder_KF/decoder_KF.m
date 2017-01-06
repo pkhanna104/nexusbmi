@@ -9,6 +9,7 @@ classdef decoder_KF < handle
         assist_level
         source
         feature_band
+        cursor_buffer
         
         A
         W
@@ -57,6 +58,7 @@ classdef decoder_KF < handle
             %obj.it_cnt = handles.iter_cnt;
             obj.assist_level = 0;
             obj.lp_filter = 1;
+            obj.cursor_buffer = zeros(10,1);
             
             %Load dec file
             d = load(dec_name);
@@ -136,12 +138,6 @@ classdef decoder_KF < handle
                 obj=obj.run_RML(handles.iter_cnt, task_feat, intended_pos);
             end
             
-            %Apply low pass filter:
-            if obj.lp_filter > 1
-                earliest_ix = max([1, handles.iter_cnt - obj.lp_filter + 1]);
-                comp_dat = [obj.decoded_position handles.save_data.cursor(earliest_ix:handles.iter_cnt-1)'];
-                obj.decoded_position = (1/obj.lp_filter)*sum(comp_dat);
-            end
             
             % Add assist:
             if ~isempty(handles.task.target_y_pos)
@@ -160,6 +156,14 @@ classdef decoder_KF < handle
             ypos = nansum([alpha*obj.ideal_position; ...
                 (1-alpha)*obj.decoded_position(1:end-1)],1);
             
+            
+            %Apply low pass filter:
+            if obj.lp_filter > 1
+                earliest_ix = obj.lp_filter - 2; %because matlab indexing doesn't make sense...
+                comp_dat = [ypos; obj.cursor_buffer(end-earliest_ix:end)];
+                ypos = (1/obj.lp_filter)*sum(comp_dat);
+            end
+            
             % Clip cursor to stay on screen:
             if ypos > 10
                 ypos=10;
@@ -168,6 +172,7 @@ classdef decoder_KF < handle
             end
             
             handles.window.cursor_pos(2) = ypos;
+            obj.cursor_buffer = [obj.cursor_buffer(2:end); ypos];
             
         end
         
