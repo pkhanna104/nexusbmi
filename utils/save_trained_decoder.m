@@ -1,4 +1,4 @@
-function save_trained_decoder(handles, lower_lim, upper_lim, decoder)
+ function save_trained_decoder(handles, lower_lim, upper_lim, decoder)
 
 try
     if isfield(handles, 'decoder_suffix')

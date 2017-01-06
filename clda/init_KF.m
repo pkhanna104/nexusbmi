@@ -3,13 +3,18 @@ function decoder = init_KF(feats, decoder, targ_pos)
 %Estimate X_1:T from Y_1:T -- 
 %First assume no Noise (W = 0) in state space
 [nr, nc] = size(feats);
+
+%Ensure feats : (nfts x nbins):
 if nc==1
     feats = feats';
 end
-if nr == 2 %Power features
+
+% Don't do this as is, TODO: actually implement multidim KF
+if nr > 1 %Power features
     feats = reshape(feats, [nc * nr, 1])';
     targ_pos = reshape([targ_pos targ_pos]', [2*length(targ_pos), 1]);
 end
+
 %Normalize features:
 sqrt_neur = sqrt(feats);
 neur = sqrt_neur - mean(sqrt_neur);
@@ -43,7 +48,7 @@ end
 Y = [neur];
 
 %Add a little noise to X: 
-eps = (randn(1, length(targ_pos)) - 0.5)*10^-1;
+eps = randn(1, length(targ_pos))*10^-1;
 X = [targ_pos'+eps; ones(1, length(targ_pos))];
 
 %Estimate C: 

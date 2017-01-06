@@ -14,9 +14,6 @@ if isempty(add_java)
     add_java = 1;
 end
 
-%FileSaving:
-%1 = ucsf, 2 = pk-mbp
-
 %Function for dealing with not having to keep initializing Nexus
 global nex_init;
 
