@@ -91,18 +91,18 @@ classdef target_task < handle
             end
             
             %Update Accel
-            try
-                if isnan(obj.ard)
-                end
-            catch
-                [d1, d2, ax, ay, az] = obj.ard.read();
-                obj.acc_dat = [ax, ay, az];
-                obj.tap_bool = d1;
-                obj.touch_sens = [d1, d2];
-            end
-            obj.sub_cycle = obj.sub_cycle + 1;
-            obj.sub_cycle_abs_time = toc(handles.tic);
-            obj.sub_cycle_abs_time = toc(handles.tic);
+%             try
+%                 if isnan(obj.ard)
+%                 end
+%             catch
+%                 [d1, d2, ax, ay, az] = obj.ard.read();
+%                 obj.acc_dat = [ax, ay, az];
+%                 obj.tap_bool = d1;
+%                 obj.touch_sens = [d1, d2];
+%             end
+%             obj.sub_cycle = obj.sub_cycle + 1;
+%             obj.sub_cycle_abs_time = toc(handles.tic);
+%             obj.sub_cycle_abs_time = toc(handles.tic);
             
         end
         
