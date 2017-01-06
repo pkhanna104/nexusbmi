@@ -17,7 +17,7 @@ classdef target_task < handle
         point_counter;
         rew_flag;
         target_y_pos;
-        
+        mod_check_neural_cnt;
         
         ard;
         sub_cycle;
@@ -55,6 +55,7 @@ classdef target_task < handle
             obj.point_counter = 0;
             %obj.target_generator = obj.four_targ_gen(100);
             obj.target_generator = obj.three_targ_co_gen(100);
+            obj.mod_check_neural_cnt = tic;
             
             obj.ard = NaN;
             obj.acc_dat = [0 0 0];
