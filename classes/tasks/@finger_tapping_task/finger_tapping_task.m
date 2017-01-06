@@ -39,7 +39,7 @@ classdef finger_tapping_task < handle
             obj.state_name_array = {'wait','target','hold','tapping','reward'};
             obj.FSM = {
                        {'wait','target', @obj.start_target}; 
-                       {'target','hold', @obj.enter_target};
+                       {'target','tapping', @obj.enter_target};
                        {'target','wait', @obj.nf_timeout};
                        {'hold','target', @obj.leave_early};
                        {'hold','tapping', @obj.end_hold};
@@ -132,6 +132,16 @@ classdef finger_tapping_task < handle
             d = abs(handles.window.cursor_pos(2) - obj.target_y_pos);
             if d < handles.window.target_radius
                 tf = 1;
+                
+                %Only for periph targets
+                if abs(obj.target_y_pos)>0
+                    set(handles.window.target, 'MarkerFaceColor', 'c');
+                    set(handles.window.tap_text,'String', handles.tap_on_str);
+                    obj.tap_time = obj.tapping_time;
+                else
+                    obj.tap_time = obj.center_pause_time;
+                end
+
             else
                 tf = 0;
             end
