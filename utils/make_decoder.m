@@ -37,8 +37,7 @@ if strcmp(source(end-1:end), 'td')
     else
         disp('Error! Not a sim channel nor a designated channel')
     end
-    
-    
+   
     [feats, lower_lim, upper_lim] = extract_freq_feats_from_td(dat, channel);
     
 elseif strcmp(source(end-2:end), 'pxx')
@@ -51,11 +50,12 @@ elseif strcmp(source(end-2:end), 'pxx')
     else
         disp('Error! Not a sim pxx channel nor a designated channel');
     end
+    
     rect_pwr = {};
     for ii = 1:length(dat.(channel))
         if size(dat.(channel){ii},1) ~=2
             rect_pwr{ii} = [];
-            disp(strcat('Skipping ix: ', num2str(ii)));            
+            disp(strcat('Empty ix: ', num2str(ii)));            
         else
             rect_pwr{ii} = dat.(channel){ii};
         end

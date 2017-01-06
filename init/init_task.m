@@ -176,8 +176,8 @@ if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
             fprintf(fID,'%s', x );
             fclose(fID);
             
-            fname_h5 = get_data_fname('txt', handles);
-            serial_job = batch('run_slim_arduino', 0, {fname_h5, com_port, handles.tic}, 'matlabpool', 1);
+            [fname_txt, handles] = get_data_fname('txt', handles);
+            serial_job = batch('run_slim_arduino', 0, {fname_txt, com_port, handles.tic}, 'matlabpool', 1);
             fprintf('Sent Arduino to separate process\n')
         end
     end

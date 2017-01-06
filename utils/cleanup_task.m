@@ -9,7 +9,7 @@ function cleanup_task(handles)
     catch
         disp('No decoder to Save')
     end
-    filename = get_data_fname('data',handles);
+    [filename, handles] = get_data_fname('data',handles);
     save(filename,'dat');
     
     % Add entry to db: 

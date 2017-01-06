@@ -1,7 +1,7 @@
 function handles = init_data_save_HD5(handles, load_dec)
 
     %Return a string with .mat ending
-    fname_h5 = get_data_fname('h5_data',handles);
+    [fname_h5, handles] = get_data_fname('h5_data',handles);
     
     %Create H5 file: 
     %NEEDED: PLACE TO LIST handles.task.FSM, task_params (handles.task),

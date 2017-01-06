@@ -1,11 +1,9 @@
 % function to get filename
-function [data_filename_ucsf] = get_data_fname(type,handles)
+function [data_filename_ucsf, handles] = get_data_fname(type,handles)
     %Type is 'data' or 'decoder'
 
-    text = 'abcdefghijklmnopqrstuvwxyz';
-    
     suffx = '';
-    
+
     if strcmp(type(1:3), 'dec')
         if isfield(handles, 'dec_suffix')
             suffx = handles.dec_suffix;
@@ -24,37 +22,46 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
         data_dir = handles.dat_path;
     end
     
-
-    % get experiment number
-    dlist = dir(data_dir);
     
-    str = ['dat' datestr(date,'mmddyy')];
-    str2 = ['h5_' datestr(date,'mmddyy')];
-    ex = [];
-    for k = 1:length(dlist)
-        if length(dlist(k).name)>10
-            if strmatch(str,dlist(k).name(1:10))
-                addx = 1;
-            elseif strmatch(str2,dlist(k).name(1:10))
-                addx = 1;
-            else 
-                addx = 0;
-            end
-            
-            if addx
-                pattern = dlist(k).name(10);
-                ind = strfind(text,pattern);
-                ex(end+1) = ind;
+    if isfield(handles, 'curex')
+        curex = handles.curex;
+    else
+        text = 'abcdefghijklmnopqrstuvwxyz';
+
+        % get experiment number
+        dlist = dir(data_dir);
+
+        str = ['dat' datestr(date,'mmddyy')];
+        str2 = ['h5_' datestr(date,'mmddyy')];
+        ex = [];
+        for k = 1:length(dlist)
+            if length(dlist(k).name)>10
+                if strmatch(str,dlist(k).name(1:10))
+                    addx = 1;
+                elseif strmatch(str2,dlist(k).name(1:10))
+                    addx = 1;
+                else 
+                    addx = 0;
+                end
+
+                if addx
+                    pattern = dlist(k).name(10);
+                    ind = strfind(text,pattern);
+                    ex(end+1) = ind;
+                end
             end
         end
+
+        if ~isempty(ex)
+            curex_ind = max(ex)+1;
+            curex = text(curex_ind);
+        else
+            curex = text(1);
+        end
+        
+        handles.curex = curex;
     end
-    if ~isempty(ex)
-        curex_ind = max(ex)+1;
-        curex = text(curex_ind);
-    else
-        curex = text(1);
-    end
-    
+
     if strcmp(type(1:2), 'h5')
         data_filename_ucsf  = [data_dir type(1:3) datestr(date,'mmddyy') curex '_' get(suffx,'String') '.h5'];
     elseif strcmp(type(1:3), 'ard')
