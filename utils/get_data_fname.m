@@ -29,10 +29,19 @@ function [data_filename_ucsf] = get_data_fname(type,handles)
     dlist = dir(data_dir);
     
     str = ['dat' datestr(date,'mmddyy')];
+    str2 = ['h5_' datestr(date,'mmddyy')];
     ex = [];
     for k = 1:length(dlist)
         if length(dlist(k).name)>10
             if strmatch(str,dlist(k).name(1:10))
+                addx = 1;
+            elseif strmatch(str2,dlist(k).name(1:10))
+                addx = 1;
+            else 
+                addx = 0;
+            end
+            
+            if addx
                 pattern = dlist(k).name(10);
                 ind = strfind(text,pattern);
                 ex(end+1) = ind;
