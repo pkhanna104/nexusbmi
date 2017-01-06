@@ -29,10 +29,7 @@ classdef nexus_power_extractor < feature_extractor
             
             %Get frequencies 
             test = zeros(obj.width,1);
-            
             obj.fs         = extractor_params.fs;
-            obj.width_t    = extractor_params.width_t;
-            
             
             %MTM 
             %obj.params     = struct('fpass',[0 obj.f_max],'Fs',obj.fs,'tapers',[3 5]);
@@ -41,10 +38,7 @@ classdef nexus_power_extractor < feature_extractor
             %PWELCH
             obj.nfft=max(2^(nextpow2(obj.width)),obj.width);
             [~,f] = pwelch(test,obj.width-1,[],obj.nfft,obj.fs); 
-            
-            % nfft=max(2^(nextpow2(obj.width)),obj.width);
-            % [f,~]=getfgrid(extractor_params.fs,nfft,[0 obj.f_max]);
-            
+                        
 
             %Get domain: 
             if isfield(extractor_params,'domain')
@@ -55,7 +49,7 @@ classdef nexus_power_extractor < feature_extractor
                 obj.domain = 'td';
             end
             
-            %Make sure channel matchs: 
+            %Make sure channel matches: 
             if strmatch(obj.domain, 'td')
                 assert(or(obj.used_chan == 1, obj.used_chan==3))
             elseif strmatch(obj.domain, 'pd')
