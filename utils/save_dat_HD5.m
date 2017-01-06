@@ -33,7 +33,7 @@ if ~isempty(data)
         %Play a reward sound :)
         z = randperm(length(handles.reward_sounds.file));
         ix = z(1);
-        
+
         y = handles.reward_sounds.file{ix};
         params = handles.reward_sounds.params{ix};
         sound(y, params(1), params(2));
