@@ -158,7 +158,7 @@ classdef decoder_KF < handle
             end
             
             ypos = nansum([alpha*obj.ideal_position; ...
-                (1-alpha)*obj.decoded_position],1);
+                (1-alpha)*obj.decoded_position(1:end-1)],1);
             
             % Clip cursor to stay on screen:
             if ypos > 10
