@@ -36,7 +36,7 @@ classdef target_task < handle
             obj.state_name_array = {'wait','target','hold','reward'};
             obj.FSM = {
                 {'wait','target', @obj.start_target};
-                {'target','hold', @obj.enter_target};
+                {'target','reward', @obj.enter_target};
                 {'target','wait', @obj.timeout};
                 {'hold','target', @obj.leave_early};
                 {'hold','reward', @obj.end_hold};
