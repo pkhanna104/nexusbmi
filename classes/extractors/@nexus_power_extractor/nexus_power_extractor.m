@@ -73,7 +73,7 @@ classdef nexus_power_extractor < feature_extractor
             obj.last_features.td = zeros(obj.n_features,1);
             obj.task_f_ranges = extractor_params.task_f_ranges;
             
-            disp(strcat('n_features ',num2str(obj.n_features)));
+            %disp(strcat('n_features ',num2str(obj.n_features)));
             %obj.used_chan_array = {}; % have every frequency use same channels for now
 %             
 %             for c = 1:size(obj.f_ranges,1)
