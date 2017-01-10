@@ -70,7 +70,6 @@ classdef decoder_simple < handle
             end
             
             % Run decoder
-            
             obj.decoded_position = obj.run_decoder(task_feat);
                         
             % Add assist:
@@ -87,8 +86,13 @@ classdef decoder_simple < handle
                 alpha = obj.assist_level/100;
             end
             
+            %Ignores nans: 
             ypos = nansum([alpha*obj.ideal_position; ...
                 (1-alpha)*obj.decoded_position(1:end-1)],1);
+            
+            if isnan(obj.decoded_position(1:end-1))
+                disp(' Decoded pos is nan! ')
+            end
             
              % low pass filter:
             if obj.lp_filter > 1
