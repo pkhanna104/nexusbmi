@@ -49,7 +49,7 @@ classdef target_task < handle
             obj.state_ind = 1;
             obj.loop_time = .4; %loop time
             obj.ts = 0;
-            obj.ITI  = .1;
+            obj.ITI  = .5;
             obj.rew_flag = 0;
             obj.rew_cnt = 0;
             obj.point_counter = 0;
@@ -119,6 +119,9 @@ classdef target_task < handle
             d = abs(handles.window.cursor_pos(2) - obj.target_y_pos);
             if d < handles.window.target_radius
                 tf = 1;
+                obj.rew_flag = 1;
+                obj.rew_cnt = obj.rew_cnt+1;
+                obj.point_counter = obj.rew_cnt;
             else
                 tf = 0;
             end
