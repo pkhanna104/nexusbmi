@@ -3,6 +3,12 @@ function handles = save_dat_HD5(handles, data, seq, feat, load_dec)
 fname_h5 = handles.save_data_h5;
 ix = handles.iter_cnt;
 handles.save_data.target(ix) = handles.task.target_y_pos;
+try
+    % Just for movement task:
+    handles.save_data.beep(ix) = handles.task.beep_bool;
+catch
+    dummy=0;
+end
 
 if ~isempty(data)
     handles.save_data.state{ix} = handles.task.state;
@@ -37,6 +43,10 @@ if ~isempty(data)
         y = handles.reward_sounds.file{ix};
         params = handles.reward_sounds.params{ix};
         sound(y, params(1), params(2));
+    end
+    
+    if strcmp(handles.task.state, 'tapping') && ~strcmp(handles.save_data.state{ix-1}, 'tapping')
+        h5write(fname_h5, '/task_events/start_tapping', ix, [1, handles.rew_cnt+1], [1, 1]);
     end
     
     try

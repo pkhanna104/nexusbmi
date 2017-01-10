@@ -102,6 +102,11 @@ elseif strcmp(method, 'KF')
     
     decoder = init_KF(feats, decoder, targ_pos);
     decoder.source = source;
+
+elseif strcmp(method, 'perc_pdf')
+   decoder = init_perc_pdf_dec(feats, decoder); 
+   decoder.source = source;
+    
 end
 
 %Save all trained decoders
