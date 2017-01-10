@@ -35,6 +35,8 @@ task_sources.names = {'','target_task', 'target_touch_task','movement_task', 'fi
 task_sources.obj = {'',@target_task, @target_touch_task, @movement_task, @finger_tapping_task};
 
 task_ix = get(handles.task_list_pulldown, 'Value');
+handles.task_name = task_sources.names{task_ix};
+
 if task_ix ==1
     error('Must select a task!')
 end
@@ -88,10 +90,15 @@ if load_dec
     if ~isfield(dec.decoder,'method')
         dec.decoder.method = 'simple';
     end
+    
     if strcmp(dec.decoder.method, 'simple')
         handles.decoder = decoder_simple(DL{ix},handles);
+    
     elseif strcmp(dec.decoder.method, 'KF')
         handles.decoder = decoder_KF(DL{ix},handles);
+    
+    elseif strcmp(dec.decoder.method, 'perc_pdf')
+        handles.decoder = decoder_perc_pdf(DL{ix}, handles);
     end
     
     %Add spectral feature to decoder if necessary

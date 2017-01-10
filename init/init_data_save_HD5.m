@@ -14,6 +14,7 @@ function handles = init_data_save_HD5(handles, load_dec)
     h5create(fname_h5, '/task/ideal_pos',[1, Inf], 'ChunkSize', [1, 10]);
     
     h5create(fname_h5, '/task_events/reward_times',[1, Inf], 'ChunkSize', [1, 10]);
+    h5create(fname_h5, '/task_events/start_tapping', [1, Inf], 'ChunkSize', [1, 10]);
     h5create(fname_h5, '/task_events/hold_times',[1, Inf], 'ChunkSize', [1, 10]);
     
     %h5create(fname_h5, '/task_params/cursor_rad',[1, Inf], 'ChunkSize', [1, 10]);
@@ -34,9 +35,12 @@ function handles = init_data_save_HD5(handles, load_dec)
     %Things to save: 
     %Save task info: 
     x = struct;
+    x.task_name = handles.task_name;
+    x.task = handles.task;
     x.tot_task_iters = 30*60*2.5;
     x.state = cell(x.tot_task_iters,1);
     x.target = zeros(x.tot_task_iters, 1);
+    x.beep = zeros(x.tot_task_iters, 1);
     x.reward_times = {[]};
     x.hold_times = {};
     x.assist_level = zeros(x.tot_task_iters, 1);
@@ -49,6 +53,7 @@ function handles = init_data_save_HD5(handles, load_dec)
     x.rawdata_timeseries_stn = zeros(x.tot_task_iters, 400);
     x.rawdata_power_ch2 = {};
     x.rawdata_power_ch4 = {};
+    
     
     DL = get(handles.decoder_list,'String');
     ix = get(handles.decoder_list,'Value');
