@@ -18,7 +18,7 @@ function run_slim_arduino(fname, com_port, T)
     % Initialize data file: 
    
     fID = fopen(fname, 'w');
-    fprintf(fID, '%s, %s, %s, %s, %s, %s, %s, %s\n', 'ts', 'd1','axL','azL','hr', 'ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz', 'tp')
+    fprintf(fID, '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s\n', 'ts', 'd1','axL','azL','hr', 'ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz', 'tp')
     
     ix = 0;
     

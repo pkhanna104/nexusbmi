@@ -75,19 +75,19 @@ methods
         axL = fscanf(obj.cereal, '%d');
         azL = fscanf(obj.cereal, '%d');
         hr = fscanf(obj.cereal, '%d');
-        ax = fscanf(obj.cereal);
-        ay = fscanf(obj.cereal);
-        az = fscanf(obj.cereal);
+        ax = str2num(fscanf(obj.cereal));
+        ay = str2num(fscanf(obj.cereal));
+        az = str2num(fscanf(obj.cereal));
         
-        gx = fscanf(obj.cereal);
-        gy = fscanf(obj.cereal);
-        gz = fscanf(obj.cereal);
+        gx = str2num(fscanf(obj.cereal));
+        gy = str2num(fscanf(obj.cereal));
+        gz = str2num(fscanf(obj.cereal));
         
-        mx = fscanf(obj.cereal);
-        my = fscanf(obj.cereal);
-        mz = fscanf(obj.cereal);
+        mx = str2num(fscanf(obj.cereal));
+        my = str2num(fscanf(obj.cereal));
+        mz = str2num(fscanf(obj.cereal));
         
-        tp = fscanf(obj.cereal);
+        tp = str2num(fscanf(obj.cereal));
         
     end
         
