@@ -229,6 +229,7 @@ void loop()
     if (cc == 'd') {
       // Print acceleration values in milligs!
       //Serial.print("X-acceleration: "); 
+
       Serial.println(1000 * myIMU.ax);
       //Serial.print(" mg "); 
       //Serial.print("Y-acceleration: "); 
@@ -236,10 +237,12 @@ void loop()
       //Serial.print(" mg ");
       //Serial.print("Z-acceleration: "); 
       Serial.println(1000 * myIMU.az);
+
       //Serial.println(" mg ");
       
       // Print gyro values in degree/sec
       //Serial.print("X-gyro rate: "); 
+
       Serial.println(myIMU.gx, 3);
       //Serial.print(" degrees/sec ");
       //Serial.print("Y-gyro rate: "); 
@@ -247,10 +250,12 @@ void loop()
       //Serial.print(" degrees/sec ");
       //Serial.print("Z-gyro rate: "); 
       Serial.println(myIMU.gz, 3);
+
       //Serial.println(" degrees/sec");
 
       // Print mag values in degree/sec
       //Serial.print("X-mag field: "); 
+
       Serial.println(myIMU.mx);
       //Serial.print(" mG ");
       //Serial.print("Y-mag field: "); 
@@ -258,6 +263,7 @@ void loop()
       //Serial.print(" mG ");
       //Serial.print("Z-mag field: "); 
       Serial.println(myIMU.mz);
+
       //Serial.println(" mG");
 
       myIMU.tempCount = myIMU.readTempData();  // Read the adc values
@@ -265,6 +271,7 @@ void loop()
       myIMU.temperature = ((float) myIMU.tempCount) / 333.87 + 21.0;
       // Print temperature in degrees Centigrade
       //Serial.print("Temperature is ");  
+
       Serial.println(myIMU.temperature, 1);
       //Serial.println(" degrees C");
     }
