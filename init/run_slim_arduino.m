@@ -18,14 +18,15 @@ function run_slim_arduino(fname, com_port, T)
     % Initialize data file: 
    
     fID = fopen(fname, 'w');
-    fprintf(fID, '%s, %s, %s, %s, %s, %s, %s, %s\n', 'd1', 'ax','ay','az','axL','azL','ts', 'hr')
+    fprintf(fID, '%s, %s, %s, %s, %s, %s, %s, %s\n', 'ts', 'd1','axL','azL','hr', 'ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz', 'tp')
+    
     ix = 0;
     
     while cont
         ix = ix + 1;
         
-        [d1, ax, ay, az, axL, azL, hr] = obj.read();
-        fprintf(fID, '%.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f\n', [d1, ax, ay, az, axL, azL, toc(T), hr]);         
+        [d1, axL, azL, hr, ax, ay, az, gx, gy, gz, mx, my, mz, tp] = obj.read();
+        fprintf(fID, '%.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f, %.5f,\n', [toc(T), d1, axL, azL, hr, ax, ay, az, gx, gy, gz, mx, my, mz, tp]);         
        
         if toc(t) > 5
             %Check file: 'shared_process.txt' in nexusbmi > data
