@@ -11,10 +11,12 @@ classdef slim_arduino < handle
 
 properties
     cereal;
+    first_attempt;
 end
 
 methods
     function obj = slim_arduino(com_port)
+        obj.first_attempt = true;
         obj.cereal = serial(com_port);
         pause(3);
         set(obj.cereal, 'BaudRate', 115200);
@@ -42,7 +44,7 @@ methods
         
     end
     
-    function [d1, ax, ay, az, axL, azL, hr] = read(obj)
+    function [d1, axL, azL, hr, ax, ay, az, gx, gy, gz, mx, my, mz, tp] = read(obj)
         %flushinput(obj.cereal);
         
         %Request data (please)
@@ -53,13 +55,40 @@ methods
             x = x+1;
         end
         %Read data 
-        d1 = fscanf(obj.cereal, '%d');
-        ax = fscanf(obj.cereal, '%d');
-        ay = fscanf(obj.cereal, '%d');
-        az = fscanf(obj.cereal, '%d');
+        have_d1 = false;
+        
+        while obj.first_attempt
+            pause(1)
+            flushinput(obj.cereal)
+            fprintf(obj.cereal, 'd')
+            d1 = fscanf(obj.cereal, '%d');
+            if or(d1 == 0, d1 == 1)
+                obj.first_attempt = false;
+                have_d1 = true;
+            end
+        end
+        
+        if ~have_d1    
+            d1 = fscanf(obj.cereal, '%d');
+        end
+        
         axL = fscanf(obj.cereal, '%d');
         azL = fscanf(obj.cereal, '%d');
         hr = fscanf(obj.cereal, '%d');
+        ax = fscanf(obj.cereal);
+        ay = fscanf(obj.cereal);
+        az = fscanf(obj.cereal);
+        
+        gx = fscanf(obj.cereal);
+        gy = fscanf(obj.cereal);
+        gz = fscanf(obj.cereal);
+        
+        mx = fscanf(obj.cereal);
+        my = fscanf(obj.cereal);
+        mz = fscanf(obj.cereal);
+        
+        tp = fscanf(obj.cereal);
+        
     end
         
 end
