@@ -2,6 +2,10 @@
 % file.
 
 function run_slim_arduino(fname, com_port, T)
+    
+    %Remove all instrument objects
+    delete(instrfindall)
+            
     %Initialize object:
     obj = slim_arduino(com_port);
     
