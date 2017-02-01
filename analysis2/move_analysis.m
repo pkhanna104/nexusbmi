@@ -4,8 +4,8 @@ function move_analysis(dat_str)
 load(strcat('dat', dat_str, '_.mat'))
 
 %Load M1 timeseries
-time_ser = dat.rawdata_timeseries_m1;
-%time_ser = dat.rawdata_timeseries_stn;
+%time_ser = dat.rawdata_timeseries_m1;
+time_ser = dat.rawdata_timeseries_stn;
 
 %Find beep onset
 
