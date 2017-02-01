@@ -24,7 +24,7 @@ if ~isempty(data)
     
     if load_dec
         h5write(fname_h5, '/task/decoded_pos',  handles.decoder.decoded_position(1:end-1), [1, ix], [1, 1]);
-        h5write(fname_h5, '/task/ideal_pos',  handles.decoder.ideal_position, [1, ix], [1, 1]);
+        %h5write(fname_h5, '/task/ideal_pos',  handles.decoder.ideal_position, [1, ix], [1, 1]);
         handles.save_data.assist_level(ix) = handles.decoder.assist_level;
         handles.save_data.lp_filter(ix) = handles.decoder.lp_filter;
         h5write(fname_h5, '/task/state_ix',handles.task.state_ind, [1, ix], [1, 1]); 
@@ -50,13 +50,13 @@ if ~isempty(data)
     end
     
     try
-        if ~isempty(data{3})
-            h5write(fname_h5, '/neural/timeseries_m1', data{3}, [1, ix], [length(data{3}), 1]);
-        end
-        if ~isempty(data{1})
-            h5write(fname_h5, '/neural/timeseries_stn', data{1}, [1, ix], [length(data{1}), 1]);
-        end
-        
+%         if ~isempty(data{3})
+%             h5write(fname_h5, '/neural/timeseries_m1', data{3}, [1, ix], [length(data{3}), 1]);
+%         end
+%         if ~isempty(data{1})
+%             h5write(fname_h5, '/neural/timeseries_stn', data{1}, [1, ix], [length(data{1}), 1]);
+%         end
+%         
         if ~isempty(data{2})
             h5write(fname_h5, '/neural/pxx_ch2', data{2}, [1, ix], [2, 1]);
         end
