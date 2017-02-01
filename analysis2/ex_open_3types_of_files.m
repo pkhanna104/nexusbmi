@@ -1,6 +1,8 @@
-%% Read Arduino data: 
+function ex_open_3types_of_files(dat_str)
+% dat_str: e.g. '013117a'
+% Read Arduino data: 
 % Rows: 'd1', 'ax', 'ay', 'az', 'axL', 'azL', 'ts', 'hr'
-M = dlmread('txt012817c__ard.txt', ',', 1, 0);
+M = dlmread(strcat('txt', dat_str, '__ard.txt'), ',', 1, 0);
 
 t = M(:, 1);
 T = t - t(1);
@@ -37,8 +39,8 @@ subplot(3, 2, 6)
 plot(T, M(:, 9:14))
 title('Gyro & Mag')
 
-%% Read Neural Data
-fname = 'h5_012817c_.h5';
+% Read Neural Data
+fname = strcat('h5_', dat_str, '_.h5');
 rew = h5read(fname, '/task_events/reward_times');
 cursor = h5read(fname, '/task/cursor');
 target = h5read(fname, '/task/target');
@@ -61,9 +63,9 @@ ix = 2:length(ts);
 plot(TS(ix), cursor(ix))
 hold all
 plot(TS(ix), target(ix))
-plot(TS(ix), ideal_pos(ix))
+%plot(TS(ix), ideal_pos(ix))
 plot(TS(ix), decoded_pos(ix))
-legend('Cursor', 'Target', 'Ideal Pos', 'Decoded Pos')
+legend('Cursor', 'Target', 'Decoded Pos')
 
 %Neural Figure;
 figure()
@@ -73,12 +75,14 @@ plot(TS(ix), pxx_ch4(1,ix), TS(ix), pxx_ch4(2,ix))
 legend('pxx ch2, 1', 'pxx ch2, 2', 'pxx ch4, 1', 'pxx ch4 2')
 
 figure()
+dat = load(strcat('dat', dat_str, '_.mat'));
 subplot(2, 1, 1)
-imagesc(ts_stn)
+iter_cnt = dat.dat.iter_cnt;
+imagesc(dat.dat.rawdata_timeseries_stn(1:iter_cnt, 1:169))
 title('TS STN')
 subplot(2, 1, 2)
-imagesc(ts_m1);
+imagesc(dat.dat.rawdata_timeseries_m1(1:iter_cnt, 1:169));
 title('TS M1')
 
-
+end
 
