@@ -118,7 +118,7 @@ classdef decoder_perc_pdf < handle
             perc = obj.map(ix, 2);
             
             % Map perc to Y axis: 
-            ypos = (perc - 0.5) * 20;
+            ypos = (perc - 0.5) * 12;
             ypos = [ypos, 1];
             
         end
