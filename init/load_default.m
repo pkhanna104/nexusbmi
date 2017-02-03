@@ -15,7 +15,7 @@ set(handles.timeoutTime_box, 'String','1000');
 % set(handles.simNexusSource_pxx, 'Value',0);
 % set(handles.nexusSource, 'Value',1);
 % handles.neural_source_name.nexus = 1;
-set(handles.serial_port_box, 'String', 'COM5');
+set(handles.serial_port_box, 'String', 'COM4');
 
 % extractor params;
 set(handles.window_size_box,'String',400);
