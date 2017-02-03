@@ -14,6 +14,7 @@ classdef finger_tapping_task < handle
         state_ref; %State reference matrix
         tapping_time;
         center_pause_time;
+        center_reward;
         target_generator = rand(1000,1);
         rew_cnt;
         point_counter;
@@ -64,6 +65,7 @@ classdef finger_tapping_task < handle
             obj.sub_loop_time = 1/obj.task_fs;
             obj.tap_bool = nan;
             obj.ard = nan;
+            obj.center_reward = false;
             
             %How often to check for neural 
             obj.mod_check_neural_cnt = tic; %(obj.loop_time / (1/obj.task_fs))-2;
@@ -72,7 +74,7 @@ classdef finger_tapping_task < handle
             obj.sub_cycle_abs_time = 0;
             obj.target_y_pos = -100;
             obj.tapping_time = 6;
-            obj.center_pause_time = 1;            
+            obj.center_pause_time = 0;            
             
         end
         
@@ -124,8 +126,10 @@ classdef finger_tapping_task < handle
             obj.hold = obj.hold_time_mean + obj.hold_time_std*randn(1,1);
             obj.target_y_pos = obj.target_generator(1);
             obj.target_generator = obj.target_generator(2:end);
+            obj.center_reward = false;
             set(handles.window.tap_text,'String', '\fontsize{18} \color{black} ');
             tf = 1;
+            
         end
  
         function tf = enter_target(obj, handles)
@@ -140,6 +144,7 @@ classdef finger_tapping_task < handle
                     obj.tap_time = obj.tapping_time;
                 else
                     obj.tap_time = obj.center_pause_time;
+                    obj.center_reward = true;
                 end
 
             else
