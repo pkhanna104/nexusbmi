@@ -181,6 +181,7 @@ classdef finger_tapping_task < handle
                     obj.tap_time = obj.tapping_time;
                 else
                     obj.tap_time = obj.center_pause_time;
+                    obj.center_reward = true;
                 end
             else
                 tf = 0;
@@ -196,9 +197,13 @@ classdef finger_tapping_task < handle
             
             if tf
                 obj.rew_flag = 1;
-                obj.rew_cnt = obj.rew_cnt+1;
-                obj.point_counter = obj.rew_cnt;
-                disp('Score !')
+                if obj.center_reward
+                    a = 10;
+                else
+                    obj.rew_cnt = obj.rew_cnt+1;
+                    obj.point_counter = obj.rew_cnt;
+                    disp('Score !')
+                end
             end
         end
         
