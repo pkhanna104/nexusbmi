@@ -4,8 +4,8 @@ function move_analysis(dat_str)
 load(strcat('dat', dat_str, '_.mat'))
 
 %Load M1 timeseries
-%time_ser = dat.rawdata_timeseries_m1;
-time_ser = dat.rawdata_timeseries_stn;
+time_ser = dat.rawdata_timeseries_m1;
+%time_ser = dat.rawdata_timeseries_stn;
 
 %Find beep onset
 
@@ -18,7 +18,7 @@ try
 catch
     %New files: 
     ix_beep = find(diff(dat.beep) > 0) + 1;
-    time_beep = dat.rawdata_abs_time(ix_beep);
+    time_beep = dat.rawdata_abs_time(ix_beep(1:end-1));
     disp('New files\n');
     old_files = 0;
 end
