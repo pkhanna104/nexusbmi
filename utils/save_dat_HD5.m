@@ -37,12 +37,23 @@ if ~isempty(data)
         h5write(fname_h5, '/task_events/reward_times', ix, [1, handles.rew_cnt], [1,1]);
         
         %Play a reward sound :)
-        z = randperm(length(handles.reward_sounds.file));
-        ix = z(1);
+        snd = true;
+        try
+            if handles.task.center_reward
+                snd = false;
+            end
+        catch
+            snd = true;
+        end
+    
+        if snd
+            z = randperm(length(handles.reward_sounds.file));
+            ix = z(1);
 
-        y = handles.reward_sounds.file{ix};
-        params = handles.reward_sounds.params{ix};
-        sound(y, params(1), params(2));
+            y = handles.reward_sounds.file{ix};
+            params = handles.reward_sounds.params{ix};
+            sound(y, params(1), params(2));
+        end
     end
     
     if strcmp(handles.task.state, 'tapping') && ~strcmp(handles.save_data.state{ix-1}, 'tapping')

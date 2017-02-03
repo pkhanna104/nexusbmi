@@ -1,7 +1,9 @@
 function handles = plot_mario(loc, handles)
 
     if strcmp(handles.task.state, 'tapping')
-        loc = [100 100];
+        if abs(handles.task.target_y_pos)>0
+            loc = [100 100];
+        end
     end
     
     old_x = mean(get(handles.mario.im,'Xdata'));
