@@ -85,6 +85,10 @@ if strcmp(method,'simple')
     %-2, 2, 6], so a distance of four = 1 quarter step
     
     decoder.std = quarter_step/4;
+    
+    % Added 2/3/17 to make decoder harder
+    decoder.std = decoder.std * 2;
+    
     %decoder.feature_band = handles.feature_extractor.f_ranges(ft_ind(ft_ind==1),:);
     
 elseif strcmp(method, 'KF')
