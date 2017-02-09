@@ -2,42 +2,47 @@ function ex_open_3types_of_files(dat_str)
 % dat_str: e.g. '013117a'
 % Read Arduino data: 
 % Rows: 'd1', 'ax', 'ay', 'az', 'axL', 'azL', 'ts', 'hr'
-M = dlmread(strcat('txt', dat_str, '__ard.txt'), ',', 1, 0);
+try
+    M = dlmread(strcat('txt', dat_str, '__ard.txt'), ',', 1, 0);
 
-t = M(:, 1);
-T = t - t(1);
+    t = M(:, 1);
+    T = t - t(1);
 
-figure();
+    figure();
 
-%Acc R
-subplot(3, 2, 1)
-plot(T, M(:, [6, 7, 8]));
-title('Acc R')
+    %Acc R
+    subplot(3, 2, 1)
+    plot(T, M(:, [6, 7, 8]));
+    title('Acc R')
 
-%Acc L
-subplot(3, 2, 2)
-plot(T, M(:, [3 4]))
-title('Acc L')
+    %Acc L
+    subplot(3, 2, 2)
+    plot(T, M(:, [3 4]))
+    title('Acc L')
 
-%Touch
-subplot(3, 2, 3)
-plot(T, M(:,2))
-title('Touch')
+    %Touch
+    subplot(3, 2, 3)
+    plot(T, M(:,2))
+    title('Touch')
 
-%Pulse
-subplot(3, 2, 4)
-plot(T, M(:, 5))
-title('Pulse')
+    %Pulse
+    subplot(3, 2, 4)
+    plot(T, M(:, 5))
+    title('Pulse')
 
-%DT
-subplot(3, 2, 5)
-plot(T(2:end), diff(T))
-title('DT')
+    %DT
+    subplot(3, 2, 5)
+    plot(T(2:end), diff(T))
+    title('DT')
 
-%IMUs
-subplot(3, 2, 6)
-plot(T, M(:, 9:14))
-title('Gyro & Mag')
+    %IMUs
+    subplot(3, 2, 6)
+    plot(T, M(:, 9:14))
+    title('Gyro & Mag')
+catch
+    disp('No arduino file')
+    t = [0];
+end
 
 % Read Neural Data
 fname = strcat('h5_', dat_str, '_.h5');
@@ -68,12 +73,14 @@ plot(TS(ix), decoded_pos(ix))
 legend('Cursor', 'Target', 'Decoded Pos')
 
 %Neural Figure;
+
 figure()
 plot(TS(ix), pxx_ch2(1,ix), TS(ix), pxx_ch2(2,ix))
 hold all
 plot(TS(ix), pxx_ch4(1,ix), TS(ix), pxx_ch4(2,ix))
 legend('pxx ch2, 1', 'pxx ch2, 2', 'pxx ch4, 1', 'pxx ch4 2')
 
+    
 figure()
 dat = load(strcat('dat', dat_str, '_.mat'));
 subplot(2, 1, 1)
