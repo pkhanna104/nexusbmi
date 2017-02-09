@@ -6,7 +6,7 @@ function [nf_time2targ_save, bool_rt_save] = plot_targs(blocks, date, tslice, ts
 cmap = {[32 178 170]/255, [70 130 180]/255,[255 215 0]/255, [255 69 0]/255};
 
 [FT, RAW_stn, RAW_m1, TARG, CURS, REW, idx, pxx, time2rew, TAPPING_IX,...
-    task, trial_outcome, targ_len, bool_rt] = concat_dat_gen(blocks, date, tslice,...
+    task, trial_outcome, targ_len, bool_rt, timeout_tm] = concat_dat_gen(blocks, date, tslice,...
     tslice_opt, trim_n_targs);
 
 %Ranges of bool_rts: 
@@ -25,18 +25,21 @@ for b=1:length(bool_rt_rgs)
 end
 
 %PRINT: 
-prob_low_targ{:}
+if strcmp(task, 'target_tapping')
+    prob_low_targ{:}
 
-%Bool RT vs. Targ Len: 
-figure()
-low_rew = find(trial_outcome(rew_ix, 2)==-6);
-high_rew = find(trial_outcome(rew_ix, 2)==6);
-plot(targ_len(rew_ix(low_rew)), bool_rt(rew_ix(low_rew)), '.', 'color', cmap{1})
-hold on;
-plot(targ_len(rew_ix(high_rew)),bool_rt(rew_ix(high_rew)),  '.', 'color', cmap{3})
-linfit  = regstats(bool_rt(rew_ix), targ_len(rew_ix),'linear');
-xhat = 0:120;
-yhat = linfit.beta(1)+linfit.beta(2)*xhat;
+    %Bool RT vs. Targ Len: 
+
+    figure()
+    low_rew = find(trial_outcome(rew_ix, 2)==-6);
+    high_rew = find(trial_outcome(rew_ix, 2)==6);
+    plot(targ_len(rew_ix(low_rew)), bool_rt(rew_ix(low_rew)), '.', 'color', cmap{1})
+    hold on;
+    plot(targ_len(rew_ix(high_rew)),bool_rt(rew_ix(high_rew)),  '.', 'color', cmap{3})
+    linfit  = regstats(bool_rt(rew_ix), targ_len(rew_ix),'linear');
+    xhat = 0:120;
+    yhat = linfit.beta(1)+linfit.beta(2)*xhat;
+end
 
 nf_time2targ_save = {};
 perc_corr_save = {};
@@ -55,17 +58,28 @@ epoch_ix = 1:epoch_step:end_;
 
 unique_targs = sort(unique(trial_outcome(:,2)));
 perc_corr = zeros(length(unique_targs), length(epoch_ix)-1);
-avg_beta_power = zeros(length(epoch_ix)-1, 1);
+avg_beta_power = zeros(length(epoch_ix)-1, 2);
 
 for e=1:length(epoch_ix(1:end-1))
-    avg_beta_power(e) = mean(mean(FT(epoch_ix(e):epoch_ix(e+1), :)));
+    P1 = pxx{1}(:, epoch_ix(e):epoch_ix(e+1));
+    P1(P1 == 0) = nan;
+    P2 = pxx{2}(:, epoch_ix(e):epoch_ix(e+1));
+    P2(P2 == 0) = nan;
+    
+    avg_beta_power(e, 1) = nanmean(unrav(P1));
+    avg_beta_power(e, 2) = nanmean(unrav(P2));
+    
     time_ix = find(and(trial_outcome(:,1)<=epoch_ix(e+1), trial_outcome(:,1)>epoch_ix(e)));
     
     for t=1:length(unique_targs)
         targ_ix = find(trial_outcome(time_ix,2)==unique_targs(t));
         if ~isempty(targ_ix)
             outcome = trial_outcome(time_ix(targ_ix), 3);
-            perc_corr(t, e) = length(outcome(outcome==9))/length(outcome);
+            if abs(unique_targs(t)) > 0
+                perc_corr(t, e) = length(outcome(outcome==9))/length(outcome);
+            elseif unique_targs(t) == 0
+                perc_corr(t, e) = length(outcome(outcome==15))/length(outcome);
+            end
         end
     end
 end
@@ -89,7 +103,7 @@ end
 c_idx_day_start = cumsum(bl_len);
 
 for t=1:length(c_idx)
-    t1 = c_idx(t)*0.4/60;
+    t1 = c_idx(t)*0.4/60
     if ~isempty(find(c_idx_day_start==t))
         plot(gca, [t1, t1], [0, 1], 'k-','linewidth',5)
     else
@@ -107,6 +121,7 @@ hold on;
 plot(time_ax(1:end-1), avg_beta_power)
 xlabel('Time in Minutes')
 ylabel(strcat('Avg. Beta Power in ', num2str(mins_per_epoch), ' min. Epochs'))
+legend('M1', 'STN')
 subplot(2, 1, 2)
 
 for t=1:length(c_idx)
@@ -117,6 +132,8 @@ for t=1:length(c_idx)
         plot(gca, [t1, t1], [0, 600], 'k--')
     end
 end
+
+ylim([400, 1025])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -139,6 +156,13 @@ elseif strcmp(task, 'target_tapping')
     targ_loc = trial_outcome(ix__, 2);
     tapping_time = ((REW - trial_outcome(ix__,1)' - targ_len(ix__))*.4);
     bool_rt_trunc = bool_rt(ix__);
+    outcome = trial_outcome(ix__, :);
+    
+elseif strcmp(task, 'finger_tapping')
+    ix__ = find(or(trial_outcome(:, 3) == 9, trial_outcome(:, 3) == 12));
+    reach_time = 0.4*targ_len(ix__);
+    targ_loc = trial_outcome(ix__, 2);
+    outcome = trial_outcome(ix__, :);
 end
 
 % %Path length
@@ -167,6 +191,11 @@ tapping_time_day_save = {};
 
 for i=1:length(targs)
     ix = find(targ_loc==targs(i));
+    out = outcome(ix, :);
+    
+    ixr = find(out(:, 3) == 9);
+    ixt = find(out(:,3) == 12);
+    
     rch_t = reach_time(ix);
     
     if strcmp(task, 'target_tapping')
@@ -174,7 +203,16 @@ for i=1:length(targs)
         bl_t = bool_rt_trunc(ix);
     end
     
-    t_t = rew_time(ix);
+    out2 = outcome(outcome(:, 3) == 9, :);
+    ix0 = find(out2(:, 2) == targs(i));
+    assert(length(ixr) == length(ix0));
+    t_r = rew_time(ix0);
+    
+    t_o = .4*(out(ixt, 1) - (rch_t(ixt)/.4)');
+    
+    t_t = zeros(length(ix), 1);
+    t_t(ixr) = t_r;
+    t_t(ixt) = t_o;
     
     if rem_targ_faster_than_n_secs > 0
         ix_n = rch_t > rem_targ_faster_than_n_secs;
@@ -183,39 +221,43 @@ for i=1:length(targs)
     end
     
     %%%%%%%%% Save Perc. Corr. By Targ %%%%%
-    mins_per_epoch = 5;
-    epoch_step = round(mins_per_epoch*60/0.4);
-    end_ = trial_outcome(end, 1);
-    epoch_ix = 1:epoch_step:end_;
-    
-    unique_targs = sort(unique(trial_outcome(:,2)));
-    perc_corr = zeros(length(unique_targs), length(epoch_ix)-1);
-    avg_beta_power = zeros(length(epoch_ix)-1, 1);
-    
-    for e=1:length(epoch_ix(1:end-1))
-        avg_beta_power(e) = mean(mean(FT(epoch_ix(e):epoch_ix(e+1), :)));
-        time_ix = find(and(trial_outcome(:,1)<=epoch_ix(e+1), trial_outcome(:,1)>epoch_ix(e)));
-        
-        for t=1:length(unique_targs)
-            targ_ix = find(trial_outcome(time_ix,2)==unique_targs(t));
-            if ~isempty(targ_ix)
-                outcome = trial_outcome(time_ix(targ_ix), 3);
-                perc_corr(t, e) = length(outcome(outcome==9))/length(outcome);
-            end
-        end
-    end
+%     mins_per_epoch = 5;
+%     epoch_step = round(mins_per_epoch*60/0.4);
+%     end_ = trial_outcome(end, 1);
+%     epoch_ix = 1:epoch_step:end_;
+%     
+%     unique_targs = sort(unique(trial_outcome(:,2)));
+%     perc_corr = zeros(length(unique_targs), length(epoch_ix)-1);
+%     avg_beta_power = zeros(length(epoch_ix)-1, 1);
+%     
+%     for e=1:length(epoch_ix(1:end-1))
+%         avg_beta_power(e) = mean(mean(FT(epoch_ix(e):epoch_ix(e+1), :)));
+%         time_ix = find(and(trial_outcome(:,1)<=epoch_ix(e+1), trial_outcome(:,1)>epoch_ix(e)));
+%         
+%         for t=1:length(unique_targs)
+%             targ_ix = find(trial_outcome(time_ix,2)==unique_targs(t));
+%             if ~isempty(targ_ix)
+%                 outcome = trial_outcome(time_ix(targ_ix), 3);
+%                 perc_corr(t, e) = length(outcome(outcome==9))/length(outcome);
+%             end
+%         end
+%     end
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %Figure 1, NF Target Time
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     figure(1);
-    subplot(4,1 ,i)
+    subplot(2, 1 ,i)
     plot(t_t(ix_n)/60, rch_t(ix_n),'.','color',cmap{i},'markersize', 20)
+    hold on;
+    out_ix = find(out(ix_n, 3) == 12);
+    plot(t_t(ix_n(out_ix))/60, rch_t(ix_n(out_ix)),'k.','markersize', 15)
+    
     disp(strcat('How long target is on: Target: ',num2str(targs(i)), ' Mean: ',...
         num2str(mean(rch_t(ix_n))), 'SEM: ', num2str(std(rch_t(ix_n))/sqrt(length(ix_n)))))
     nf_time2targ_save{i} =  rch_t(ix_n);
-    
+    ylim([0, 80])
     mx= max(rch_t(ix_n));
     %legend(['Target ' num2str(targs(i))])
     hold on
@@ -256,8 +298,8 @@ for i=1:length(targs)
                 hold on;
                 plot(xhat, yhat2, '--', 'linewidth', 2, 'color', cmap{i})
                 
-                txt = strcat('slp pv: ', num2str(linfit.tstat.pval(2)));
-                text(mean(xhat), max(rch_t(ix_n)), txt)
+                %txt = strcat('slp pv: ', num2str(linfit.tstat.pval(2)));
+                %text(mean(xhat), max(rch_t(ix_n)), txt)
             end
             
         end
@@ -266,7 +308,7 @@ for i=1:length(targs)
     xlim([0, (max(t_t)*1.1)/60])
     ylim([0, max(rch_t(ix_n))*1.1])
     try
-        title(['Target ' num2str(targs(i)) ': p = ' num2str(round(pv_slope*1000)/1000) ' slp=' num2str(linfit.beta(2))])
+        title(['Target ' num2str(targs(i))])% ': p = ' num2str(round(pv_slope*1000)/1000) ' slp=' num2str(linfit.beta(2))])
     catch
         title(['Target ' num2str(targs(i))])
     end
