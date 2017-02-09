@@ -48,10 +48,10 @@ if ~isempty(data)
     
         if snd
             z = randperm(length(handles.reward_sounds.file));
-            ix = z(1);
+            ix2 = z(1);
 
-            y = handles.reward_sounds.file{ix};
-            params = handles.reward_sounds.params{ix};
+            y = handles.reward_sounds.file{ix2};
+            params = handles.reward_sounds.params{ix2};
             sound(y, params(1), params(2));
         end
     end
