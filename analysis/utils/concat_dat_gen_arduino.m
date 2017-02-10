@@ -113,22 +113,43 @@ T0 = t(1);
 [mn, ix_d] = min(abs(T_dat2 - T0));
 
 if mn < .2
+    %Segments close by beginning of arduino stat
     if ix_d > 1
+        %Where only partially in 'arduino part'
         aft_ix = floor((length(T_dat2) - ix_d)*.4*fs);
         bef_ix = floor(ix_d*.4*fs);
         mix = zeros(aft_ix+bef_ix, size(m, 2));
         mix(1:bef_ix, :) = nan;
         mix(bef_ix:bef_ix+aft_ix, :) = m(1:aft_ix, :);
     else
-        t0 = T_dat(1);
+        % Where all within 'arduino'
+        t0 = T_dat2(1);
         [mn, ix_d] = min(abs(t - t0));
-        nix = length(ix_d)*.4*fs;
+        nix = length(T_dat2)*.4*fs;
         mix = m(ix_d:ix_d+nix, :);
     end
 else
-    mix = zeros(length(ix_d)*.4*fs, size(m, 2));
-    mix(:, :) = nan;
+    % Segments far away from arduino start
+    if ix_d == 1
+        % Segment far, into arduino
+        t0 = T_dat2(1);
+        [mn, ix_d] = min(abs(t - t0));
+        nix = length(T_dat2)*.4*fs;
+        try
+            mix = m(ix_d:ix_d+nix, :);
+        catch
+            % If too close to the end: 
+            mix = zeros(nix, size(m, 2));
+            mix(:, :) = nan;
+            nn = size(m, 1) - ix_d + 1 ; 
+            mix(1:nn, :) = m(ix_d:end, :);
+        end
+    else
+        % segments far, outside arduino
+        mix = zeros(length(ix_d)*.4*fs, size(m, 2));
+        mix(:, :) = nan;
+    end
+    
 end
 
 end
-

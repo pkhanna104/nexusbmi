@@ -182,8 +182,13 @@ if and(isprop(handles.task,'ard'), get(handles.ard_check,'Value'))
             x = 'continue';
             fprintf(fID,'%s', x );
             fclose(fID);
-            
+         
             [fname_txt, handles] = get_data_fname('txt', handles);
+            
+            % If needed: 
+            c = parcluster('local');
+            delete(c.Jobs);
+            
             serial_job = batch('run_slim_arduino', 0, {fname_txt, com_port, handles.tic}, 'matlabpool', 1);
             fprintf('Sent Arduino to separate process\n')
         end

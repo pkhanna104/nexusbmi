@@ -19,13 +19,13 @@ for trl = 1:length(trial_outcome)
             ard = dat_ix_to_ard_ix_fcn(ix);
             subplot(2, 1, 1); hold all;
             plot( ard(:, 6)+offs)
-            offs = offs + 75;
+            offs = offs + 500;
         elseif trial_outcome(trl, 2) == -6
             ix = [trial_outcome(trl, 4):1:trial_outcome(trl, 5)];
             ard = dat_ix_to_ard_ix_fcn(ix);
             subplot(2, 1, 2); hold all;
             plot( ard(:, 6)+offs2)
-            offs2 = offs2 + 75;
+            offs2 = offs2 + 500;
         end
         
     end
