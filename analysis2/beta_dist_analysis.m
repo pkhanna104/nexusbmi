@@ -89,7 +89,7 @@ for d = 1:length(date)
     beta_pxx = (beta_pxx -  move_data.(strcat('d', date{d})).mean);%/ move_data.(strcat('d', date{d})).std;
     bpxx  =[bpxx beta_pxx];
 end
-
+bpxx = bpxx(:, 2:end);
 db = struct();
 bcnt = 1;
 for d = 1:length(date)
@@ -177,7 +177,7 @@ end
 
 figure(2); plot(median_d(1:end-1), '.');
 lm = fitlm(1:bcnt-1,median_d(1:end-1)','linear');
-P = polyfit(1:bcnt-1, median_d(1:end-1), 1);
+P = polyfit(1:bcnt-1, median_d(1:end-1)', 1);
 plot(1:bcnt-1, polyval(P, 1:bcnt-1), 'b-')
 
 % [h, i] = hist(db.(strcat('d', date{d})).tapping_beta, bins);
