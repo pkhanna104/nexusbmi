@@ -89,7 +89,7 @@ for i = 1:3
         xlabel('Mean T2T')
     end
 end
-
+% 
 figure;
 ax = plot(mean(mean_t2t([1, 3], :), 1), avg_beta_power(:, 2), '.');
 hold all;
@@ -118,6 +118,21 @@ p = plt_lin_reg(ax, var_beta_power(:, 2),  var_beta_power(:, 1));
 title(strcat('Lin Reg. Sig. p = ', num2str(p)))
 xlabel('STN Beta Variance')
 ylabel('M1 Beta Variance')
+
+% figure;
+% plot( avg_beta_power(:, 2),  avg_beta_power(:, 1), '.'); hold all;
+% p = plt_lin_reg([], avg_beta_power(:, 2),  avg_beta_power(:, 1));
+% title(strcat('Lin Reg. Sig. p = ', num2str(p)))
+% xlabel('STN Beta Power')
+% ylabel('M1 Beta Power')
+% 
+% figure;
+% plot( avg_beta_power(:, 2),  var_beta_power(:, 1), '.'); hold all;
+% p = plt_lin_reg([], avg_beta_power(:, 2),  var_beta_power(:, 1));
+% title(strcat('Lin Reg. Sig. p = ', num2str(p)))
+% xlabel('STN Beta Power')
+% ylabel('M1 Beta Power Variance')
+
 
 
 

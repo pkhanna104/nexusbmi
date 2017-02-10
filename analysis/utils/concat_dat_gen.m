@@ -72,11 +72,13 @@ for di = 1:length(dates)
         alpha = blocks{di}(ai);
         fname = [dir 'data' slash 'dat' date alpha '_.mat'];
         fname2 = [dir 'data2' slash 'dat' date alpha '_.mat'];
+        
         try
             load(fname)
         catch
             load(fname2)
         end
+        
         %Get tslice in indices:
         tsl = tslice{di}{ai};
         [tsl_start, tsl_stop] = get_tslice_ix(dat, tsl, tslice_opt, trim_n_targs);
@@ -217,6 +219,7 @@ if size(FT, 2) < 3
 end
 PXX_CHAN = {PXX_CHAN1, PXX_CHAN2};
 end
+
 
 function time2rew2 = get_rew_timez(dat, rew_times)
 time2rew2 = [];

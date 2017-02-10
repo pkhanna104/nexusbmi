@@ -31,19 +31,21 @@ for i = 1:length(targ_locs)
     end
     
     if ~isempty(align_ix)
-        ft_mat = zeros(length(align_ix), 10);
+        ft_mat = zeros(length(align_ix), 19);
         for r = 1:length(align_ix)
             rw = align_ix(r);
-            if rw<length(FT)-9
-                ft_mat(r,:) = FT(rw:rw+9);
-            else
-                ft_mat(r,1:length(FT)-rw) = FT(rw:end);
+            if and(rw > 10, rw<length(FT)-9)
+                ft_mat(r,:) = FT(rw-9:rw+9);
+            elseif rw > (length(FT)-9)
+                ft_mat(r,1:length(FT(rw-9:end))) = FT(rw-9:end);
+            elseif rw < 10
+                ft_mat(r,end -length(FT(1:rw+9))+1:end) = FT(1:rw+9);
             end
         end
         ft_mat(ft_mat==0) = nan;
         sem=nanstd(ft_mat,0, 1)/sqrt(size(ft_mat,1));% standa
         mn = nanmean(ft_mat, 1);
-        t = [0:.4:.4*9];
+        t = [-.4*9:.4:.4*9];
         
         errorbar(gca, t, mn -mn(end), sem,'color',daycol,'LineWidth',3,'MarkerSize',30)
     end
