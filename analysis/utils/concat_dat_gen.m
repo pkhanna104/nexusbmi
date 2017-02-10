@@ -44,19 +44,23 @@ ind_offs = 0;
 %Check if dates are in cell format: {'050815', '050815'} or string format:
 %'050815'
 
-if and(length(dates)==6, length(dates)==6)
-    dates = {dates};
-    tslice = {tslice};
-    blocks = {blocks};
-    
-elseif length(dates{1})==6
-    %nothing happens.
-else
-    msgID = 'Dates in wrong format';
-    msg = 'Dates must be either a single string or a cell array with string entries';
-    baseException = MException(msgID,msg);
-    throw(baseException)
+try
+    if length(dates{1})==6;
+        %nothing happens.
+    else
+        msgID = 'Dates in wrong format';
+        msg = 'Dates must be either a single string or a cell array with string entries';
+        baseException = MException(msgID,msg);
+        throw(baseException)
+    end
+catch
+    if and(length(dates)==6, length(dates)==6)
+        dates = {dates};
+        tslice = {tslice};
+        blocks = {blocks};
+    end
 end
+
 
 %Stack data:
 for di = 1:length(dates)
@@ -105,7 +109,7 @@ for di = 1:length(dates)
                 else
                     cnt = cnt + 1;
                 end
-
+                
                 if cnt > length(states)
                     tap_search = 0;
                     task = 'target_task';
@@ -161,7 +165,7 @@ for di = 1:length(dates)
         end
         CURS = [CURS; cursor(tsl_start:tsl_stop)];
         timeout_tm = [timeout_tm; dat.timeoutTime(tsl_start:tsl_stop)];
-
+        
         rews = rew_inds(rew_inds>=tsl_start & rew_inds<= tsl_stop);
         blk_rews = rews-tsl_start+ind_offs';
         
@@ -170,14 +174,14 @@ for di = 1:length(dates)
         [outcomez, targ_lenz, bool_rt_blk] = get_trial_outcome(dat, ind_offs, task);
         trial_outcome = [trial_outcome; outcomez];
         bool_rt = [bool_rt bool_rt_blk];
-            
-            
+        
+        
         if length(find(outcomez(:,3)==9)) ~= length(blk_rews)
             disp('ERROR : Wrong number of blk_rews compared to trial_outcome')
         end
-            
+        
         targ_len = [targ_len, targ_lenz];
-
+        
         taps = tapping_start_offset(rew_inds>=tsl_start & rew_inds<= tsl_stop,:);
         TAPPING_IX = [ TAPPING_IX; taps];
         time2rew = [time2rew rew_times(rew_inds>=tsl_start & rew_inds<= tsl_stop)];
@@ -203,7 +207,7 @@ for di = 1:length(dates)
             end
         end
         ind_offs = ind_offs+(tsl_stop - tsl_start)+1;
-        idx = [idx (tsl_stop - tsl_start)];
+        idx = [idx (tsl_stop - tsl_start + 1)];
         
     end
 end
