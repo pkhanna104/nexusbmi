@@ -25,50 +25,60 @@ c_idx = cumsum(idx);
 
 for d = 1:length(date)
     for b = 1:length(blocks{d})
-        
         fname = [dir 'data2' slash 'txt' date{d} blocks{d}(b) '__ard.txt'];
         fname2 = [dir 'data2' slash 'dat' date{d} blocks{d}(b) '_.mat'];
         
         try
             M = dlmread(fname, ',', 1, 0);
-            load(fname2);
-            ix = size(M, 1);
-            ard_idx{d} = [ard_idx{d} ix];
+            arduino = true;
+        catch
+            arduino = false;
+        end
+        
+        if arduino
             
-            %Resample at desired sampling rate:
             m = [];
+            %Resample at desired sampling rate:
             for i=2:size(M, 2)
-                %[mi, mt] = resample(M(:, i), M(:, 1), Fs);
                 mt = [M(1, 1):1/Fs:M(end, 1)]';
                 mi = interp1(M(:, 1), M(:, i), mt);
                 
                 if i == 2
                     m = [mt];
                 end
-                
                 m = [ m mi];
             end
+            ix = size(m, 1);
             
             M_master = [M_master; m];
-            
-            tsl = tslice{d}{b};
-            [tsl_start, tsl_stop] = get_tslice_ix(dat, tsl, tslice_opt, trim_n_targs);
             if bcnt > 1
                 T_master = [T_master; T_dat(end)+m(:,1)];
-                T_dat = [T_dat; T_dat(end)+dat.rawdata_abs_time(tsl_start:tsl_stop)'];
-                
             elseif bcnt == 1
-                T_dat = dat.rawdata_abs_time(tsl_start:tsl_stop)';
                 T_master = m(:,1);
             end
-            assert(length(T_dat) == c_idx(bcnt));
-        catch
+            ard_idx{d} = [ard_idx{d} ix];
+            
+        else
             ard_idx{d} = [ard_idx{d} 0];
         end
         
+        load(fname2);
+        tsl = tslice{d}{b};
+        [tsl_start, tsl_stop] = get_tslice_ix(dat, tsl, tslice_opt, trim_n_targs);
+        if bcnt > 1
+            T_dat = [T_dat; T_dat(end)+dat.rawdata_abs_time(tsl_start:tsl_stop)'];
+            
+        elseif bcnt == 1
+            T_dat = dat.rawdata_abs_time(tsl_start:tsl_stop)';
+            
+        end
+        assert(length(T_dat) == c_idx(bcnt));
         bcnt = bcnt + 1;
+        
     end
+    
 end
+
 disp('done!')
 f = @(idxx) fcn_key(idxx, ard_idx, M_master, T_master, T_dat, blocks, date, Fs, c_idx);
 end
@@ -76,7 +86,7 @@ end
 function mix = fcn_key(idx, ard_idx, M_master, T_master, T_dat, blocks, dates, fs, c_idx)
 
 % Inputs: idx (4500:4550 --> cumulative index)
-%         ard_ix, cell array of indices
+%         dat_ix, cell array of indices --> want arduino indices from this
 %         M_master, matrix of values
 %         T_master, M_master(:, 1)
 %         T_dat, cumulative dat.rawdata_abs_value
@@ -84,7 +94,6 @@ function mix = fcn_key(idx, ard_idx, M_master, T_master, T_dat, blocks, dates, f
 %`        dates = {'020217', '020317', ...}
 
 % We get the arduino indices from the block / date:
-
 i = find(c_idx > idx(end));
 i = i(1);
 
@@ -92,7 +101,11 @@ ard_ix_sub = [-1 0];
 bcnt = 1;
 for d = 1:length(dates)
     for b = 1:length(blocks{d})
-        ard_ix_sub = [ard_ix_sub(end)+1:ard_ix_sub(end)+ard_idx{d}(b)];
+        if ard_idx{d}(b) == 0
+            ard_ix_sub = ard_ix_sub(end);
+        else
+            ard_ix_sub = [ard_ix_sub(end)+1:ard_ix_sub(end)+ard_idx{d}(b)];
+        end
         if bcnt == i
             AIX = ard_ix_sub;
         end
@@ -120,7 +133,7 @@ if mn < .2
         bef_ix = floor(ix_d*.4*fs);
         mix = zeros(aft_ix+bef_ix, size(m, 2));
         mix(1:bef_ix, :) = nan;
-        mix(bef_ix:bef_ix+aft_ix, :) = m(1:aft_ix, :);
+        mix(bef_ix+1:bef_ix+aft_ix, :) = m(1:aft_ix, :);
     else
         % Where all within 'arduino'
         t0 = T_dat2(1);
@@ -138,10 +151,10 @@ else
         try
             mix = m(ix_d:ix_d+nix, :);
         catch
-            % If too close to the end: 
+            % If too close to the end:
             mix = zeros(nix, size(m, 2));
             mix(:, :) = nan;
-            nn = size(m, 1) - ix_d + 1 ; 
+            nn = size(m, 1) - ix_d + 1 ;
             mix(1:nn, :) = m(ix_d:end, :);
         end
     else

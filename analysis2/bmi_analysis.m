@@ -1,11 +1,12 @@
-day = {'020217', '020317', '020617', '020717', '020817', '020917'};
-blocks = {'jklm', 'def', 'defg', 'ghi', 'nop', 'efgh'};
+day = {'020217', '020317', '020617', '020717', '020817', '020917', '021017'};
+blocks = {'jklm', 'def', 'defg', 'ghi', 'nop', 'efgh', 'cd'};
 ix_to_analyze = { {[1, -1], [1, -1], [1, -1], [1, -1]},...
                   {[1, -1], [1, -1], [1, -1]}, ...
                   {[1, -1], [1, -1], [1, -1], [1, -1]},...
                   {[1, -1], [1, -1], [1, -1]},...
                   {[1, -1], [1, -1], [1, -1]},...
                   {[1, -1], [1, -1], [1, -1], [1, -1]},...
+                  {[1, -1], [1, -1]},...
                   };
 % 
 % day = { '020617', '020717', '020817', '020917'};
@@ -29,12 +30,13 @@ rem_targ_faster_than_n_secs = 0;
 % Plot distribution of spec by dat: 
 low_high = [1, 3];
 
-col_dist = [215,25,28;
-253,174,97;
-255,255,191;
-166,217,106;
-26,150,65;
-1,1,1;]/256;
+col_dist = [178,24,43;
+239,138,98;
+253,219,199;
+224,224,224;
+153,153,153;
+77,77,77;
+1, 1, 1]/256;
 
 for d=1:length(day)
     dayz = {day{d}};
@@ -46,7 +48,7 @@ end
 % Plot distributions of beta | target on by day, normalized by movement
 % mean and std. 
 
-move_blocks = {'i', 'c', 'c', 'd', 'm', 'a'};
+move_blocks = {'i', 'c', 'c', 'd', 'm', 'a', 'a'};
 %move_blocks = { 'c', 'd', 'm'};
 beta_dist_analysis(blocks, day, ix_to_analyze, 'ix',...
     trim_n_targs, move_blocks)
@@ -56,12 +58,12 @@ plot_STN(blocks, day, ix_to_analyze, 'ix',...
     trim_n_targs, rem_targ_faster_than_n_secs);
 
 % Post Target Beta desynchronization
-col_dist = [215,25,28;
-253,174,97;
-120,120,120;
-166,217,106;
-26,150,65;
-1,1,1]/256;
+% col_dist = [215,25,28;
+% 253,174,97;
+% 120,120,120;
+% 166,217,106;
+% 26,150,65;
+% 1,1,1]/256;
 
 for d=1:length(day)
     dayz = {day{d}};
@@ -70,15 +72,28 @@ for d=1:length(day)
     beta_desynch_tapping(blockz, dayz, ix_to_analyzez, 'ix', trim_n_targs, low_high, col_dist(d, :));
 end
 
-beta_desynch_tapping(blocks, day, ix_to_analyze, 'ix', trim_n_targs, low_high, col_dist(d, :));
+beta_desynch_tapping(blocks, day, ix_to_analyze, 'ix', trim_n_targs,...
+    low_high, col_dist(d, :));
 
-day = {'020317'};
-blocks = {'def'};
-ix_to_analyze = { {[1, -1], [1, -1], [1, -1]}};
+
+% Remove days / blocks/ w/p arduino files
+day = {'020217', '020317', '020617', '020717', '020817', '020917', '021017'};
+blocks = {'jklm', 'def', 'defg', 'g', 'no', 'efgh', 'cd'};
+ix_to_analyze = { {[1, -1], [1, -1], [1, -1], [1, -1]},...
+                  {[1, -1], [1, -1], [1, -1]}, ...
+                  {[1, -1], [1, -1], [1, -1], [1, -1]},...
+                  {[1, -1]},...
+                  {[1, -1], [1, -1]},...
+                  {[1, -1], [1, -1], [1, -1], [1, -1]},...
+                  {[1, -1], [1, -1]},...
+                  };
 ard_Fs = 50; % Hz
 trim_n_targs = 0;
 
 % Arduino Analysis: 
-extract_arduino_tapping_mets(blocks, day, ix_to_analyze, 'ix',...
+[mets, trial_outcome] = extract_arduino_tapping_mets(blocks, day, ix_to_analyze, 'ix',...
     trim_n_targs, ard_Fs);
+
+% Arduino plotting
+plot_arduino_metrics(mets, trial_outcome)
 
