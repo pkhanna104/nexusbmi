@@ -59,8 +59,9 @@ for m = 2:length(met_ixs)
     end
 end
 
-figure; 
-for r = 1:1 %:size(rt_consol{1}, 2)
+ 
+for r = 1:3 %:size(rt_consol{1}, 2)
+    figure;
     %subplot(1, size(rt_consol{1}, 2), r); 
     hold on;
     bot = rt_consol{1}(:, r);
