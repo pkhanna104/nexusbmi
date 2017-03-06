@@ -80,13 +80,14 @@ plot_STN(blocks, day, ix_to_analyze, 'ix',...
 
 % Post Target Beta desynchronization
 
-
-for d=1:length(day)
-    dayz = {day{d}};
-    blockz = {blocks{d}};
-    ix_to_analyzez = {ix_to_analyze{d}};
-    beta_desynch_tapping(blockz, dayz, ix_to_analyzez, 'ix', trim_n_targs, low_high, col_dist(d, :));
+hh = [];
+for c=1:3
+    dayz = day(cond{c});
+    blockz = blocks(cond{c});
+    ix_to_analyzez = ix_to_analyze(cond{c});
+    hh(c) = beta_desynch_tapping(blockz, dayz, ix_to_analyzez, 'ix', trim_n_targs, low_high, col_dist(c, :));
 end
+legend(hh, 'Early', 'Med', 'Late')
 
 beta_desynch_tapping(blocks, day, ix_to_analyze, 'ix', trim_n_targs,...
     low_high, col_dist(d, :));
@@ -111,9 +112,12 @@ ard_Fs = 50; % Hz
 trim_n_targs = 0;
 
 % Arduino Analysis: 
-[mets, trial_outcome] = extract_arduino_tapping_mets(blocks, day, ix_to_analyze, 'ix',...
+[mets, hr, lhmet, trial_outcome] = extract_arduino_tapping_mets(blocks, day, ix_to_analyze, 'ix',...
     trim_n_targs, ard_Fs);
 
 % Arduino plotting
 plot_arduino_metrics(mets, trial_outcome)
+
+% HR plotting: 
+plot_arduino_hr(hr, trial_outcome)
 

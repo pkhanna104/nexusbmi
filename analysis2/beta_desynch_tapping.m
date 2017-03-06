@@ -1,4 +1,4 @@
-function beta_desynch_tapping(blocks, date, tslice, tslice_opt, trim_n_targs,...
+function hhh = beta_desynch_tapping(blocks, date, tslice, tslice_opt, trim_n_targs,...
     low_high, daycol)
 
 % Inputs: See 'concat_dat_gen' for description / format of inputs
@@ -47,7 +47,7 @@ for i = 1:length(targ_locs)
         mn = nanmean(ft_mat, 1);
         t = [-.4*9:.4:.4*9];
         
-        errorbar(gca, t, mn -mn(end), sem,'color',daycol,'LineWidth',3,'MarkerSize',30)
+        hhh = errorbar(gca, t, mn -mn(end), sem,'color',daycol,'LineWidth',3,'MarkerSize',30);
     end
 end
 end

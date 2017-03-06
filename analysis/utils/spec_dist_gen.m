@@ -1,4 +1,4 @@
-function spec_dist_gen(blocks, date, tslice, tslice_opt, trim_n_targs,...
+function h00 = spec_dist_gen(blocks, date, tslice, tslice_opt, trim_n_targs,...
     low_high, daycol)
 
 % Inputs: See 'concat_dat_gen' for description / format of inputs
@@ -52,8 +52,8 @@ if spec_plots_v1
             [n, x] = hist(FT(ix),bins);
             disp([num2str(i) 'mean: ' num2str(nanmean(FT(ix))) ', median: ' num2str(nanmedian(FT(ix)))]);
             norm_n = n/sum(n);
-            plot(gca,x+((i-1)*dbstep),norm_n, '.-','color',cmap{i},'LineWidth',3,'MarkerSize',30)
-            leg{length(leg)+1} = strcat('Targ: ', num2str(targ_locs(i)));
+            %plot(gca,x+((i-1)*dbstep),norm_n, '.-','color',cmap{i},'LineWidth',3,'MarkerSize',30)
+            %leg{length(leg)+1} = strcat('Targ: ', num2str(targ_locs(i)));
         end
     end
     xlabel('Beta Power','FontSize',20)
@@ -98,7 +98,7 @@ if spec_plots_v1
             mn = nanmean(ft_mat, 1);
             
             t = [.4*-5:.4:0];
-            errorbar(gca, t, mn-mn(1), sem,'color',daycol,'LineWidth',3,'MarkerSize',30)
+            h00 = errorbar(gca, t, mn-mn(1), sem,'color',daycol,'LineWidth',3,'MarkerSize',30)
             leg2{length(leg2)+1} = strcat('Targ: ', num2str(targ_locs(i)));
             ft_stats = [ft_stats; ft_mat];
             grp_stats = [grp_stats ones(1,size(ft_mat,1))+i];

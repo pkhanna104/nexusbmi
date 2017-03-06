@@ -57,7 +57,7 @@ for t =1:length(targ_next_state)
         end_tapping = targ_end;
         
     end
-    outcome = [outcome ; targ_start(t)+ix_add targ_pos(t) code targ_end+ix_add end_tapping+ix_add];
+    outcome = [outcome ; targ_start(t)+ix_add targ_pos(t) code targ_end+ix_add end_tapping+ix_add targ_start(t)];
     final_targ_len = [final_targ_len targ_len(t)];
     bool_rt = [bool_rt 0];
 end
