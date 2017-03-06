@@ -35,23 +35,36 @@ rem_targ_faster_than_n_secs = 0;
 % Plot distribution of spec by dat: 
 low_high = [1, 3];
 
-col_dist = [158,1,66;
-213,62,79;
-244,109,67;
-253,174,97;
-254,224,139;
-230,245,152;
-171,221,164;
-102,194,165;
-50,136,189;
-94,79,162;]/255;
+% col_dist = [158,1,66;
+% 213,62,79;
+% 244,109,67;
+% 253,174,97;
+% 254,224,139;
+% 230,245,152;
+% 171,221,164;
+% 102,194,165;
+% 50,136,189;
+% 94,79,162;]/255;
 
-for d=1:length(day)
-    dayz = {day{d}};
-    blockz = {blocks{d}};
-    ix_to_analyzez = {ix_to_analyze{d}};
-    spec_dist_gen(blockz, dayz, ix_to_analyzez, 'ix', trim_n_targs, low_high, col_dist(d, :));
+col_dist = [228,26,28;
+55,126,184;
+77,175,74]/255;
+
+cond = {};
+cond{1} = 1:3;
+cond{2} = 4:6;
+cond{3} =7:10;
+
+h=[];
+
+for c = 1:3
+    dayz = day(cond{c});
+    blockz = blocks(cond{c});
+    ix_to_analyzez = ix_to_analyze(cond{c});
+    h(c) = spec_dist_gen(blockz, dayz, ix_to_analyzez, 'ix', trim_n_targs,...
+        low_high, col_dist(c, :));
 end
+legend(h, 'Early', 'Med', 'Late')
 
 % Plot distributions of beta | target on by day, normalized by movement
 % mean and std. 

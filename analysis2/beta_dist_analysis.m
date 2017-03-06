@@ -149,7 +149,7 @@ for d = 1:bcnt-1
         
         [h_h, i] = hist(H, bins);
         medh = nanmedian(H);
-        [h_t, i] = hist(T, bins);
+        %[h_t, i] = hist(T, bins);
         
         tm1 = plot(bins, h_l/sum(h_l)); hold all;
         plot([medl, medl], [0, .3], 'color', get(tm1, 'Color'));
@@ -176,9 +176,16 @@ for d = 1:bcnt-1
 end
 
 figure(2); plot(median_d(1:end-1), '.');
-lm = fitlm(1:bcnt-1,median_d(1:end-1)','linear');
-P = polyfit(1:bcnt-1, median_d(1:end-1)', 1);
-plot(1:bcnt-1, polyval(P, 1:bcnt-1), 'b-')
+%lm = fitlm(1:bcnt-1,median_d(1:end-1)','linear');
+
+x0 = [1 -.015];
+x = 1:bcnt-1;
+y = median_d(1:end-1)';
+x1 = lsqcurvefit(@myfun,x0,x,y);
+yhat = myfun(x1, x);
+%plot(1:bcnt-1, polyval(P, 1:bcnt-1), 'b-')
+hold all;
+plot(x, yhat, 'b-')
 
 % [h, i] = hist(db.(strcat('d', date{d})).tapping_beta, bins);
 % plot(i, h/sum(h))
